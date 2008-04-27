@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=2:sts=2:ts=2
+# 2008
 import os
 import sha
 import time

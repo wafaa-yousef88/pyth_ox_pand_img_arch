@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=2:sts=2:ts=2
-# Written 2008 by j@mailb.org
+# 2008
 
 from hashes import *
 from html import *
-from numbers import *
 from text import *
-from timeformat import *
+from format import *
 import net
 import cache
 
