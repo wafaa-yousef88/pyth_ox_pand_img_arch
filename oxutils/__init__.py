@@ -12,7 +12,7 @@ import cache
 
 #only works if BitTornado is installed
 try:
-  from bt import *
+  from torrent import *
 except:
   pass
 
