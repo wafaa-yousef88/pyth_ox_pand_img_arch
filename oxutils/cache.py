@@ -35,7 +35,7 @@ def getUrlCacheFile(url, data=None, headers=DEFAULT_HEADERS):
     url_hash = sha.sha(url + '?' + data).hexdigest()
   else:
     url_hash = sha.sha(url).hexdigest()
-  domain = urlparse.urlparse(url)[1]
+  domain = ".".join(urlparse.urlparse(url)[1].split('.')[-2:])
   return os.path.join(getCacheBase(), domain, url_hash[:2], url_hash[2:4], url_hash[4:6], url_hash)
 
 def loadUrlCache(url_cache_file, data, timeout=cache_timeout):
