@@ -1,0 +1,18 @@
+python-oxutils some tools to build tools
+
+Depends:
+ python2.5
+ python-chardet (http://chardet.feedparser.org/)
+ BitTornado(optional)
+
+Usage:
+ import oxutils
+ 
+ data = oxutils.cache.readUrl('http:/...')
+ text = oxutils.stripTags(data)
+ oxutils.normalizeNewlines(text)
+ oxutils.formatBytes(len(data))
+
+ oxutils.formatBytes(1234567890)
+ '1.15 GB'
+
