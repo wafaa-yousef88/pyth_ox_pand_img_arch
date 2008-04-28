@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=2:sts=2:ts=2
+import gzip
+import StringIO
 import urllib
 import urllib2
 
@@ -18,6 +20,8 @@ def getUrl(url, data=None, headers=DEFAULT_HEADERS):
   f = openUrl(url, data, headers)
   data = f.read()
   f.close()
+  if f.headers.get('content-encoding', None) == 'gzip':
+    data = gzip.GzipFile(fileobj=StringIO.StringIO(data)).read()
   return data
 
 def getUrlUnicode(url):
