@@ -6,6 +6,8 @@ import sha
 import time
 import urlparse
 
+import chardet
+
 import net
 from net import DEFAULT_HEADERS
 

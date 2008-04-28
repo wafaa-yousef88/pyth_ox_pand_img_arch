@@ -46,7 +46,13 @@ def truncateString(s, num):
   if words:
     ts += "..."
   return ts
-    
+
+def trimString(string, num):
+  "Truncates a string after a certain number of chacters, adding ... at -10 characters"
+  if len(string) > num:
+    string = string[:num - 13] + '...' + string[-10:]
+  return string
+
 def truncateWords(s, num):
   "Truncates a string after a certain number of words."
   length = int(num)

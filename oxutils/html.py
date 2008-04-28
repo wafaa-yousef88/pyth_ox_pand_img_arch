@@ -3,6 +3,7 @@
 # GPL written 2008 by j@pad.ma
 import re
 import string
+from htmlentitydefs import name2codepoint
 
 
 # Configuration for urlize() function
@@ -115,6 +116,30 @@ def cleanHtml(text):
   # Remove stuff like "<p>&nbsp;&nbsp;</p>", but only if it's at the bottom of the text.
   text = trailing_empty_content_re.sub('', text)
   return text
+
+# This pattern matches a character entity reference (a decimal numeric
+# references, a hexadecimal numeric reference, or a named reference).
+charrefpat = re.compile(r'&(#(\d+|x[\da-fA-F]+)|[\w.:-]+);?')
+
+def htmldecode(text):
+  """Decode HTML entities in the given text."""
+  if type(text) != unicode:
+   text = unicode(text)[:]
+  if type(text) is unicode:
+    uchr = unichr
+  else:
+    uchr = lambda value: value > 255 and unichr(value) or chr(value)
+  def entitydecode(match, uchr=uchr):
+    entity = match.group(1)
+    if entity.startswith('#x'):
+      return uchr(int(entity[2:], 16))
+    elif entity.startswith('#'):
+      return uchr(int(entity[1:]))
+    elif entity in name2codepoint:
+      return uchr(name2codepoint[entity])
+    else:
+      return match.group(0)
+  return charrefpat.sub(entitydecode, text)
 
 def highlight(text, query, hlClass="hl"):
   if query:
