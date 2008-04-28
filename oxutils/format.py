@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=2:sts=2:ts=2
+import math
 import re
 
 def to36(q):
@@ -45,32 +46,26 @@ def floatValue(strValue, default=''):
     val = default
   return val
 
-"""
-Format the value like a 'human-readable' file size (i.e. 13 KB, 4.1 MB, 102
-bytes, etc).
-  number - number to format.
-  long_name - long name. i.e. byte
-  short - short name, i.e. B
-"""
-def formatNumber(number, long_name, short):
-  if not number:
-    return "0 %ss" % long_name
-  number = float(number)
+def formatNumber(number, longName, shortName):
+  """
+  Return the number in a human-readable format (23 KB, 42.7 MB, 68.77 GB)
+  """
   if number < 1024:
-    return "%d %s%s" % (number, long_name, number != 1 and 's' or '')
-  if number < 1024 * 1024:
-    return "%d K%s" % ((number / 1024), short)
-  if number < 1024 * 1024 * 1024:
-    return "%.1f M%s" % (number / (1024 * 1024), short)
-  if number < 1024 * 1024 * 1024 * 1024:
-    return "%.2f G%s" % (number / (1024 * 1024 * 1024), short)
-  return "%.3f T%s" % (number / (1024 * 1024 * 1024 * 1024), short)
+    return "%d %s%s" % (number, longName, number != 1 and 's' or '')
+  prefix = ['K', 'M', 'G', 'T', 'P']
+  for i in range(5):
+    if number < math.pow(1024, i + 2) or i == 4:
+      return '%.*f %s%s' % (i, bytes / math.pow(1024, i + 1), prefix[i], shortName)
+
+def formatBits(number):
+  return formatNumber(number, 'bit', 'b')
 
 def formatBytes(number):
   return formatNumber(number, 'byte', 'B')
 
-def formatBit(number):
-  return formatNumber(number, 'bit', 'b')
+def formatPixels(number):
+  return formatNumber(number, 'pixel', 'px')
+
 
 '''
 seperate number with thousand comma
