@@ -48,14 +48,28 @@ def floatValue(strValue, default=''):
 
 def formatNumber(number, longName, shortName):
   """
-  Return the number in a human-readable format (23 KB, 42.7 MB, 68.77 GB)
+  Return the number in a human-readable format (23 KB, 23.4 MB, 23.42 GB)
   """
   if number < 1024:
-    return "%d %s%s" % (number, longName, number != 1 and 's' or '')
+    return '%s %s%s' % (formatThousands(number), longName, number != 1 and 's' or '')
   prefix = ['K', 'M', 'G', 'T', 'P']
   for i in range(5):
     if number < math.pow(1024, i + 2) or i == 4:
-      return '%.*f %s%s' % (i, bytes / math.pow(1024, i + 1), prefix[i], shortName)
+      n = number / math.pow(1024, i + 1)
+      return '%s %s%s' % (formatThousands('%.*f' % (i, n)), prefix[i], shortName)
+
+def formatThousands(number, separator = ','):
+  """
+  Return the number with separators (1,000,000)
+  """
+  string = str(number).split('.')
+  l = []
+  for i, character in enumerate(reversed(string[0])):
+    if i and (not (i % 3)):
+      l.insert(0, separator)
+    l.insert(0, character)
+  string[0] = ''.join(l)
+  return '.'.join(string)
 
 def formatBits(number):
   return formatNumber(number, 'bit', 'b')
@@ -65,24 +79,6 @@ def formatBytes(number):
 
 def formatPixels(number):
   return formatNumber(number, 'pixel', 'px')
-
-
-'''
-seperate number with thousand comma
-'''
-def numberThousands(n, sep=','):
-  if n < 1000:
-    return "%s" % n
-  ln = list(str(n))
-  ln.reverse()
-  newn = []
-  while len(ln) > 3:
-    newn.extend(ln[:3])
-    newn.append(sep)
-    ln = ln[3:]
-    newn.extend(ln)
-    newn.reverse()
-  return "".join(newn)
 
 def plural(amount, unit, plural='s'):
   if abs(amount) != 1:
