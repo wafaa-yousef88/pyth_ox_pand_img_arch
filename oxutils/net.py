@@ -14,6 +14,7 @@ DEFAULT_HEADERS = {'User-Agent': 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9
 def openUrl(url, data=None, headers=DEFAULT_HEADERS):
   url = url.replace(' ', '%20')
   req = urllib2.Request(url, data, headers)
+  req.add_header('Accept-Encoding', 'gzip')  
   return urllib2.urlopen(req)
 
 def getUrl(url, data=None, headers=DEFAULT_HEADERS):
