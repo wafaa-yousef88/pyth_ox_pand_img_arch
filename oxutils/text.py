@@ -6,11 +6,10 @@ import re
 
 def findRegexp(string, regexp):
   result = None
-  try:
-    regexp = re.compile(regexp)
-    match = regexp.search(string)
-    if match:
-      result = match.group(1)
+  regexp = re.compile(regexp)
+  match = regexp.search(string)
+  if match:
+    result = match.group(1)
   return result
 
 def findString(string, string0, string1):
