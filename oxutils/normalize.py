@@ -1,7 +1,7 @@
 # -*- Mode: Python; -*-
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=2:sts=2:ts=2
-
+import re
 
 _articles = ('the', 'la', 'a', 'die', 'der', 'le', 'el',
             "l'", 'il', 'das', 'les', 'o', 'ein', 'i', 'un', 'los', 'de',
@@ -50,4 +50,11 @@ def normalizeTitle(title):
       if stitle[-1][-1] in ("'", '-'): sep = ''
       title = '%s%s%s' % (stitle[-1], sep, ', '.join(stitle[:-1]))
   return title
+
+def normalizeImdbId(imdbId):
+  if isinstance(imdbId, basestring):
+    imdbId = re.sub('.*(\d{7}).*', '\\1', imdbId)
+  elif isinstance(imdbId, int):
+    imdbId = "%07d" % imdbId
+  return imdbId
 
