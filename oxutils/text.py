@@ -6,7 +6,7 @@ import re
 
 def findRegexp(string, regexp):
   result = None
-  regexp = re.compile(regexp)
+  regexp = re.compile(regexp, re.DOTALL)
   match = regexp.search(string)
   if match:
     result = match.group(1)
