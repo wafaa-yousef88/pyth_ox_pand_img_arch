@@ -5,18 +5,21 @@ import re
 
 
 def findRegexp(string, regexp):
-  return re.compile(regexp, re.DOTALL).findall(string)
+  result = re.compile(regexp, re.DOTALL).findall(string)
+  if result:
+    return result[0].strip()
+  return None
 
 def findString(string, string0, string1 = ''):
-  string0 = re.escape(string0)
+  if string0:
+    string0 = re.escape(string0)
+  else:
+    string0 = '^'
   if string1:
     string1 = re.escape(string1)
   else:
     string1 = '$'
-  result = findRegexp(string, string0 + '(.*?)' + string1)
-  if result:
-    return result[0].strip()
-  return None
+  return findRegexp(string, string0 + '(.*?)' + string1)
 
 # Capitalizes the first letter of a string.
 capfirst = lambda x: x and x[0].upper() + x[1:]
