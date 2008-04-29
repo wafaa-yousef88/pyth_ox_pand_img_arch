@@ -4,6 +4,18 @@
 import re
 
 
+def findRegexp(string, regexp):
+  result = None
+  try:
+    regexp = re.compile(regexp)
+    match = regexp.search(string)
+    if match:
+      result = match.group(1)
+  return result
+
+def findString(string, string0, string1):
+  return findRegexp(string, re.escape(string0) + '(.*?)' + re.escape(string1))
+
 # Capitalizes the first letter of a string.
 capfirst = lambda x: x and x[0].upper() + x[1:]
 
