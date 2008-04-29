@@ -5,7 +5,6 @@ import re
 
 
 def findRegexp(string, regexp):
-  print string, regexp
   return re.compile(regexp, re.DOTALL).findall(string)
 
 def findString(string, string0, string1 = ''):
