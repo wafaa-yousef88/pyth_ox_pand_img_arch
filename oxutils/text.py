@@ -12,7 +12,7 @@ def findRegexp(string, regexp):
     result = match.group(1)
   return result
 
-def findString(string, string0, string1):
+def findString(string, string0, string1 = ''):
   return findRegexp(string, re.escape(string0) + '(.*?)' + re.escape(string1))
 
 # Capitalizes the first letter of a string.
