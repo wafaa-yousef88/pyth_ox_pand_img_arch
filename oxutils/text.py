@@ -5,18 +5,35 @@ import re
 
 
 def findRegexp(string, regexp):
-  return re.compile(regexp, re.DOTALL).findall(string)
+  result = re.compile(regexp, re.DOTALL).findall(string)
+  if result:
+    return result[0].strip()
+  return None
 
-def findString(string, string0, string1 = ''):
-  string0 = re.escape(string0)
+def findString(string, string0='', string1 = ''):
+  """Return the string between string0 and string1. 
+
+  If string0 or string1 is left out, begining or end of string is used.
+
+  >>> findString('i am not there', string1=' not there')
+  'i am'
+
+  >>> findString('i am not there', 'i am ', ' there')
+  'not'
+
+  >>> findString('i am not there', 'i am not t')
+  'here'
+
+  """
+  if string0:
+    string0 = re.escape(string0)
+  else:
+    string0 = '^'
   if string1:
     string1 = re.escape(string1)
   else:
     string1 = '$'
-  result = findRegexp(string, string0 + '(.*?)' + string1)
-  if result:
-    return result[0].strip()
-  return None
+  return findRegexp(string, string0 + '(.*?)' + string1)
 
 # Capitalizes the first letter of a string.
 capfirst = lambda x: x and x[0].upper() + x[1:]
@@ -158,3 +175,4 @@ def smartSplit(text):
           yield "'" + bit[1:-1].replace("\\'", "'").replace("\\\\", "\\") + "'"
       else:
           yield bit
+
