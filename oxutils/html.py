@@ -122,7 +122,7 @@ def cleanHtml(text):
 charrefpat = re.compile(r'&(#(\d+|x[\da-fA-F]+)|[\w.:-]+);?')
 
 def decodeHtml(html):
-    return htmldecode(text)
+    return htmldecode(html)
 
 def htmldecode(text):
   """Decode HTML entities in the given text."""
