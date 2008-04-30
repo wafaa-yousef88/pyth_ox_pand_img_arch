@@ -5,8 +5,10 @@ import os
 import sha
 import time
 import urlparse
+import urllib2
 
 import chardet
+import simplejson
 
 import net
 from net import DEFAULT_HEADERS
@@ -14,20 +16,44 @@ from net import DEFAULT_HEADERS
 
 cache_timeout = 30*24*60*60 # default is 30 days
 
+def status(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout):
+  headers = getHeaders(url, data, headers)
+  return int(headers['status'])
+
+def exists(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout):
+  s = status(url, data, headers, timeout)
+  if s >= 200 and s < 400:
+    return True
+  return False
+
+def getHeaders(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout):
+  url_cache_file = "%s.headers" % getUrlCacheFile(url, data, headers)
+  url_headers = loadUrlCache(url_cache_file, timeout)
+  if url_headers:
+    url_headers = simplejson.loads(url_headers)
+  else:
+    url_headers = net.getHeaders(url, data, headers)
+    saveUrlHeaders(url_cache_file, url_headers)
+  return url_headers
+
+def getUrl(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout):
+  url_cache_file = getUrlCacheFile(url, data, headers)
+  result = loadUrlCache(url_cache_file, timeout)
+  if not result:
+    try:
+      url_headers, result = net.getUrl(url, data, headers, returnHeaders=True)
+    except urllib2.HTTPError, e:
+      url_headers = dict(e.headers)
+      result = e.read()
+    saveUrlCache(url_cache_file, result, url_headers)
+  return result
+
 def getUrlUnicode(url):
   data = getUrl(url)
   encoding = chardet.detect(data)['encoding']
   if not encoding:
     encoding = 'latin-1'
   return unicode(data, encoding)
-
-def getUrl(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout):
-  url_cache_file = getUrlCacheFile(url, data, headers)
-  result = loadUrlCache(url_cache_file, timeout)
-  if not result:
-    result = net.getUrl(url, data, headers)
-    saveUrlCache(url_cache_file, result)
-  return result
 
 def getCacheBase():
   'cache base is eather ~/.ox/cache or can set via env variable oxCACHE'
@@ -41,7 +67,7 @@ def getUrlCacheFile(url, data=None, headers=DEFAULT_HEADERS):
   domain = ".".join(urlparse.urlparse(url)[1].split('.')[-2:])
   return os.path.join(getCacheBase(), domain, url_hash[:2], url_hash[2:4], url_hash[4:6], url_hash)
 
-def loadUrlCache(url_cache_file, data, timeout=cache_timeout):
+def loadUrlCache(url_cache_file, timeout=cache_timeout):
   if timeout <= 0:
     return None
   if os.path.exists(url_cache_file):
@@ -55,11 +81,20 @@ def loadUrlCache(url_cache_file, data, timeout=cache_timeout):
       return data
   return None
 
-def saveUrlCache(url_cache_file, data):
+def saveUrlCache(url_cache_file, data, headers):
   folder = os.path.dirname(url_cache_file)
   if not os.path.exists(folder):
     os.makedirs(folder)
   f = open(url_cache_file, 'w')
   f.write(data)
+  f.close()
+  saveUrlHeaders("%s.headers" % url_cache_file, headers)
+
+def saveUrlHeaders(url_cache_file, headers):
+  folder = os.path.dirname(url_cache_file)
+  if not os.path.exists(folder):
+    os.makedirs(folder)
+  f = open(url_cache_file, 'w')
+  f.write(simplejson.dumps(headers))
   f.close()
 
