@@ -121,6 +121,9 @@ def cleanHtml(text):
 # references, a hexadecimal numeric reference, or a named reference).
 charrefpat = re.compile(r'&(#(\d+|x[\da-fA-F]+)|[\w.:-]+);?')
 
+def decodeHtml(html):
+    return htmldecode(text)
+
 def htmldecode(text):
   """Decode HTML entities in the given text."""
   if type(text) != unicode:
