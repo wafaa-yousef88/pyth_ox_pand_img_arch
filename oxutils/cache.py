@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=2:sts=2:ts=2
 # 2008
+import gzip
+import StringIO
 import os
 import sha
 import time
@@ -43,13 +45,16 @@ def getUrl(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout):
     try:
       url_headers, result = net.getUrl(url, data, headers, returnHeaders=True)
     except urllib2.HTTPError, e:
+      e.headers['Status'] = "%s" % e.code
       url_headers = dict(e.headers)
       result = e.read()
+      if url_headers.get('content-encoding', None) == 'gzip':
+        result = gzip.GzipFile(fileobj=StringIO.StringIO(result)).read()
     saveUrlCache(url_cache_file, result, url_headers)
   return result
 
-def getUrlUnicode(url):
-  data = getUrl(url)
+def getUrlUnicode(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout, _getUrl=getUrl):
+  data = _getUrl(url, data, headers, timeout)
   encoding = chardet.detect(data)['encoding']
   if not encoding:
     encoding = 'latin-1'
