@@ -142,7 +142,7 @@ def htmldecode(text):
       return uchr(name2codepoint[entity])
     else:
       return match.group(0)
-  return charrefpat.sub(entitydecode, text)
+  return charrefpat.sub(entitydecode, text).replace(u'\xa0', ' ')
 
 def highlight(text, query, hlClass="hl"):
   if query:
