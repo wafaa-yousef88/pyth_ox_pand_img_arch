@@ -21,12 +21,18 @@ def getInfoHash(torrentFile):
   info = metainfo['info']
   return sha.sha(bencode(info)).hexdigest().upper()
 
-def getTorrentInfo(torrentFile):
+def getTorrentInfoFromFile(torrentFile):
+  f = open(torrentFile, 'rb')
+  data = f.read()
+  f.close()
+  tinfo = getTorrentInfo(data)
+  tinfo['timestamp'] = stat(torrentFile).st_ctime
+  return tinfo
+
+def getTorrentInfo(data):
   "Returns Torrent Info from torrent file"
   tinfo = {}
-  metainfo_file = open(torrentFile, 'rb')
-  metainfo = bdecode(metainfo_file.read())
-  metainfo_file.close()
+  metainfo = bdecode(data)
   info = metainfo['info']
   piece_length = info['piece length']
   if info.has_key('length'):
@@ -42,9 +48,15 @@ def getTorrentInfo(torrentFile):
           path = path + "/"
         path = path + item
         file_length += file['length']
+  for key in info:
+    if key != 'pieces':
+      tinfo[key] = info[key]
+  for key in metainfo:
+    if key != 'info':
+      tinfo[key] = metainfo[key]
   tinfo['size'] = file_length
   tinfo['hash'] = sha.sha(bencode(info)).hexdigest()
-  tinfo['timestamp'] = stat(torrentFile).st_ctime
+  tinfo['announce'] = metainfo['announce']
   return tinfo
 
 def getTorrentSize(torrentFile):
