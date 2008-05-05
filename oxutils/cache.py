@@ -19,10 +19,22 @@ from net import DEFAULT_HEADERS
 cache_timeout = 30*24*60*60 # default is 30 days
 
 def status(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout):
+  '''
+    >>> status('http://google.com')
+    200
+    >>> status('http://google.com/mysearch')
+    404
+  '''
   headers = getHeaders(url, data, headers)
   return int(headers['status'])
 
 def exists(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout):
+  '''
+    >>> exists('http://google.com')
+    True
+    >>> exists('http://google.com/mysearch')
+    False
+  '''
   s = status(url, data, headers, timeout)
   if s >= 200 and s < 400:
     return True

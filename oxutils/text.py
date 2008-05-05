@@ -66,7 +66,14 @@ def wrap(text, width):
                 )
 
 def truncateString(s, num):
-  "Truncates a string after a certain number of chacters, but ends with a word"
+  """Truncates a string after a certain number of chacters, but ends with a word
+
+  >>> truncateString('Truncates a string after a certain number of chacters, but ends with a word', 23)
+  'Truncates a string...'
+  >>> truncateString('Truncates a string', 23)
+  'Truncates a string'
+
+  """
   length = int(num)
   if len(s) <= length:
     return s
@@ -76,10 +83,16 @@ def truncateString(s, num):
     ts += " " + words.pop(0)
   if words:
     ts += "..."
-  return ts
+  return ts.strip()
 
 def trimString(string, num):
-  "Truncates a string after a certain number of chacters, adding ... at -10 characters"
+  """Truncates a string after a certain number of chacters, adding ... at -10 characters
+
+  >>> trimString('Truncates a string after a certain number of chacters', 23)
+  'Truncates ...f chacters'
+  >>> trimString('Truncates a string', 23)
+  'Truncates a string'
+  """
   if len(string) > num:
     string = string[:num - 13] + '...' + string[-10:]
   return string
@@ -99,8 +112,9 @@ def getValidFilename(s):
   Returns the given string converted to a string that can be used for a clean
   filename. Specifically, leading and trailing spaces are removed; 
   all non-filename-safe characters are removed.
-  >>> get_valid_filename("john's portrait in 2004.jpg")
-  'john_s portrait in 2004.jpg'
+
+  >>> getValidFilename("john's portrait in 2004.jpg")
+  'john_s_portrait_in_2004.jpg'
   """
   s = s.strip()
   s = s.replace(' ', '_')
@@ -110,15 +124,15 @@ def getValidFilename(s):
 
 def getTextList(list_, last_word='or'):
   """
-  >>> get_text_list(['a', 'b', 'c', 'd'])
+  >>> getTextList(['a', 'b', 'c', 'd'])
   'a, b, c or d'
-  >>> get_text_list(['a', 'b', 'c'], 'and')
+  >>> getTextList(['a', 'b', 'c'], 'and')
   'a, b and c'
-  >>> get_text_list(['a', 'b'], 'and')
+  >>> getTextList(['a', 'b'], 'and')
   'a and b'
-  >>> get_text_list(['a'])
+  >>> getTextList(['a'])
   'a'
-  >>> get_text_list([])
+  >>> getTextList([])
   ''
   """
   if len(list_) == 0: return ''
@@ -164,8 +178,8 @@ def smartSplit(text):
   Supports both single and double quotes, and supports escaping quotes with
   backslashes. In the output, strings will keep their initial and trailing
   quote marks.
-  >>> list(smart_split('This is "a person\'s" test.'))
-  ['This', 'is', '"a person\'s"', 'test.']
+  >>> list(smartSplit('This is "a person\\'s" test.'))
+  ['This', 'is', '"a person\\'s"', 'test.']
   """
   for bit in smart_split_re.finditer(text):
       bit = bit.group(0)

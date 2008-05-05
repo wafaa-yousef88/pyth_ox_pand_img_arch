@@ -18,7 +18,11 @@ for article in _articles:
   _spArticles.append(article)
 
 def canonicalTitle(title):
-  """Return the title in the canonic format 'Movie Title, The'."""
+  """Return the title in the canonic format 'Movie Title, The'.
+  
+  >>> canonicalTitle('The Movie Title')
+  'Movie Title, The'
+  """
   try:
       if _articlesDict.has_key(title.split(', ')[-1].lower()): return title
   except IndexError: pass
@@ -43,7 +47,11 @@ def canonicalTitle(title):
   return title
 
 def normalizeTitle(title):
-  """Return the title in the normal "The Title" format."""
+  """Return the title in the normal "The Title" format.
+
+  >>> normalizeTitle('Movie Title, The')
+  'The Movie Title'
+  """
   stitle = title.split(', ')
   if len(stitle) > 1 and _articlesDict.has_key(stitle[-1].lower()):
       sep = ' '
@@ -52,6 +60,15 @@ def normalizeTitle(title):
   return title
 
 def normalizeImdbId(imdbId):
+  """Return 7 digit imdbId.
+
+  >>> normalizeImdbId('http://www.imdb.com/title/tt0159206/')
+  '0159206'
+  >>> normalizeImdbId(159206)
+  '0159206'
+  >>> normalizeImdbId('tt0159206')
+  '0159206'
+  """
   if isinstance(imdbId, basestring):
     imdbId = re.sub('.*(\d{7}).*', '\\1', imdbId)
   elif isinstance(imdbId, int):

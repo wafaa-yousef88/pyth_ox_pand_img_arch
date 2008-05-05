@@ -26,20 +26,32 @@ trailing_empty_content_re = re.compile(r'(?:<p>(?:&nbsp;|\s|<br \/>)*?</p>\s*)+\
 del x # Temporary variable
 
 def escape(html):
-  "Returns the given HTML with ampersands, quotes and carets encoded"
+  '''
+  Returns the given HTML with ampersands, quotes and carets encoded
+
+  >>> escape('html "test" & <brothers>')
+  'html &quot;test&quot; &amp; &lt;brothers&gt;'
+  '''
   if not isinstance(html, basestring):
       html = str(html)
   return html.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
 
 def linebreaks(value):
-  "Converts newlines into <p> and <br />s"
+  '''
+  Converts newlines into <p> and <br />
+  '''
   value = re.sub(r'\r\n|\r|\n', '\n', value) # normalize newlines
   paras = re.split('\n{2,}', value)
   paras = ['<p>%s</p>' % p.strip().replace('\n', '<br />') for p in paras]
   return '\n\n'.join(paras)
 
 def stripTags(value):
-  "Returns the given HTML with all tags stripped"
+  """
+  Returns the given HTML with all tags stripped
+  
+  >>> stripTags('some <h2>title</h2> <script>asdfasdf</script>')
+  'some title asdfasdf'
+  """
   return re.sub(r'<[^>]*?>', '', value)
     
 def stripSpacesBetweenTags(value):
@@ -122,7 +134,11 @@ def cleanHtml(text):
 charrefpat = re.compile(r'&(#(\d+|x[\da-fA-F]+)|[\w.:-]+);?')
 
 def decodeHtml(html):
-    return htmldecode(html)
+  """
+  >>> decodeHtml('me &amp; you and &#36;&#38;%')
+  u'me & you and $&%'
+  """
+  return htmldecode(html)
 
 def htmldecode(text):
   """Decode HTML entities in the given text."""
@@ -145,6 +161,10 @@ def htmldecode(text):
   return charrefpat.sub(entitydecode, text).replace(u'\xa0', ' ')
 
 def highlight(text, query, hlClass="hl"):
+  """
+  >>> highlight('me &amp; you and &#36;&#38;%', 'and')
+  'me &amp; you <span class="hl">and</span> &#36;&#38;%'
+  """
   if query:
     text = text.replace('<br />', '|')
     query = re.escape(query).replace('\ ', '.')

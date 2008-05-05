@@ -16,3 +16,6 @@ Usage:
  oxutils.formatBytes(1234567890)
  '1.15 GB'
 
+
+Tests:
+ nosetests --with-doctest oxutils
