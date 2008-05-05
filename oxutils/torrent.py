@@ -41,13 +41,8 @@ def getTorrentInfo(data):
   else:
     # let's assume we have a directory structure
     file_length = 0;
-    for file in info['files']:
-      path = ''
-      for item in file['path']:
-        if (path != ''):
-          path = path + "/"
-        path = path + item
-        file_length += file['length']
+    for f in info['files']:
+      file_length += f['length']
   for key in info:
     if key != 'pieces':
       tinfo[key] = info[key]
