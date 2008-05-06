@@ -139,6 +139,30 @@ def getTextList(list_, last_word='or'):
   if len(list_) == 1: return list_[0]
   return '%s %s %s' % (', '.join([str(i) for i in list_][:-1]), last_word, list_[-1])
 
+def getListText(text, last_word='or'):
+  """
+  >>> getListText('a, b, c or d')
+  ['a', 'b', 'c', 'd']
+  >>> getListText('a, b and c', 'and')
+  ['a', 'b', 'c']
+  >>> getListText('a and b', 'and')
+  ['a', 'b']
+  >>> getListText('a')
+  ['a']
+  >>> getListText('')
+  []
+  """
+  list_ = []
+  if text:
+    list_ = text.split(', ')
+    if list_:
+      i=len(list_)-1
+      last = list_[i].split(last_word)
+      if len(last) == 2:
+        list_[i] = last[0].strip()
+        list_.append(last[1].strip())
+  return list_
+
 def normalizeNewlines(text):
   return re.sub(r'\r\n|\r|\n', '\n', text)
 
