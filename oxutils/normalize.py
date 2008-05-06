@@ -75,3 +75,87 @@ def normalizeImdbId(imdbId):
     imdbId = "%07d" % imdbId
   return imdbId
 
+
+# Common suffixes in surnames.
+_sname_suffixes = ('de', 'la', 'der', 'den', 'del', 'y', 'da', 'van',
+                    'e', 'von', 'the', 'di', 'du', 'el', 'al')
+
+def canonicalName(name):
+    """Return the given name in canonical "Surname, Name" format.
+    It assumes that name is in the 'Name Surname' format.
+    
+    >>> canonicalName('Jean Luc Godard')
+    'Godard, Jean Luc'
+
+    >>> canonicalName('Ivan Ivanov-Vano')
+    'Ivanov-Vano, Ivan'
+
+    >>> canonicalName('Gus Van Sant')
+    'Van Sant, Gus'
+
+    >>> canonicalName('Brian De Palma')
+    'De Palma, Brian'
+    """
+
+    # XXX: some statistics (over 1852406 names):
+    #      - just a surname:                 51921
+    #      - single surname, single name:  1792759
+    #      - composed surname, composed name: 7726
+    #      - composed surname, single name:  55623
+    #        (2: 49259, 3: 5502, 4: 551)
+    #      - single surname, composed name: 186604
+    #        (2: 178315, 3: 6573, 4: 1219, 5: 352)
+    # Don't convert names already in the canonical format.
+    if name.find(', ') != -1: return name
+    sname = name.split(' ')
+    snl = len(sname)
+    if snl == 2:
+        # Just a name and a surname: how boring...
+        name = '%s, %s' % (sname[1], sname[0])
+    elif snl > 2:
+        lsname = [x.lower() for x in sname]
+        if snl == 3: _indexes = (0, snl-2)
+        else: _indexes = (0, snl-2, snl-3)
+        # Check for common surname prefixes at the beginning and near the end.
+        for index in _indexes:
+            if lsname[index] not in _sname_suffixes: continue
+            try:
+                # Build the surname.
+                surn = '%s %s' % (sname[index], sname[index+1])
+                del sname[index]
+                del sname[index]
+                try:
+                    # Handle the "Jr." after the name.
+                    if lsname[index+2].startswith('jr'):
+                        surn += ' %s' % sname[index]
+                        del sname[index]
+                except (IndexError, ValueError):
+                    pass
+                name = '%s, %s' % (surn, ' '.join(sname))
+                break
+            except ValueError:
+                continue
+        else:
+            name = '%s, %s' % (sname[-1], ' '.join(sname[:-1]))
+    return name
+
+def normalizeName(name):
+    """Return a name in the normal "Name Surname" format.
+    
+    >>> normalizeName('Godard, Jean Luc')
+    'Jean Luc Godard'
+
+    >>> normalizeName('Ivanov-Vano, Ivan')
+    'Ivan Ivanov-Vano'
+
+    >>> normalizeName('Van Sant, Gus')
+    'Gus Van Sant'
+
+    >>> normalizeName('De Palma, Brian')
+    'Brian De Palma'
+    """
+    sname = name.split(', ')
+    if len(sname) == 2:
+        name = '%s %s' % (sname[1], sname[0])
+    return name
+
