@@ -138,10 +138,6 @@ def decodeHtml(html):
   >>> decodeHtml('me &amp; you and &#36;&#38;%')
   u'me & you and $&%'
   """
-  return htmldecode(html)
-
-def htmldecode(text):
-  """Decode HTML entities in the given text."""
   if type(text) != unicode:
    text = unicode(text)[:]
   if type(text) is unicode:

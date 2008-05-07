@@ -10,8 +10,6 @@ def findRe(string, regexp):
     return result[0].strip()
   return ''
 
-findRegexp = findRe
-
 def findString(string, string0='', string1 = ''):
   """Return the string between string0 and string1. 
 

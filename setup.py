@@ -8,13 +8,16 @@ setup(
   version="0.1",
 
   description="collection of utils used to work with python",
-  author="ox",
-  author_email="utils@0xdb.org",
-  url="http://code.0xdb.org/python-oxutils",
-  download_url="http://code.0xdb.org/python-oxutils/download",
-  license="GPL",
+  author="0x",
+  author_email="code@0xdb.org",
+  url="http://code.0xdb.org/oxutils",
+  download_url="http://code.0xdb.org/oxutils/download",
+  license="GPLv3",
   packages=find_packages(),
   zip_safe=False,
+  install_requires=[
+        'chardet',
+  ],
   keywords = [
   ],
   classifiers = [
