@@ -8,10 +8,9 @@ def findRe(string, regexp):
   result = re.compile(regexp, re.DOTALL).findall(string)
   if result:
     return result[0].strip()
-  return None
+  return ''
 
-def findRegexp(string, regexp):
-  return findRe(string, regexp)
+findRegexp = findRe
 
 def findString(string, string0='', string1 = ''):
   """Return the string between string0 and string1. 
