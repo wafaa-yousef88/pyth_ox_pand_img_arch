@@ -138,9 +138,9 @@ def decodeHtml(html):
   >>> decodeHtml('me &amp; you and &#36;&#38;%')
   u'me & you and $&%'
   """
-  if type(text) != unicode:
-   text = unicode(text)[:]
-  if type(text) is unicode:
+  if type(html) != unicode:
+   html = unicode(html)[:]
+  if type(html) is unicode:
     uchr = unichr
   else:
     uchr = lambda value: value > 255 and unichr(value) or chr(value)
@@ -154,7 +154,7 @@ def decodeHtml(html):
       return uchr(name2codepoint[entity])
     else:
       return match.group(0)
-  return charrefpat.sub(entitydecode, text).replace(u'\xa0', ' ')
+  return charrefpat.sub(entitydecode, html).replace(u'\xa0', ' ')
 
 def highlight(text, query, hlClass="hl"):
   """
