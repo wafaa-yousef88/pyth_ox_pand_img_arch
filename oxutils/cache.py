@@ -85,13 +85,13 @@ def getUrlCacheFile(url, data=None, headers=DEFAULT_HEADERS):
   return os.path.join(getCacheBase(), domain, url_hash[:2], url_hash[2:4], url_hash[4:6], url_hash)
 
 def loadUrlCache(url_cache_file, timeout=cache_timeout):
-  if timeout <= 0:
+  if timeout == 0:
     return None
   if os.path.exists(url_cache_file):
     ctime = os.stat(url_cache_file).st_ctime
     now = time.mktime(time.localtime())
     file_age = now-ctime
-    if file_age < timeout:
+    if timeout < 0 or file_age < timeout:
       f = open(url_cache_file)
       data = f.read()
       f.close()
