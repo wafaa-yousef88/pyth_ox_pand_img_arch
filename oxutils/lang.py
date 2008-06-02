@@ -191,7 +191,7 @@ _iso639_languages = [
   ("Zulu", "", "zu", "zul"),
 ]
 
-def langFromCode(code):
+def codeToLang(code):
   code = code.lower()
   if len(code) == 2:
     for l in _iso639_languages:
@@ -204,24 +204,28 @@ def langFromCode(code):
   return None
 
 def langTo3Code(lang):
-  lang = englishName(lang).lower()
+  lang = englishName(lang)
+  if lang:
+    lang=lang.lower()
   for l in _iso639_languages:
     if l[0].lower() == lang:
       return l[3]
   return None
 
 def langTo2Code(lang):
-  lang = englishName(lang).lower()
+  lang = englishName(lang)
+  if lang:
+    lang=lang.lower()
   for l in _iso639_languages:
     if l[0].lower() == lang:
       return l[2]
   return None
 
 def langCode2To3(code):
-  langTo3Code(langFromCode(code))
+  langTo3Code(codeToLang(code))
 
 def langCode3To2(code):
-  langTo2Code(langFromCode(code))
+  langTo2Code(codeToLang(code))
 
 def englishName(lang):
   lang = lang.lower()
