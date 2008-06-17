@@ -13,7 +13,7 @@ import chardet
 import simplejson
 
 import net
-from net import DEFAULT_HEADERS
+from net import DEFAULT_HEADERS, getEncoding
 
 
 cache_timeout = 30*24*60*60 # default is 30 days
@@ -67,7 +67,7 @@ def getUrl(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout):
 
 def getUrlUnicode(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout, _getUrl=getUrl):
   data = _getUrl(url, data, headers, timeout)
-  encoding = chardet.detect(data)['encoding']
+  encoding = getEncoding(data)
   if not encoding:
     encoding = 'latin-1'
   return unicode(data, encoding)

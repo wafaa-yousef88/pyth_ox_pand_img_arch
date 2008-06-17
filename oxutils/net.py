@@ -5,7 +5,7 @@ import StringIO
 import urllib
 import urllib2
 
-import chardet
+from chardet.universaldetector import UniversalDetector
 
 
 # Default headers for HTTP requests.
@@ -57,8 +57,17 @@ def getUrl(url, data=None, headers=DEFAULT_HEADERS, returnHeaders=False):
 
 def getUrlUnicode(url):
   data = getUrl(url)
-  encoding = chardet.detect(data)['encoding']
+  encoding = getEncoding(data)
   if not encoding:
     encoding = 'latin-1'
   return unicode(data, encoding)
+
+def getEncoding(data):
+  detector = UniversalDetector()
+  for line in data.split('\n'):
+    detector.feed(line)
+    if detector.done:
+      break
+  detector.close()
+  return detector.result['encoding']
 
