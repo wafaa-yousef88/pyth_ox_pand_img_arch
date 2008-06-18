@@ -113,7 +113,7 @@ def cleanHtml(text):
   text = normalizeNewlines(text)
   text = re.sub(r'<(/?)\s*b\s*>', '<\\1strong>', text)
   text = re.sub(r'<(/?)\s*i\s*>', '<\\1em>', text)
-  text = fix_ampersands(text)
+  text = fixAmpersands(text)
   # Remove all target="" attributes from <a> tags.
   text = link_target_attribute_re.sub('\\1', text)
   # Trim stupid HTML such as <br clear="all">.
