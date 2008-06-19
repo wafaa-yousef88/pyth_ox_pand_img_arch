@@ -172,6 +172,10 @@ def ms2playtime(ms):
     ss = it % 60
     mm = ((it-ss)/60) % 60
     hh = ((it-(mm*60)-ss)/3600) % 60
+    if hh >= 24:
+        dd = int(hh / 24)
+        hh = hh % 24
+        playtime= "%d:%02d:%02d:%02d" % (dd, hh, mm, ss)
     if hh:
         playtime= "%02d:%02d:%02d" % (hh, mm, ss)
     else:
