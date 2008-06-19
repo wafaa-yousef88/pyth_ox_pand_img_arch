@@ -234,3 +234,10 @@ def englishName(lang):
             return l[0]
     return None
 
+def languages2Letter():
+    languages = []
+    for l in _iso639_languages:
+        if l[2]:
+            languages.append(l[2])
+    return languages
+

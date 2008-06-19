@@ -139,7 +139,7 @@ def plural(amount, unit, plural='s'):
         else: unit = plural
     return "%s %s" % (formatThousands(amount), unit)
 
-def ms2runtime(ms):
+def ms2runtime(ms, shortenLong=False):
     '''
     >>> ms2runtime(5000)
     '5 seconds'
@@ -167,8 +167,11 @@ def ms2runtime(ms):
     if days >= 365:
         years = int(days / 365)
         days = days % 365
-    runtimeString = (plural(years, 'year'), plural(days, 'day'),
-      plural(hours,'hour'), plural(minutes, 'minute'), plural(seconds, 'second'))
+    if shortenLong and years > 0 or days > 99:
+        runtimeString = ("%sy" % years, "%sd" % days, "%sh" % hours,  "%sm" % minutes, "%ss" % seconds)
+    else:
+        runtimeString = (plural(years, 'year'), plural(days, 'day'),
+                         plural(hours,'hour'), plural(minutes, 'minute'), plural(seconds, 'second'))
     runtimeString = filter(lambda x: not x.startswith('0'), runtimeString)
     return " ".join(runtimeString).strip()
 
