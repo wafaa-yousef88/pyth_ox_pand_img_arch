@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# vi:si:et:sw=2:sts=2:ts=2
+# vi:si:et:sw=4:sts=4:ts=4
 # GPL written 2008 by j@pad.ma
 import re
 import string
@@ -26,147 +26,147 @@ trailing_empty_content_re = re.compile(r'(?:<p>(?:&nbsp;|\s|<br \/>)*?</p>\s*)+\
 del x # Temporary variable
 
 def escape(html):
-  '''
-  Returns the given HTML with ampersands, quotes and carets encoded
+    '''
+    Returns the given HTML with ampersands, quotes and carets encoded
 
-  >>> escape('html "test" & <brothers>')
-  'html &quot;test&quot; &amp; &lt;brothers&gt;'
-  '''
-  if not isinstance(html, basestring):
-      html = str(html)
-  return html.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
+    >>> escape('html "test" & <brothers>')
+    'html &quot;test&quot; &amp; &lt;brothers&gt;'
+    '''
+    if not isinstance(html, basestring):
+          html = str(html)
+    return html.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
 
 def linebreaks(value):
-  '''
-  Converts newlines into <p> and <br />
-  '''
-  value = re.sub(r'\r\n|\r|\n', '\n', value) # normalize newlines
-  paras = re.split('\n{2,}', value)
-  paras = ['<p>%s</p>' % p.strip().replace('\n', '<br />') for p in paras]
-  return '\n\n'.join(paras)
+    '''
+    Converts newlines into <p> and <br />
+    '''
+    value = re.sub(r'\r\n|\r|\n', '\n', value) # normalize newlines
+    paras = re.split('\n{2,}', value)
+    paras = ['<p>%s</p>' % p.strip().replace('\n', '<br />') for p in paras]
+    return '\n\n'.join(paras)
 
 def stripTags(value):
-  """
-  Returns the given HTML with all tags stripped
-  
-  >>> stripTags('some <h2>title</h2> <script>asdfasdf</script>')
-  'some title asdfasdf'
-  """
-  return re.sub(r'<[^>]*?>', '', value)
+    """
+    Returns the given HTML with all tags stripped
+    
+    >>> stripTags('some <h2>title</h2> <script>asdfasdf</script>')
+    'some title asdfasdf'
+    """
+    return re.sub(r'<[^>]*?>', '', value)
     
 def stripSpacesBetweenTags(value):
-  "Returns the given HTML with spaces between tags normalized to a single space"
-  return re.sub(r'>\s+<', '> <', value)
+    "Returns the given HTML with spaces between tags normalized to a single space"
+    return re.sub(r'>\s+<', '> <', value)
 
 def stripEntities(value):
-  "Returns the given HTML with all entities (&something;) stripped"
-  return re.sub(r'&(?:\w+|#\d);', '', value)
+    "Returns the given HTML with all entities (&something;) stripped"
+    return re.sub(r'&(?:\w+|#\d);', '', value)
 
 def fixAmpersands(value):
-  "Returns the given HTML with all unencoded ampersands encoded correctly"
-  return unencoded_ampersands_re.sub('&amp;', value)
+    "Returns the given HTML with all unencoded ampersands encoded correctly"
+    return unencoded_ampersands_re.sub('&amp;', value)
 
 def urlize(text, trim_url_limit=None, nofollow=False):
-  """
-  Converts any URLs in text into clickable links. Works on http://, https:// and
-  www. links. Links can have trailing punctuation (periods, commas, close-parens)
-  and leading punctuation (opening parens) and it'll still do the right thing.
+    """
+    Converts any URLs in text into clickable links. Works on http://, https:// and
+    www. links. Links can have trailing punctuation (periods, commas, close-parens)
+    and leading punctuation (opening parens) and it'll still do the right thing.
 
-  If trim_url_limit is not None, the URLs in link text will be limited to
-  trim_url_limit characters.
+    If trim_url_limit is not None, the URLs in link text will be limited to
+    trim_url_limit characters.
 
-  If nofollow is True, the URLs in link text will get a rel="nofollow" attribute.
-  """
-  trim_url = lambda x, limit=trim_url_limit: limit is not None and (x[:limit] + (len(x) >=limit and '...' or ''))  or x
-  words = word_split_re.split(text)
-  nofollow_attr = nofollow and ' rel="nofollow"' or ''
-  for i, word in enumerate(words):
-    match = punctuation_re.match(word)
-    if match:
-      lead, middle, trail = match.groups()
-      if middle.startswith('www.') or ('@' not in middle and not middle.startswith('http://') and \
-              len(middle) > 0 and middle[0] in string.letters + string.digits and \
-              (middle.endswith('.org') or middle.endswith('.net') or middle.endswith('.com'))):
-        middle = '<a href="http://%s"%s>%s</a>' % (middle, nofollow_attr, trim_url(middle))
-      if middle.startswith('http://') or middle.startswith('https://'):
-        middle = '<a href="%s"%s>%s</a>' % (middle, nofollow_attr, trim_url(middle))
-      if '@' in middle and not middle.startswith('www.') and not ':' in middle \
-        and simple_email_re.match(middle):
-        middle = '<a href="mailto:%s">%s</a>' % (middle, middle)
-      if lead + middle + trail != word:
-        words[i] = lead + middle + trail
-  return ''.join(words)
+    If nofollow is True, the URLs in link text will get a rel="nofollow" attribute.
+    """
+    trim_url = lambda x, limit=trim_url_limit: limit is not None and (x[:limit] + (len(x) >=limit and '...' or ''))  or x
+    words = word_split_re.split(text)
+    nofollow_attr = nofollow and ' rel="nofollow"' or ''
+    for i, word in enumerate(words):
+        match = punctuation_re.match(word)
+        if match:
+            lead, middle, trail = match.groups()
+            if middle.startswith('www.') or ('@' not in middle and not middle.startswith('http://') and \
+                    len(middle) > 0 and middle[0] in string.letters + string.digits and \
+                    (middle.endswith('.org') or middle.endswith('.net') or middle.endswith('.com'))):
+                middle = '<a href="http://%s"%s>%s</a>' % (middle, nofollow_attr, trim_url(middle))
+            if middle.startswith('http://') or middle.startswith('https://'):
+                middle = '<a href="%s"%s>%s</a>' % (middle, nofollow_attr, trim_url(middle))
+            if '@' in middle and not middle.startswith('www.') and not ':' in middle \
+              and simple_email_re.match(middle):
+                middle = '<a href="mailto:%s">%s</a>' % (middle, middle)
+            if lead + middle + trail != word:
+                words[i] = lead + middle + trail
+    return ''.join(words)
 
 def cleanHtml(text):
-  """
-  Cleans the given HTML. Specifically, it does the following:
-      * Converts <b> and <i> to <strong> and <em>.
-      * Encodes all ampersands correctly.
-      * Removes all "target" attributes from <a> tags.
-      * Removes extraneous HTML, such as presentational tags that open and
-        immediately close and <br clear="all">.
-      * Converts hard-coded bullets into HTML unordered lists.
-      * Removes stuff like "<p>&nbsp;&nbsp;</p>", but only if it's at the
-        bottom of the text.
-  """
-  from text import normalizeNewlines
-  text = normalizeNewlines(text)
-  text = re.sub(r'<(/?)\s*b\s*>', '<\\1strong>', text)
-  text = re.sub(r'<(/?)\s*i\s*>', '<\\1em>', text)
-  text = fixAmpersands(text)
-  # Remove all target="" attributes from <a> tags.
-  text = link_target_attribute_re.sub('\\1', text)
-  # Trim stupid HTML such as <br clear="all">.
-  text = html_gunk_re.sub('', text)
-  # Convert hard-coded bullets into HTML unordered lists.
-  def replace_p_tags(match):
-    s = match.group().replace('</p>', '</li>')
-    for d in DOTS:
-      s = s.replace('<p>%s' % d, '<li>')
-    return '<ul>\n%s\n</ul>' % s
-  text = hard_coded_bullets_re.sub(replace_p_tags, text)
-  # Remove stuff like "<p>&nbsp;&nbsp;</p>", but only if it's at the bottom of the text.
-  text = trailing_empty_content_re.sub('', text)
-  return text
+    """
+    Cleans the given HTML. Specifically, it does the following:
+        * Converts <b> and <i> to <strong> and <em>.
+        * Encodes all ampersands correctly.
+        * Removes all "target" attributes from <a> tags.
+        * Removes extraneous HTML, such as presentational tags that open and
+          immediately close and <br clear="all">.
+        * Converts hard-coded bullets into HTML unordered lists.
+        * Removes stuff like "<p>&nbsp;&nbsp;</p>", but only if it's at the
+          bottom of the text.
+    """
+    from text import normalizeNewlines
+    text = normalizeNewlines(text)
+    text = re.sub(r'<(/?)\s*b\s*>', '<\\1strong>', text)
+    text = re.sub(r'<(/?)\s*i\s*>', '<\\1em>', text)
+    text = fixAmpersands(text)
+    # Remove all target="" attributes from <a> tags.
+    text = link_target_attribute_re.sub('\\1', text)
+    # Trim stupid HTML such as <br clear="all">.
+    text = html_gunk_re.sub('', text)
+    # Convert hard-coded bullets into HTML unordered lists.
+    def replace_p_tags(match):
+        s = match.group().replace('</p>', '</li>')
+        for d in DOTS:
+            s = s.replace('<p>%s' % d, '<li>')
+        return '<ul>\n%s\n</ul>' % s
+    text = hard_coded_bullets_re.sub(replace_p_tags, text)
+    # Remove stuff like "<p>&nbsp;&nbsp;</p>", but only if it's at the bottom of the text.
+    text = trailing_empty_content_re.sub('', text)
+    return text
 
 # This pattern matches a character entity reference (a decimal numeric
 # references, a hexadecimal numeric reference, or a named reference).
 charrefpat = re.compile(r'&(#(\d+|x[\da-fA-F]+)|[\w.:-]+);?')
 
 def decodeHtml(html):
-  """
-  >>> decodeHtml('me &amp; you and &#36;&#38;%')
-  u'me & you and $&%'
-  """
-  if type(html) != unicode:
-   html = unicode(html)[:]
-  if type(html) is unicode:
-    uchr = unichr
-  else:
-    uchr = lambda value: value > 255 and unichr(value) or chr(value)
-  def entitydecode(match, uchr=uchr):
-    entity = match.group(1)
-    if entity.startswith('#x'):
-      return uchr(int(entity[2:], 16))
-    elif entity.startswith('#'):
-      return uchr(int(entity[1:]))
-    elif entity in name2codepoint:
-      return uchr(name2codepoint[entity])
+    """
+    >>> decodeHtml('me &amp; you and &#36;&#38;%')
+    u'me & you and $&%'
+    """
+    if type(html) != unicode:
+        html = unicode(html)[:]
+    if type(html) is unicode:
+        uchr = unichr
     else:
-      return match.group(0)
-  return charrefpat.sub(entitydecode, html).replace(u'\xa0', ' ')
+        uchr = lambda value: value > 255 and unichr(value) or chr(value)
+    def entitydecode(match, uchr=uchr):
+        entity = match.group(1)
+        if entity.startswith('#x'):
+            return uchr(int(entity[2:], 16))
+        elif entity.startswith('#'):
+            return uchr(int(entity[1:]))
+        elif entity in name2codepoint:
+            return uchr(name2codepoint[entity])
+        else:
+            return match.group(0)
+    return charrefpat.sub(entitydecode, html).replace(u'\xa0', ' ')
 
 def highlight(text, query, hlClass="hl"):
-  """
-  >>> highlight('me &amp; you and &#36;&#38;%', 'and')
-  'me &amp; you <span class="hl">and</span> &#36;&#38;%'
-  """
-  if query:
-    text = text.replace('<br />', '|')
-    query = re.escape(query).replace('\ ', '.')
-    m = re.compile("(%s)" % query, re.IGNORECASE).findall(text)
-    for i in m:
-      text = re.sub("(%s)" % re.escape(i).replace('\ ', '.'), '<span class="%s">\\1</span>' % hlClass, text)
-    text = text.replace('|', '<br />')
-  return text
+    """
+    >>> highlight('me &amp; you and &#36;&#38;%', 'and')
+    'me &amp; you <span class="hl">and</span> &#36;&#38;%'
+    """
+    if query:
+        text = text.replace('<br />', '|')
+        query = re.escape(query).replace('\ ', '.')
+        m = re.compile("(%s)" % query, re.IGNORECASE).findall(text)
+        for i in m:
+            text = re.sub("(%s)" % re.escape(i).replace('\ ', '.'), '<span class="%s">\\1</span>' % hlClass, text)
+        text = text.replace('|', '<br />')
+    return text
 
