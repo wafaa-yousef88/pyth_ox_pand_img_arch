@@ -112,6 +112,20 @@ def formatBytes(number):
 def formatPixels(number):
     return formatNumber(number, 'pixel', 'px')
 
+def formatCurrency(amount, currency="$"):
+  if amount:
+    temp = "%.2f" % amount
+    profile=re.compile(r"(\d)(\d\d\d[.,])")
+    while 1:
+      temp, count = re.subn(profile,r"\1,\2",temp)
+      if not count:
+        break
+    if temp.startswith('-'):
+       return "-"+ currency + temp[1:-3]
+    return currency + temp[:-3]
+  else:
+    return ""
+
 def plural(amount, unit, plural='s'):
     '''
     >>> plural(1, 'unit')
