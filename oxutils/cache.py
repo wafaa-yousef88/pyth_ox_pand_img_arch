@@ -62,7 +62,7 @@ def getUrl(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout):
             result = e.read()
             if url_headers.get('content-encoding', None) == 'gzip':
                 result = gzip.GzipFile(fileobj=StringIO.StringIO(result)).read()
-          saveUrlCache(url_cache_file, result, url_headers)
+        saveUrlCache(url_cache_file, result, url_headers)
     return result
 
 def getUrlUnicode(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout, _getUrl=getUrl):
