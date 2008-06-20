@@ -175,7 +175,7 @@ def ms2runtime(ms, shortenLong=False):
     runtimeString = filter(lambda x: not x.startswith('0'), runtimeString)
     return " ".join(runtimeString).strip()
 
-def ms2playtime(ms):
+def ms2playtime(ms, hours=False):
     '''
     >>> ms2playtime(5000)
     '00:05'
@@ -193,7 +193,7 @@ def ms2playtime(ms):
         dd = int(hh / 24)
         hh = hh % 24
         playtime= "%d:%02d:%02d:%02d" % (dd, hh, mm, ss)
-    if hh:
+    if hh or hours:
         playtime= "%02d:%02d:%02d" % (hh, mm, ss)
     else:
         playtime= "%02d:%02d" % (mm, ss)
