@@ -139,21 +139,21 @@ def plural(amount, unit, plural='s'):
         else: unit = plural
     return "%s %s" % (formatThousands(amount), unit)
 
-def formatDuration(ms, verbosity=0, years=False, hours=False, milliseconds=False):
+def formatDuration(ms, verbosity=0, years=True, hours=True, milliseconds=True):
     '''
         verbosity
             0: D:HH:MM:SS
             1: Dd Hh Mm Ss
             2: D days H hours M minutes S seconds
         years
-            False: 366 days are 366 days
             True: 366 days are 1 year 1 day
+            False: 366 days are 366 days
         hours
-            False: 30 seconds are 00:30
             True: 30 seconds are 00:00:30
+            False: 30 seconds are 00:30
         milliseconds
-            False: never display milliseconds
             True: always display milliseconds
+            False: never display milliseconds
     '''
     if years:
         y = int(ms / 31536000000)
@@ -177,14 +177,18 @@ def formatDuration(ms, verbosity=0, years=False, hours=False, milliseconds=False
             duration += ".%03d" % ms
     else:
         if verbosity == 1:
-            durations = ["%sy" % y, "%sd" % d, "%sh" % h,  "%sm" % m, "%ss" % s]
+            durations = ["%sd" % d, "%sh" % h,  "%sm" % m, "%ss" % s]
+            if years:
+                durations.insert(0, "%sy" % y)
             if milliseconds:
-                durations.push("%sms" % ms)
+                durations.append("%sms" % ms)
         else:
-            durations = [plural(y, 'year'), plural(d, 'day'), plural(h,'hour'),
+            durations = [plural(d, 'day'), plural(h,'hour'),
                 plural(m, 'minute'), plural(s, 'second')]
+            if years:
+                durations.insert(0, plural(y, 'year'))
             if milliseconds:
-                durations.push(plural(ms, 'millisecond'))
+                durations.append(plural(ms, 'millisecond'))
         durations = filter(lambda x: not x.startswith('0'), durations)
         duration = ' '.join(durations)
     return duration
