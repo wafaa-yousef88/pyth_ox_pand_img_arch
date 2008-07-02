@@ -193,7 +193,7 @@ def ms2playtime(ms, hours=False):
         dd = int(hh / 24)
         hh = hh % 24
         playtime= "%d:%02d:%02d:%02d" % (dd, hh, mm, ss)
-    if hh or hours:
+    elif hh or hours:
         playtime= "%02d:%02d:%02d" % (hh, mm, ss)
     else:
         playtime= "%02d:%02d" % (mm, ss)
