@@ -177,14 +177,18 @@ def formatDuration(ms, verbosity=0, years=False, hours=False, milliseconds=False
             duration += ".%03d" % ms
     else:
         if verbosity == 1:
-            durations = ["%sy" % y, "%sd" % d, "%sh" % h,  "%sm" % m, "%ss" % s]
+            durations = ["%sd" % d, "%sh" % h,  "%sm" % m, "%ss" % s]
+            if years:
+                durations.insert(0, "%sy" % y)
             if milliseconds:
-                durations.push("%sms" % ms)
+                durations.append("%sms" % ms)
         else:
-            durations = [plural(y, 'year'), plural(d, 'day'), plural(h,'hour'),
+            durations = [plural(d, 'day'), plural(h,'hour'),
                 plural(m, 'minute'), plural(s, 'second')]
+            if years:
+                durations.insert(0, plural(y, 'year'))
             if milliseconds:
-                durations.push(plural(ms, 'millisecond'))
+                durations.append(plural(ms, 'millisecond'))
         durations = filter(lambda x: not x.startswith('0'), durations)
         duration = ' '.join(durations)
     return duration
