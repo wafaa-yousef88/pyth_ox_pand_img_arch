@@ -141,19 +141,27 @@ def plural(amount, unit, plural='s'):
 
 def formatDuration(ms, verbosity=0, years=True, hours=True, milliseconds=True):
     '''
-        verbosity
-            0: D:HH:MM:SS
-            1: Dd Hh Mm Ss
-            2: D days H hours M minutes S seconds
-        years
-            True: 366 days are 1 year 1 day
-            False: 366 days are 366 days
-        hours
-            True: 30 seconds are 00:00:30
-            False: 30 seconds are 00:30
-        milliseconds
-            True: always display milliseconds
-            False: never display milliseconds
+    verbosity
+        0: D:HH:MM:SS
+        1: Dd Hh Mm Ss
+        2: D days H hours M minutes S seconds
+    years
+        True: 366 days are 1 year 1 day
+        False: 366 days are 366 days
+    hours
+        True: 30 seconds are 00:00:30
+        False: 30 seconds are 00:30
+    milliseconds
+        True: always display milliseconds
+        False: never display milliseconds
+    >>> formatDuration(1000 * 60 * 60 * 24 * 366)
+    '1:001:00:00:00.000'
+    >>> formatDuration(1000 * 60 * 60 * 24 * 366, year=False)
+    '366:00:00:00.000'
+    >>> formatDuration(1000 * 60 * 60 * 24 * 365 + 2003, verbosity=2)
+    '1 year 2 seconds 3 milliseconds'
+    >>> formatDuration(1000 * 30, hours=False, milliseconds=False)
+    '00:30'
     '''
     if years:
         y = int(ms / 31536000000)
