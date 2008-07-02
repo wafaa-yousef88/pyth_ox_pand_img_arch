@@ -156,7 +156,7 @@ def formatDuration(ms, verbosity=0, years=True, hours=True, milliseconds=True):
         False: never display milliseconds
     >>> formatDuration(1000 * 60 * 60 * 24 * 366)
     '1:001:00:00:00.000'
-    >>> formatDuration(1000 * 60 * 60 * 24 * 366, year=False)
+    >>> formatDuration(1000 * 60 * 60 * 24 * 366, years=False)
     '366:00:00:00.000'
     >>> formatDuration(1000 * 60 * 60 * 24 * 365 + 2003, verbosity=2)
     '1 year 2 seconds 3 milliseconds'
