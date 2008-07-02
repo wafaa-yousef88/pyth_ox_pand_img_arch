@@ -150,30 +150,18 @@ def ms2runtime(ms, shortenLong=False):
     >>> ms2runtime(50000000-20000)
     '13 hours 53 minutes'
     '''
-    seconds = int(ms / 1000)
-    years = 0
-    days = 0
-    hours = 0
-    minutes = 0
-    if seconds >= 60:
-        minutes = int(seconds / 60)
-        seconds = seconds % 60
-    if minutes >= 60:
-        hours = int(minutes / 60)
-        minutes = minutes % 60
-    if hours >= 24:
-        days = int(hours / 24)
-        hours = hours % 24
-    if days >= 365:
-        years = int(days / 365)
-        days = days % 365
-    if shortenLong and years > 0 or days > 99:
-        runtimeString = ("%sy" % years, "%sd" % days, "%sh" % hours,  "%sm" % minutes, "%ss" % seconds)
+    y = int(ms / 31536000000)
+    d = int(ms % 31536000000 / 86400000)
+    h = int(ms % 86400000 / 3600000)
+    m = int(ms % 3600000 / 60000)
+    s = int(ms % 60000 / 1000)
+    if shortenLong and y > 0 or d > 99:
+        runtimeString = ("%sy" % y, "%sd" % d, "%sh" % h,  "%sm" % m, "%ss" % s)
     else:
-        runtimeString = (plural(years, 'year'), plural(days, 'day'),
-                         plural(hours,'hour'), plural(minutes, 'minute'), plural(seconds, 'second'))
+        runtimeString = (plural(y, 'year'), plural(d, 'day'),
+                         plural(h,'hour'), plural(m, 'minute'), plural(s, 'second'))
     runtimeString = filter(lambda x: not x.startswith('0'), runtimeString)
-    return " ".join(runtimeString).strip()
+    return ' '.join(runtimeString).strip()
 
 def ms2playtime(ms, hours=False):
     '''
@@ -184,10 +172,10 @@ def ms2playtime(ms, hours=False):
     >>> ms2playtime(50000000)
     '13:53:20'
     '''
-    d = math.floor(ms / 86400000)
-    h = math.floor(ms % 86400000 / 3600000)
-    m = math.floor(ms % 3600000 / 60000)
-    s = math.floor(ms % 60000 / 1000)
+    d = int(ms / 86400000)
+    h = int(ms % 86400000 / 3600000)
+    m = int(ms % 3600000 / 60000)
+    s = int(ms % 60000 / 1000)
     if d:
         playtime= "%d:%02d:%02d:%02d" % (d, h, m, s)
     elif h or hours:
