@@ -184,19 +184,16 @@ def ms2playtime(ms, hours=False):
     >>> ms2playtime(50000000)
     '13:53:20'
     '''
-    it = int(ms / 1000)
-    ms = ms - it*1000
-    ss = it % 60
-    mm = ((it-ss)/60) % 60
-    hh = ((it-(mm*60)-ss)/3600) % 60
-    if hh >= 24:
-        dd = int(hh / 24)
-        hh = hh % 24
-        playtime= "%d:%02d:%02d:%02d" % (dd, hh, mm, ss)
-    elif hh or hours:
-        playtime= "%02d:%02d:%02d" % (hh, mm, ss)
+    d = math.floor(ms / 86400000)
+    h = math.floor(ms % 86400000 / 3600000)
+    m = math.floor(ms % 3600000 / 60000)
+    s = math.floor(ms % 60000 / 1000)
+    if d:
+        playtime= "%d:%02d:%02d:%02d" % (d, h, m, s)
+    elif h or hours:
+        playtime= "%02d:%02d:%02d" % (h, m, s)
     else:
-        playtime= "%02d:%02d" % (mm, ss)
+        playtime= "%02d:%02d" % (m, s)
     return playtime
 
 def ms2time(ms):
