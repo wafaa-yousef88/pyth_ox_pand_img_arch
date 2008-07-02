@@ -33,7 +33,7 @@ def findString(string, string0='', string1 = ''):
         string1 = re.escape(string1)
     else:
         string1 = '$'
-    return findRegexp(string, string0 + '(.*?)' + string1)
+    return findRe(string, string0 + '(.*?)' + string1)
 
 # Capitalizes the first letter of a string.
 capfirst = lambda x: x and x[0].upper() + x[1:]
