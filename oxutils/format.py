@@ -139,7 +139,58 @@ def plural(amount, unit, plural='s'):
         else: unit = plural
     return "%s %s" % (formatThousands(amount), unit)
 
+def formatDuration(ms, verbosity=0, years=False, hours=False, milliseconds=False):
+    '''
+        verbosity
+            0: D:HH:MM:SS
+            1: Dd Hh Mm Ss
+            2: D days H hours M minutes S seconds
+        years
+            False: 366 days are 366 days
+            True: 366 days are 1 year 1 day
+        hours
+            False: 30 seconds are 00:30
+            True: 30 seconds are 00:00:30
+        milliseconds
+            False: never display milliseconds
+            True: always display milliseconds
+    '''
+    if years:
+        y = int(ms / 31536000000)
+        d = int(ms % 31536000000 / 86400000)
+    else:
+        d = int(ms / 86400000)
+    h = int(ms % 86400000 / 3600000)
+    m = int(ms % 3600000 / 60000)
+    s = int(ms % 60000 / 1000)
+    ms = ms % 1000
+    if verbosity == 0:
+        if years and y:
+            duration = "%d:%03d:%02d:%02d:%02d" % (y, d, h, m, s)
+        elif d:
+            duration = "%d:%02d:%02d:%02d" % (d, h, m, s)
+        elif hours or h:
+            duration = "%02d:%02d:%02d" % (h, m, s)
+        else:
+            duration = "%02d:%02d" % (m, s)
+        if milliseconds:
+            duration += ".%03d" % ms
+    else:
+        if verbosity == 1:
+            durations = ["%sy" % y, "%sd" % d, "%sh" % h,  "%sm" % m, "%ss" % s]
+            if milliseconds:
+                durations.push("%sms" % ms)
+        else:
+            durations = [plural(y, 'year'), plural(d, 'day'), plural(h,'hour'),
+                plural(m, 'minute'), plural(s, 'second')]
+            if milliseconds:
+                durations.push(plural(ms, 'millisecond'))
+        durations = filter(lambda x: not x.startswith('0'), durations)
+        duration = ' '.join(durations)
+    return duration
+
 def ms2runtime(ms, shortenLong=False):
+    # deprecated - use formatDuration
     '''
     >>> ms2runtime(5000)
     '5 seconds'
@@ -164,6 +215,7 @@ def ms2runtime(ms, shortenLong=False):
     return ' '.join(runtimeString).strip()
 
 def ms2playtime(ms, hours=False):
+    # deprecated - use formatDuration
     '''
     >>> ms2playtime(5000)
     '00:05'
@@ -185,6 +237,7 @@ def ms2playtime(ms, hours=False):
     return playtime
 
 def ms2time(ms):
+    # deprecated - use formatDuration
     '''
     >>> ms2time(44592123)
     '12:23:12.123'
