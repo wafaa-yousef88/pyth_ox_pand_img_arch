@@ -139,21 +139,21 @@ def plural(amount, unit, plural='s'):
         else: unit = plural
     return "%s %s" % (formatThousands(amount), unit)
 
-def formatDuration(ms, verbosity=0, years=False, hours=False, milliseconds=False):
+def formatDuration(ms, verbosity=0, years=True, hours=True, milliseconds=True):
     '''
         verbosity
             0: D:HH:MM:SS
             1: Dd Hh Mm Ss
             2: D days H hours M minutes S seconds
         years
-            False: 366 days are 366 days
             True: 366 days are 1 year 1 day
+            False: 366 days are 366 days
         hours
-            False: 30 seconds are 00:30
             True: 30 seconds are 00:00:30
+            False: 30 seconds are 00:30
         milliseconds
-            False: never display milliseconds
             True: always display milliseconds
+            False: never display milliseconds
     '''
     if years:
         y = int(ms / 31536000000)
