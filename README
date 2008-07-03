@@ -1,4 +1,4 @@
-python-oxutils some tools to build tools
+python-oxlib some tools to build tools
 
 Depends:
  python2.5
@@ -6,16 +6,16 @@ Depends:
  BitTornado(optional)
 
 Usage:
- import oxutils
+ import oxlib
  
- data = oxutils.cache.readUrl('http:/...')
- text = oxutils.stripTags(data)
- oxutils.normalizeNewlines(text)
- oxutils.formatBytes(len(data))
+ data = oxlib.cache.readUrl('http:/...')
+ text = oxlib.stripTags(data)
+ oxlib.normalizeNewlines(text)
+ oxlib.formatBytes(len(data))
 
- oxutils.formatBytes(1234567890)
+ oxlib.formatBytes(1234567890)
  '1.15 GB'
 
 
 Tests:
- nosetests --with-doctest oxutils
+ nosetests --with-doctest oxlib

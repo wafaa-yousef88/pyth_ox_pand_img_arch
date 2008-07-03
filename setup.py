@@ -4,14 +4,14 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="oxutils",
+    name="oxlib",
     version="0.1",
 
     description="collection of utils used to work with python",
     author="0x",
     author_email="code@0xdb.org",
-    url="http://code.0xdb.org/oxutils",
-    download_url="http://code.0xdb.org/oxutils/download",
+    url="http://code.0xdb.org/oxlib",
+    download_url="http://code.0xdb.org/oxlib/download",
     license="GPLv3",
     packages=find_packages(),
     zip_safe=False,
