@@ -5,7 +5,8 @@ import re
 
 def to36(q):
     """
-    Converts an integer to base 36 (a useful scheme for human-sayable IDs).
+    Converts an integer to base 36 (a useful scheme for human-sayable IDs
+    like 'fuck' (739172), 'shit' (1329077) or 'hitler' (1059538851)).
 
     >>> to36(35)
     'z'
