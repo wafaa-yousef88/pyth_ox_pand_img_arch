@@ -4,6 +4,7 @@
 
 from hashes import *
 from html import *
+from str import *
 from text import *
 from format import *
 import net
