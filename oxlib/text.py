@@ -114,7 +114,6 @@ def truncateString(string, length, padding='...', position='right'):
         elif position == 'center':
             left = int(math.ceil(float(length - paddingLength) / 2))
             right = int(stringLength - math.floor(float(length - paddingLength) / 2))
-            print left, right
             string = '%s%s%s' % (string[:left], padding, string[right:])
         elif position == 'right':
             string = '%s%s' % (string[:length - paddingLength], padding)
