@@ -16,9 +16,9 @@ import net
 from net import DEFAULT_HEADERS, getEncoding
 
 
-_cache_timeout = 30*24*60*60 # default is 30 days
+cache_timeout = 30*24*60*60 # default is 30 days
 
-def status(url, data=None, headers=DEFAULT_HEADERS, timeout=_cache_timeout):
+def status(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout):
     '''
       >>> status('http://google.com')
       200
@@ -28,7 +28,7 @@ def status(url, data=None, headers=DEFAULT_HEADERS, timeout=_cache_timeout):
     headers = getHeaders(url, data, headers)
     return int(headers['status'])
 
-def exists(url, data=None, headers=DEFAULT_HEADERS, timeout=_cache_timeout):
+def exists(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout):
     '''
       >>> exists('http://google.com')
       True
@@ -40,7 +40,7 @@ def exists(url, data=None, headers=DEFAULT_HEADERS, timeout=_cache_timeout):
         return True
     return False
 
-def getHeaders(url, data=None, headers=DEFAULT_HEADERS, timeout=_cache_timeout):
+def getHeaders(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout):
     url_cache_file = "%s.headers" % _getUrlCacheFile(url, data, headers)
     url_headers = _loadUrlCache(url_cache_file, timeout)
     if url_headers:
@@ -50,7 +50,7 @@ def getHeaders(url, data=None, headers=DEFAULT_HEADERS, timeout=_cache_timeout):
         _saveUrlHeaders(url_cache_file, url_headers)
     return url_headers
 
-def getUrl(url, data=None, headers=DEFAULT_HEADERS, timeout=_cache_timeout):
+def getUrl(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout):
     url_cache_file = _getUrlCacheFile(url, data, headers)
     result = _loadUrlCache(url_cache_file, timeout)
     if not result:
@@ -65,7 +65,7 @@ def getUrl(url, data=None, headers=DEFAULT_HEADERS, timeout=_cache_timeout):
         _saveUrlCache(url_cache_file, result, url_headers)
     return result
 
-def getUrlUnicode(url, data=None, headers=DEFAULT_HEADERS, timeout=_cache_timeout, _getUrl=getUrl):
+def getUrlUnicode(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout, _getUrl=getUrl):
     data = _getUrl(url, data, headers, timeout)
     encoding = getEncoding(data)
     if not encoding:
@@ -84,7 +84,7 @@ def _getUrlCacheFile(url, data=None, headers=DEFAULT_HEADERS):
     domain = ".".join(urlparse.urlparse(url)[1].split('.')[-2:])
     return os.path.join(_getCacheBase(), domain, url_hash[:2], url_hash[2:4], url_hash[4:6], url_hash)
 
-def _loadUrlCache(url_cache_file, timeout=_cache_timeout):
+def _loadUrlCache(url_cache_file, timeout=cache_timeout):
     if timeout == 0:
         return None
     if os.path.exists(url_cache_file):
