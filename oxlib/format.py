@@ -32,29 +32,39 @@ def to36(q):
 def from36(q):
     return int(q, 36)
 
-def intValue(strValue, default=''):
+def intValue(strValue, default=u''):
+    """
+    >>> intValue('abc23')
+    u'23'
+
+    >>> intValue(' abc23')
+    u'23'
+
+    >>> intValue('ab')
+    u''
+    """
     try:
         val = re.compile('(\d+)').findall(unicode(strValue).strip())[0]
     except:
         val = default
     return val
 
-def test_intValue():
-    assert intValue('abc23') == '23'
-    assert intValue(' abc23') == '23'
-    assert intValue(' abc') == ''
+def floatValue(strValue, default=u''):
+    """
+    >>> floatValue('abc23.4')
+    u'23.4'
 
-def floatValue(strValue, default=''):
+    >>> floatValue(' abc23.4')
+    u'23.4'
+
+    >>> floatValue('ab')
+    u''
+    """
     try:
         val = re.compile('([\d.]+)').findall(unicode(strValue).strip())[0]
     except:
         val = default
     return val
-
-def test_floatValue():
-    assert floatValue('abc23.4') == '23.4'
-    assert floatValue(' abc23.4') == '23.4'
-    assert floatValue(' abc') == ''
 
 def formatNumber(number, longName, shortName):
     """
