@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-# 2008
+# GPL 2008
 
-from hashes import *
-from html import *
-from text import *
+from file import *
 from format import *
-import net
+from html import *
+from iso import *
+from text import *
 import cache
+import net
 
 #only works if BitTornado is installed
 try:
