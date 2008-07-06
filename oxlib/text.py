@@ -69,17 +69,17 @@ def wrapString(string, length=80, separator='\n', balance=False):
     >>> wrapString('All you can eat', 12, '\n', True)
     'All you \ncan eat'
     '''
+    words = string.split(' ')
     if balance:
         # balance lines: test if same number of lines
         # can be achieved with a shorter line length
         lines = wrapString(string, length, separator, False).split(separator)
         if len(lines) > 1:
-            while length > max(map(lambda x : len(x), string.split(' '))):
+            while length > max(map(lambda x : len(x), words)):
                 length -= 1
                 if len(wrapString(string, length, separator, False).split(separator)) > len(lines):
                     length += 1
                     break
-    words = string.split(' ')
     lines = ['']
     for word in words:
         if len(lines[len(lines) - 1] + word + ' ') <= length + 1:
