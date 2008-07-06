@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-# GPL written 2008 by j@pad.ma
+# GPL 2008
 import sha
 import os
 

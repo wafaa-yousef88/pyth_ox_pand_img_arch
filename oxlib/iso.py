@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-
+# GPL 2008
 
 _iso639_languages = [
     ("Unknown", "", "", "und"),
@@ -227,7 +227,7 @@ def langCode2To3(code):
 def langCode3To2(code):
     langTo2Code(codeToLang(code))
 
-def englishName(lang):
+def langEnglishName(lang):
     lang = lang.lower()
     for l in _iso639_languages:
         if l[1].lower() == lang:
