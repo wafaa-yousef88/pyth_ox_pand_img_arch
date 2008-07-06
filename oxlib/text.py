@@ -62,7 +62,13 @@ def wrap(text, width):
                   text.split(' ')
                   )
 
-def wrapString(string, length, separator, balance):
+def wrapString(string, length=80, separator='\n', balance=False):
+    '''
+    >>> wrapString("Anticonstitutionellement, Paris s'eveille", 16)
+    "Anticonstitution\nellement, Paris \ns'eveille"
+    >>> wrapString('All you can eat', 12, '\n', True)
+    'All you \ncan eat'
+    '''
     if balance:
         # balance lines: test if same number of lines
         # can be achieved with a shorter line length
