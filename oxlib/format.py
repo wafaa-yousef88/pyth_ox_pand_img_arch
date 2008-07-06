@@ -224,18 +224,9 @@ def ms2runtime(ms, shortenLong=False):
     >>> ms2runtime(50000000-20000)
     '13 hours 53 minutes'
     '''
-    y = int(ms / 31536000000)
-    d = int(ms % 31536000000 / 86400000)
-    h = int(ms % 86400000 / 3600000)
-    m = int(ms % 3600000 / 60000)
-    s = int(ms % 60000 / 1000)
-    if shortenLong and y > 0 or d > 99:
-        runtimeString = ("%sy" % y, "%sd" % d, "%sh" % h,  "%sm" % m, "%ss" % s)
-    else:
-        runtimeString = (plural(y, 'year'), plural(d, 'day'),
-                         plural(h,'hour'), plural(m, 'minute'), plural(s, 'second'))
-    runtimeString = filter(lambda x: not x.startswith('0'), runtimeString)
-    return ' '.join(runtimeString).strip()
+    if shortenLong and ms > 1000 * 60 * 60 * 24 * 464:
+        return formatDuration(ms, verbosity=1, milliseconds=False)
+    return formatDuration(ms, verbosity=2, milliseconds=False)
 
 def ms2playtime(ms, hours=False):
     # deprecated - use formatDuration
@@ -247,17 +238,7 @@ def ms2playtime(ms, hours=False):
     >>> ms2playtime(50000000)
     '13:53:20'
     '''
-    d = int(ms / 86400000)
-    h = int(ms % 86400000 / 3600000)
-    m = int(ms % 3600000 / 60000)
-    s = int(ms % 60000 / 1000)
-    if d:
-        playtime= "%d:%02d:%02d:%02d" % (d, h, m, s)
-    elif h or hours:
-        playtime= "%02d:%02d:%02d" % (h, m, s)
-    else:
-        playtime= "%02d:%02d" % (m, s)
-    return playtime
+    return formatDuration(ms, hours=False, years=False, milliseconds=False)
 
 def ms2time(ms):
     # deprecated - use formatDuration
@@ -265,12 +246,7 @@ def ms2time(ms):
     >>> ms2time(44592123)
     '12:23:12.123'
     '''
-    it = int(ms / 1000)
-    ms = ms - it*1000
-    ss = it % 60
-    mm = ((it-ss)/60) % 60
-    hh = ((it-(mm*60)-ss)/3600) % 60
-    return "%d:%02d:%02d.%03d" % (hh, mm, ss, ms)
+    return formatDuration(ms, years=False)
 
 def time2ms(timeString):
     '''
