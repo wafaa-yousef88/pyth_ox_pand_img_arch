@@ -98,8 +98,28 @@ def wrapString(string, length=80, separator='\n', balance=False):
                 lines[len(lines) - 1] += ' '
     return separator.join(lines).strip()
 
+def truncateString(string, length, paddding='...', position='right'):
+    #  >>> truncateString('anticonstitutionellement', 16, '...', 'left')
+    #  '...utionellement'
+    #  >>> truncateString('anticonstitutionellement', 16, '...', 'center')
+    #  'anticon...lement'
+    #  >>> truncateString('anticonstitutionellement', 16, '...', 'right')
+    #  'anticonstitut...'
+    stringLength = len(string);
+    paddingLength = len(padding)
+    if stringLength > length:
+        if position == 'left':
+            string = '%s%s' % (padding, string[:paddingLength + stringLength - len])
+        elif position == 'center':
+            left = math.ceil((length - paddingLength) / 2)
+            right = math.floor((len - paddingLength) / 2)
+            string = '%s%s%s' % (string[:left], padding, str[-right:]
+        elif position == 'right':
+            string = '%s%s' % (string[:length - paddingLength], pad)
+    return string;
+},
 
-def truncateString(s, num):
+def truncateWords(s, num):
     """Truncates a string after a certain number of chacters, but ends with a word
 
     >>> truncateString('Truncates a string after a certain number of chacters, but ends with a word', 23)
