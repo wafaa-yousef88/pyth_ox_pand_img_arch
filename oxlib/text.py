@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 # GPL written 2008 by j@pad.ma
+import math
 import re
 
 
@@ -98,7 +99,7 @@ def wrapString(string, length=80, separator='\n', balance=False):
                 lines[len(lines) - 1] += ' '
     return separator.join(lines).strip()
 
-def truncateString(string, length, paddding='...', position='right'):
+def truncateString(string, length, padding='...', position='right'):
     #  >>> truncateString('anticonstitutionellement', 16, '...', 'left')
     #  '...utionellement'
     #  >>> truncateString('anticonstitutionellement', 16, '...', 'center')
@@ -109,15 +110,15 @@ def truncateString(string, length, paddding='...', position='right'):
     paddingLength = len(padding)
     if stringLength > length:
         if position == 'left':
-            string = '%s%s' % (padding, string[:paddingLength + stringLength - len])
+            string = '%s%s' % (padding, string[stringLength + paddingLength - length:])
         elif position == 'center':
-            left = math.ceil((length - paddingLength) / 2)
-            right = math.floor((len - paddingLength) / 2)
-            string = '%s%s%s' % (string[:left], padding, str[-right:]
+            left = int(math.ceil(float(length - paddingLength) / 2))
+            right = int(stringLength - math.floor(float(length - paddingLength) / 2))
+            print left, right
+            string = '%s%s%s' % (string[:left], padding, string[right:])
         elif position == 'right':
-            string = '%s%s' % (string[:length - paddingLength], pad)
+            string = '%s%s' % (string[:length - paddingLength], padding)
     return string;
-},
 
 def truncateWords(s, num):
     """Truncates a string after a certain number of chacters, but ends with a word
