@@ -35,9 +35,6 @@ def findString(string, string0='', string1 = ''):
         string1 = '$'
     return findRe(string, string0 + '(.*?)' + string1)
 
-# Capitalizes the first letter of a string.
-capfirst = lambda x: x and x[0].upper() + x[1:]
-
 def removeSpecialCharacters(text):
     """
     Removes special characters inserted by Word.
