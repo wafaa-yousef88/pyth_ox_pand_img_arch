@@ -3,12 +3,12 @@
 # GPL 2008
 
 from file import *
-from html import *
-from text import *
 from format import *
-import net
-import cache
+from html import *
 from iso import *
+from text import *
+import cache
+import net
 
 #only works if BitTornado is installed
 try:
