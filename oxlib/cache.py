@@ -51,6 +51,8 @@ def getHeaders(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout):
     return url_headers
 
 def getUrl(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout):
+    if isinstance(url, unicode):
+        url = url.encode('utf-8')
     url_cache_file = _getUrlCacheFile(url, data, headers)
     result = _loadUrlCache(url_cache_file, timeout)
     if not result:
