@@ -65,10 +65,10 @@ def wrap(text, width):
 
 def wrapString(string, length=80, separator='\n', balance=False):
     '''
-    >>> wrapString("Anticonstitutionellement, Paris s'eveille", 16)
-    "Anticonstitution\nellement, Paris \ns'eveille"
-    >>> wrapString('All you can eat', 12, '\n', True)
-    'All you \ncan eat'
+    >>> wrapString(u"Anticonstitutionellement, Paris s'eveille", 16)
+    u"Anticonstitution\\nellement, Paris \\ns'eveille"
+    >>> wrapString(u'All you can eat', 12, '\\n', True)
+    u'All you \\ncan eat'
     '''
     words = string.split(' ')
     if balance:
@@ -83,20 +83,20 @@ def wrapString(string, length=80, separator='\n', balance=False):
                     break
     lines = ['']
     for word in words:
-        if len(lines[len(lines) - 1] + word + ' ') <= length + 1:
+        if len(lines[len(lines) - 1] + word + u' ') <= length + 1:
             # word fits in current line
-            lines[len(lines) - 1] += word + ' ';
+            lines[len(lines) - 1] += word + u' ';
         else:
             if len(word) <= length:
                 # word fits in next line
-                lines.append(word + ' ')
+                lines.append(word + u' ')
             else:
                 # word is longer than line
                 position = length - len(lines[len(lines) - 1])
                 lines[len(lines) - 1] += word[0:position]
                 for i in range(position, len(word), length):
                     lines.append(word[i:i+length]);
-                lines[len(lines) - 1] += ' '
+                lines[len(lines) - 1] += u' '
     return separator.join(lines).strip()
 
 def truncateString(string, length, padding='...', position='right'):
@@ -178,37 +178,37 @@ def getValidFilename(s):
 
 def getTextList(list_, last_word='or'):
     """
-    >>> getTextList(['a', 'b', 'c', 'd'])
-    'a, b, c or d'
-    >>> getTextList(['a', 'b', 'c'], 'and')
-    'a, b and c'
-    >>> getTextList(['a', 'b'], 'and')
-    'a and b'
-    >>> getTextList(['a'])
-    'a'
+    >>> getTextList([u'a', u'b', u'c', u'd'])
+    u'a, b, c or d'
+    >>> getTextList([u'a', u'b', u'c'], 'and')
+    u'a, b and c'
+    >>> getTextList([u'a', u'b'], 'and')
+    u'a and b'
+    >>> getTextList([u'a'])
+    u'a'
     >>> getTextList([])
     ''
     """
     if len(list_) == 0: return ''
     if len(list_) == 1: return list_[0]
-    return '%s %s %s' % (', '.join([str(i) for i in list_][:-1]), last_word, list_[-1])
+    return u'%s %s %s' % (u', '.join([unicode(i) for i in list_][:-1]), last_word, list_[-1])
 
 def getListText(text, last_word='or'):
     """
-    >>> getListText('a, b, c or d')
-    ['a', 'b', 'c', 'd']
-    >>> getListText('a, b and c', 'and')
-    ['a', 'b', 'c']
-    >>> getListText('a and b', 'and')
-    ['a', 'b']
-    >>> getListText('a')
-    ['a']
-    >>> getListText('')
+    >>> getListText(u'a, b, c or d')
+    [u'a', u'b', u'c', u'd']
+    >>> getListText(u'a, b and c', u'and')
+    [u'a', u'b', u'c']
+    >>> getListText(u'a and b', u'and')
+    [u'a', u'b']
+    >>> getListText(u'a')
+    [u'a']
+    >>> getListText(u'')
     []
     """
     list_ = []
     if text:
-        list_ = text.split(', ')
+        list_ = text.split(u', ')
         if list_:
             i=len(list_)-1
             last = list_[i].split(last_word)

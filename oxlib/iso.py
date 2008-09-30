@@ -204,7 +204,7 @@ def codeToLang(code):
     return None
 
 def langTo3Code(lang):
-    lang = englishName(lang)
+    lang = langEnglishName(lang)
     if lang:
         lang=lang.lower()
     for l in _iso639_languages:
@@ -213,7 +213,7 @@ def langTo3Code(lang):
     return None
 
 def langTo2Code(lang):
-    lang = englishName(lang)
+    lang = langEnglishName(lang)
     if lang:
         lang=lang.lower()
     for l in _iso639_languages:
