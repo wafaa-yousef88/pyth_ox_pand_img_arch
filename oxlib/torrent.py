@@ -7,7 +7,7 @@ import sha
 from os import stat
 
 from BitTornado.BT1.makemetafile import make_meta_file
-from BitTornado.bencode import bencode, bdecode
+from bencode import bencode, bdecode
 
 
 def createTorrent(file, url, params = {}, flag = Event(),
