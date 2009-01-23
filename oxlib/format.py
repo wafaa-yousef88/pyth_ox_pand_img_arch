@@ -174,7 +174,7 @@ def formatDuration(ms, verbosity=0, years=True, hours=True, milliseconds=True):
     >>> formatDuration(1000 * 30, hours=False, milliseconds=False)
     '00:30'
     '''
-    if not ms:
+    if not ms and ms != 0:
         return ''
     if years:
         y = int(ms / 31536000000)

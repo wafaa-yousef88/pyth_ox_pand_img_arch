@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 setup(
     name="oxlib",
     version="0.1",
-    description="python-oxlib some tools to build toos",
+    description="python-oxlib some tools to build tools",
     author="0x",
     author_email="code@0xdb.org",
     url="http://code.0xdb.org/oxlib",
