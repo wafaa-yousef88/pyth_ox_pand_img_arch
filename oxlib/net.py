@@ -64,6 +64,8 @@ def getUrlUnicode(url):
     return unicode(data, encoding)
 
 def getEncoding(data):
+    if 'content="text/html; charset=utf-8"' in data:
+        return 'utf-8'
     detector = UniversalDetector()
     for line in data.split('\n'):
         detector.feed(line)
