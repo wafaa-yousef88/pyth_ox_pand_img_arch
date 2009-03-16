@@ -2,9 +2,9 @@
 # vi:si:et:sw=4:sts=4:ts=4
 # GPL 2008
 import gzip
-import StringIO
+import hashlib
 import os
-import sha
+import StringIO
 import time
 import urlparse
 import urllib2
@@ -80,9 +80,9 @@ def _getCacheBase():
 
 def _getUrlCacheFile(url, data=None, headers=DEFAULT_HEADERS):
     if data:
-        url_hash = sha.sha(url + '?' + data).hexdigest()
+        url_hash = hashlib.sha1(url + '?' + data).hexdigest()
     else:
-        url_hash = sha.sha(url).hexdigest()
+        url_hash = hashlib.sha1(url).hexdigest()
     domain = ".".join(urlparse.urlparse(url)[1].split('.')[-2:])
     return os.path.join(_getCacheBase(), domain, url_hash[:2], url_hash[2:4], url_hash[4:6], url_hash)
 

@@ -3,7 +3,7 @@
 # GPL 2007
 
 from threading import Event
-import sha
+import hashlib
 from os import stat
 
 from BitTornado.BT1.makemetafile import make_meta_file
@@ -20,7 +20,7 @@ def getInfoHash(torrentFile):
     metainfo_file = open(torrentFile, 'rb')
     metainfo = bdecode(metainfo_file.read())
     info = metainfo['info']
-    return sha.sha(bencode(info)).hexdigest().upper()
+    return hashlib.sha1(bencode(info)).hexdigest().upper()
 
 def getTorrentInfoFromFile(torrentFile):
     f = open(torrentFile, 'rb')
@@ -51,7 +51,7 @@ def getTorrentInfo(data):
         if key != 'info':
             tinfo[key] = metainfo[key]
     tinfo['size'] = file_length
-    tinfo['hash'] = sha.sha(bencode(info)).hexdigest()
+    tinfo['hash'] = hashlib.sha1(bencode(info)).hexdigest()
     tinfo['announce'] = metainfo['announce']
     return tinfo
 

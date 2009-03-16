@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 # GPL 2008
-import sha
 import os
+import hashlib
 
 def sha1sum(filename):
-    sha1 = sha.new()
+    sha1 = hashlib.sha1()
     file=open(filename)
     buffer=file.read(4096)
     while buffer:
