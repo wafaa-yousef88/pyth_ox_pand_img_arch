@@ -85,12 +85,15 @@ def formatNumber(number, longName, shortName):
     >>> formatNumber(1234567890123456789, 'Byte', 'B')
     '1,096.5166 PB'
 
+    >>> formatNumber(-1234567890123456789, 'Byte', 'B')
+    '-1,096.5166 PB'
+
     """
-    if number < 1024:
+    if abs(number) < 1024:
         return '%s %s%s' % (formatThousands(number), longName, number != 1 and 's' or '')
     prefix = ['K', 'M', 'G', 'T', 'P']
     for i in range(5):
-        if number < math.pow(1024, i + 2) or i == 4:
+        if abs(number) < math.pow(1024, i + 2) or i == 4:
             n = number / math.pow(1024, i + 1)
             return '%s %s%s' % (formatThousands('%.*f' % (i, n)), prefix[i], shortName)
 
