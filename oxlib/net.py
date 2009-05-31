@@ -11,7 +11,7 @@ from chardet.universaldetector import UniversalDetector
 
 # Default headers for HTTP requests.
 DEFAULT_HEADERS = {
-    'User-Agent': 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9) Gecko/2008061015 Firefox/3.0',
+    'User-Agent': 'Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.2a1pre) Gecko/20090529 Minefield/3.6a1pre',
     'Accept-Encoding': 'gzip'
 }
 
