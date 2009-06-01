@@ -50,7 +50,22 @@ def getHeaders(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout):
         _saveUrlHeaders(url_cache_file, url_headers)
     return url_headers
 
-def getUrl(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout):
+class InvalidResult(Exception):
+    """Base class for exceptions in this module."""
+    def __init__(self, result, headers):
+        self.result = result
+        self.headers = headers
+
+def getUrl(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout, valid=None):
+    '''
+        url     - url to load
+        data    - possible post data
+        headers - headers to send with request
+        timeout - get from cache if cache not older than given seconds, -1 to get from cache
+        valid   - function to check if result is ok, its passed result and headers
+                  if this function fails, InvalidResult will be raised deal with it in your code 
+    '''
+    #FIXME: send last-modified / etag from cache and only update if needed
     if isinstance(url, unicode):
         url = url.encode('utf-8')
     url_cache_file = _getUrlCacheFile(url, data, headers)
@@ -64,11 +79,14 @@ def getUrl(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout):
             result = e.read()
             if url_headers.get('content-encoding', None) == 'gzip':
                 result = gzip.GzipFile(fileobj=StringIO.StringIO(result)).read()
-        _saveUrlCache(url_cache_file, result, url_headers)
+        if not valid or valid(result, url_headers):
+            _saveUrlCache(url_cache_file, result, url_headers)
+        else:
+            raise InvalidResult(result, url_headers)
     return result
 
-def getUrlUnicode(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout, _getUrl=getUrl):
-    data = _getUrl(url, data, headers, timeout)
+def getUrlUnicode(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout, _getUrl=getUrl, valid=None):
+    data = _getUrl(url, data, headers, timeout, valid)
     encoding = getEncoding(data)
     if not encoding:
         encoding = 'latin-1'
