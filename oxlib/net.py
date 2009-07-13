@@ -56,6 +56,16 @@ def getUrl(url, data=None, headers=DEFAULT_HEADERS, returnHeaders=False):
         return dict(f.headers), data
     return data
 
+def saveUrl(url, filename, overwrite=False):
+    if not os.path.exists(filename) or overwrite:
+        dirname = os.path.dirname(filename)
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
+        data = oxlib.net.getUrl(url)
+        f = open(filename, 'w')
+        f.write(data)
+        f.close()
+
 def getUrlUnicode(url):
     data = getUrl(url)
     encoding = getEncoding(data)
