@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 # GPL 2008
+import os
 import gzip
 import StringIO
 import urllib
@@ -61,7 +62,7 @@ def saveUrl(url, filename, overwrite=False):
         dirname = os.path.dirname(filename)
         if not os.path.exists(dirname):
             os.makedirs(dirname)
-        data = oxlib.net.getUrl(url)
+        data = getUrl(url)
         f = open(filename, 'w')
         f.write(data)
         f.close()
