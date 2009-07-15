@@ -57,16 +57,6 @@ def getUrl(url, data=None, headers=DEFAULT_HEADERS, returnHeaders=False):
         return dict(f.headers), data
     return data
 
-def saveUrl(url, filename, overwrite=False):
-    if not os.path.exists(filename) or overwrite:
-        dirname = os.path.dirname(filename)
-        if not os.path.exists(dirname):
-            os.makedirs(dirname)
-        data = getUrl(url)
-        f = open(filename, 'w')
-        f.write(data)
-        f.close()
-
 def getUrlUnicode(url):
     data = getUrl(url)
     encoding = getEncoding(data)
@@ -77,6 +67,8 @@ def getUrlUnicode(url):
 def getEncoding(data):
     if 'content="text/html; charset=utf-8"' in data:
         return 'utf-8'
+    elif 'content="text/html; charset=iso-8859-1"' in data:
+        return 'iso-8859-1'
     detector = UniversalDetector()
     for line in data.split('\n'):
         detector.feed(line)
@@ -84,4 +76,14 @@ def getEncoding(data):
             break
     detector.close()
     return detector.result['encoding']
+
+def saveUrl(url, filename, overwrite=False):
+    if not os.path.exists(filename) or overwrite:
+        dirname = os.path.dirname(filename)
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
+        data = getUrl(url)
+        f = open(filename, 'w')
+        f.write(data)
+        f.close()
 
