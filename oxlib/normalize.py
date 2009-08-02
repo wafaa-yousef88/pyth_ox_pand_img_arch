@@ -78,7 +78,7 @@ def normalizeImdbId(imdbId):
 
 # Common suffixes in surnames.
 _sname_suffixes = ('de', 'la', 'der', 'den', 'del', 'y', 'da', 'van',
-                    'e', 'von', 'the', 'di', 'du', 'el', 'al')
+                    'e', 'von', 'vom', 'the', 'di', 'du', 'el', 'al')
 
 def canonicalName(name):
     """Return the given name in canonical "Surname, Name" format.
