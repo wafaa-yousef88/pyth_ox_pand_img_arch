@@ -6,6 +6,9 @@ import os
 import hashlib
 import sys
 import struct
+import subprocess
+
+from simplejson
 
 
 def sha1sum(filename):
@@ -54,4 +57,9 @@ def oshash(filename):
         return returnedhash
     except(IOError):
         return "IOError"
+
+def avinfo(filename):
+    p = subprocess.Popen(['ffmpeg2theora', '--info', filename], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    info, error = p.communicate()
+    return simplejson.loads(info)
 
