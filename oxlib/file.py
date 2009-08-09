@@ -8,7 +8,7 @@ import sys
 import struct
 import subprocess
 
-from simplejson
+import simplejson
 
 
 def sha1sum(filename):
