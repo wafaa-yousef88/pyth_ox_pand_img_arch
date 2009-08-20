@@ -107,7 +107,7 @@ def _connectDb():
 
 def _createDb(c):
     # Create table and indexes 
-    c.execute('''CREATE TABLE IF NOT EXISTS cache (url_hash varchar(42) unique, url text,
+    c.execute('''CREATE TABLE IF NOT EXISTS cache (url_hash varchar(42) unique, domain text, url text,
                       post_data text, headers text, created int, data blob, only_headers int)''')
     c.execute('''CREATE INDEX IF NOT EXISTS cache_domain ON cache (domain)''')
     c.execute('''CREATE INDEX IF NOT EXISTS cache_url ON cache (url)''')
