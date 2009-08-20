@@ -8,6 +8,7 @@ import StringIO
 import time
 import urlparse
 import urllib2
+import sqlite3
 
 import chardet
 import simplejson
@@ -17,6 +18,7 @@ from net import DEFAULT_HEADERS, getEncoding
 
 
 cache_timeout = 30*24*60*60 # default is 30 days
+
 
 def status(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout):
     '''
@@ -41,13 +43,12 @@ def exists(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout):
     return False
 
 def getHeaders(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout):
-    url_cache_file = "%s.headers" % _getUrlCacheFile(url, data, headers)
-    url_headers = _loadUrlCache(url_cache_file, timeout)
+    url_headers = _getUrlCache(url, data, headers, timeout, "headers")
     if url_headers:
         url_headers = simplejson.loads(url_headers)
     else:
         url_headers = net.getHeaders(url, data, headers)
-        _saveUrlHeaders(url_cache_file, url_headers)
+        _saveUrlCache(url, data, -1, url_headers)
     return url_headers
 
 class InvalidResult(Exception):
@@ -68,9 +69,9 @@ def getUrl(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout, valid
     #FIXME: send last-modified / etag from cache and only update if needed
     if isinstance(url, unicode):
         url = url.encode('utf-8')
-    url_cache_file = _getUrlCacheFile(url, data, headers)
-    result = _loadUrlCache(url_cache_file, timeout)
+    result = _getUrlCache(url, data, headers, timeout)
     if not result:
+        print "get data", url
         try:
             url_headers, result = net.getUrl(url, data, headers, returnHeaders=True)
         except urllib2.HTTPError, e:
@@ -80,7 +81,7 @@ def getUrl(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout, valid
             if url_headers.get('content-encoding', None) == 'gzip':
                 result = gzip.GzipFile(fileobj=StringIO.StringIO(result)).read()
         if not valid or valid(result, url_headers):
-            _saveUrlCache(url_cache_file, result, url_headers)
+            _saveUrlCache(url, data, result, url_headers)
         else:
             raise InvalidResult(result, url_headers)
     return result
@@ -96,42 +97,113 @@ def _getCacheBase():
     'cache base is eather ~/.ox/cache or can set via env variable oxCACHE'
     return os.environ.get('oxCACHE', os.path.expanduser('~/.ox/cache'))
 
-def _getUrlCacheFile(url, data=None, headers=DEFAULT_HEADERS):
+def _getCacheDB():
+    return os.path.join(_getCacheBase(), "cache.sqlite")
+
+def _connectDb():
+    conn = sqlite3.connect(_getCacheDB(), timeout=10)
+    conn.text_factory = str
+    return conn
+
+def _createDb(c):
+    # Create table and indexes 
+    c.execute('''CREATE TABLE IF NOT EXISTS cache (url_hash varchar(42) unique, url text,
+                      post_data text, headers text, created int, data blob, only_headers int)''')
+    c.execute('''CREATE INDEX IF NOT EXISTS cache_domain ON cache (domain)''')
+    c.execute('''CREATE INDEX IF NOT EXISTS cache_url ON cache (url)''')
+    c.execute('''CREATE INDEX IF NOT EXISTS cache_url_hash ON cache (url_hash)''')
+
+
+def _getUrlCache(url, data, headers=DEFAULT_HEADERS, timeout=-1, value="data"):
+    r = None
+    if timeout == 0:
+        return r
+
     if data:
         url_hash = hashlib.sha1(url + '?' + data).hexdigest()
     else:
         url_hash = hashlib.sha1(url).hexdigest()
-    domain = ".".join(urlparse.urlparse(url)[1].split('.')[-2:])
-    return os.path.join(_getCacheBase(), domain, url_hash[:2], url_hash[2:4], url_hash[4:6], url_hash)
 
-def _loadUrlCache(url_cache_file, timeout=cache_timeout):
-    if timeout == 0:
-        return None
-    if os.path.exists(url_cache_file):
-        ctime = os.stat(url_cache_file).st_ctime
+    conn = _connectDb()
+    c = conn.cursor()
+    _createDb(c)
+
+    sql = 'SELECT %s FROM cache WHERE url_hash=?' % value
+    if timeout > 0:
         now = time.mktime(time.localtime())
-        file_age = now-ctime
-        if timeout < 0 or file_age < timeout:
-            f = open(url_cache_file)
-            data = f.read()
-            f.close()
-            return data
-    return None
+        t = (url_hash, now-timeout)
+        sql += ' AND created > ?'
+    else:
+        t = (url_hash, )
+    if value != "headers":
+        sql += ' AND only_headers != 1 '
+    c.execute(sql, t)
+    for row in c:
+        r = row[0]
+        break
 
-def _saveUrlCache(url_cache_file, data, headers):
-    folder = os.path.dirname(url_cache_file)
-    if not os.path.exists(folder):
-        os.makedirs(folder)
-    f = open(url_cache_file, 'w')
-    f.write(data)
-    f.close()
-    _saveUrlHeaders("%s.headers" % url_cache_file, headers)
+    c.close()
+    conn.close()
+    return r
 
-def _saveUrlHeaders(url_cache_file, headers):
-    folder = os.path.dirname(url_cache_file)
-    if not os.path.exists(folder):
-        os.makedirs(folder)
-    f = open(url_cache_file, 'w')
-    f.write(simplejson.dumps(headers))
-    f.close()
+def _saveUrlCache(url, post_data, data, headers):
+    if post_data:
+        url_hash = hashlib.sha1(url + '?' + post_data).hexdigest()
+    else:
+        url_hash = hashlib.sha1(url).hexdigest()
+
+    domain = ".".join(urlparse.urlparse(url)[1].split('.')[-2:])
+
+    conn = _connectDb()
+    c = conn.cursor()
+
+    # Create table if not exists
+    _createDb(c)
+
+    # Insert a row of data
+    if not post_data: post_data=""
+    only_headers = 0
+    if data == -1:
+        only_headers = 1
+        data = ""
+    created = time.mktime(time.localtime())
+    t = (url_hash, domain, url, post_data, simplejson.dumps(headers), created, data, only_headers)
+    c.execute(u"""INSERT OR REPLACE INTO cache values (?, ?, ?, ?, ?, ?, ?, ?)""", t)
+
+    # Save (commit) the changes and clean up
+    conn.commit()
+    c.close()
+    conn.close()
+
+def migrate_to_db():
+    import re
+    import os
+    import sqlite3
+    import glob
+
+    conn = _connectDb()
+    c = conn.cursor()
+    _createDb(c)
+
+    files = glob.glob(_getCacheBase() + "/*/*/*/*/*")
+    _files = filter(lambda x: not x.endswith(".headers"), files)
+
+    for f in _files:
+        info = re.compile("%s/(.*?)/../../../(.*)" % _getCacheBase()).findall(f)
+        domain = url = info[0][0]
+        url_hash = info[0][1]
+        post_data = ""
+        created = os.stat(f).st_ctime
+        fd = open(f, "r")
+        data = fd.read()
+        fd.close()
+        fd = open(f + ".headers", "r")
+        headers = fd.read()
+        fd.close()
+        t = (url_hash, domain, url, post_data, headers, created, data, 0)
+        c.execute(u"""INSERT OR REPLACE INTO cache values (?, ?, ?, ?, ?, ?, ?, ?)""", t)
+
+    conn.commit()
+    c.close()
+    conn.close()
 
