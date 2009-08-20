@@ -71,7 +71,7 @@ def getUrl(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout, valid
         url = url.encode('utf-8')
     result = _getUrlCache(url, data, headers, timeout)
     if not result:
-        print "get data", url
+        #print "get data", url
         try:
             url_headers, result = net.getUrl(url, data, headers, returnHeaders=True)
         except urllib2.HTTPError, e:
