@@ -140,6 +140,8 @@ def _getUrlCache(url, data, headers=DEFAULT_HEADERS, timeout=-1, value="data"):
     c.execute(sql, t)
     for row in c:
         r = row[0]
+        if value == 'data':
+            r = str(r)
         break
 
     c.close()
