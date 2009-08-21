@@ -16,6 +16,8 @@ Usage:
  oxlib.formatBytes(1234567890)
  '1.15 GB'
 
+Install:
+  python setup.py install
 
 Tests:
  nosetests --with-doctest oxlib

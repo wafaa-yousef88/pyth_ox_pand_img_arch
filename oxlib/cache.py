@@ -167,7 +167,7 @@ def _saveUrlCache(url, post_data, data, headers):
         only_headers = 1
         data = ""
     created = time.mktime(time.localtime())
-    t = (url_hash, domain, url, post_data, simplejson.dumps(headers), created, data, only_headers)
+    t = (url_hash, domain, url, post_data, simplejson.dumps(headers), created, sqlite3.Binary(data), only_headers)
     c.execute(u"""INSERT OR REPLACE INTO cache values (?, ?, ?, ?, ?, ?, ?, ?)""", t)
 
     # Save (commit) the changes and clean up
@@ -200,7 +200,7 @@ def migrate_to_db():
         fd = open(f + ".headers", "r")
         headers = fd.read()
         fd.close()
-        t = (url_hash, domain, url, post_data, headers, created, data, 0)
+        t = (url_hash, domain, url, post_data, headers, created, sqlite3.Binary(data), 0)
         c.execute(u"""INSERT OR REPLACE INTO cache values (?, ?, ?, ?, ?, ?, ?, ?)""", t)
 
     conn.commit()
