@@ -5,6 +5,7 @@
 from threading import Event
 import hashlib
 from os import stat
+import os
 
 from BitTornado.BT1.makemetafile import make_meta_file
 from bencode import bencode, bdecode
@@ -54,6 +55,18 @@ def getTorrentInfo(data):
     tinfo['hash'] = hashlib.sha1(bencode(info)).hexdigest()
     tinfo['announce'] = metainfo['announce']
     return tinfo
+
+def getFiles(data):
+    files = []
+    info = getTorrentInfo(data)
+    if 'files' in info:
+        for f in info['files']:
+            path = [info['name'], ]
+            path.extend(f['path'])
+            files.append(os.path.join(*path))
+    else:
+        files.append(info['name'])
+    return files
 
 def getTorrentSize(torrentFile):
     "Returns Size of files in torrent file in bytes"
