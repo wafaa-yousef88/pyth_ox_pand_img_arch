@@ -19,7 +19,7 @@ setup(
     url="http://code.0xdb.org/oxlib",
     download_url="http://code.0xdb.org/oxlib/download",
     license="GPLv3",
-    packages=['oxlib'],
+    packages=['ox'],
     zip_safe=False,
     keywords = [
     ],
