@@ -46,7 +46,7 @@ def openUrl(url, data=None, headers=DEFAULT_HEADERS):
     req = urllib2.Request(url, data, headers)
     return urllib2.urlopen(req)
 
-def getUrl(url, data=None, headers=DEFAULT_HEADERS, returnHeaders=False):
+def readUrl(url, data=None, headers=DEFAULT_HEADERS, returnHeaders=False):
     f = openUrl(url, data, headers)
     data = f.read()
     f.close()
@@ -57,8 +57,8 @@ def getUrl(url, data=None, headers=DEFAULT_HEADERS, returnHeaders=False):
         return dict(f.headers), data
     return data
 
-def getUrlUnicode(url):
-    data = getUrl(url)
+def readUrlUnicode(url):
+    data = readUrl(url)
     encoding = getEncoding(data)
     if not encoding:
         encoding = 'latin-1'

@@ -43,7 +43,7 @@ def exists(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout):
     return False
 
 def getHeaders(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout):
-    url_headers = _getUrlCache(url, data, headers, timeout, "headers")
+    url_headers = _readUrlCache(url, data, headers, timeout, "headers")
     if url_headers:
         url_headers = simplejson.loads(url_headers)
     else:
@@ -57,7 +57,7 @@ class InvalidResult(Exception):
         self.result = result
         self.headers = headers
 
-def getUrl(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout, valid=None):
+def readUrl(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout, valid=None):
     '''
         url     - url to load
         data    - possible post data
@@ -69,11 +69,11 @@ def getUrl(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout, valid
     #FIXME: send last-modified / etag from cache and only update if needed
     if isinstance(url, unicode):
         url = url.encode('utf-8')
-    result = _getUrlCache(url, data, headers, timeout)
+    result = _readUrlCache(url, data, headers, timeout)
     if not result:
         #print "get data", url
         try:
-            url_headers, result = net.getUrl(url, data, headers, returnHeaders=True)
+            url_headers, result = net.readUrl(url, data, headers, returnHeaders=True)
         except urllib2.HTTPError, e:
             e.headers['Status'] = "%s" % e.code
             url_headers = dict(e.headers)
@@ -86,8 +86,8 @@ def getUrl(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout, valid
             raise InvalidResult(result, url_headers)
     return result
 
-def getUrlUnicode(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout, _getUrl=getUrl, valid=None):
-    data = _getUrl(url, data, headers, timeout, valid)
+def readUrlUnicode(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout, _readUrl=readUrl, valid=None):
+    data = _readUrl(url, data, headers, timeout, valid)
     encoding = getEncoding(data)
     if not encoding:
         encoding = 'latin-1'
@@ -114,7 +114,7 @@ def _createDb(c):
     c.execute('''CREATE INDEX IF NOT EXISTS cache_url_hash ON cache (url_hash)''')
 
 
-def _getUrlCache(url, data, headers=DEFAULT_HEADERS, timeout=-1, value="data"):
+def _readUrlCache(url, data, headers=DEFAULT_HEADERS, timeout=-1, value="data"):
     r = None
     if timeout == 0:
         return r
