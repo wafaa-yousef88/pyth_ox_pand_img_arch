@@ -16,10 +16,10 @@ setup(
     description="python-oxlib some tools to build tools",
     author="0x",
     author_email="code@0xdb.org",
-    url="http://code.0xdb.org/oxlib",
-    download_url="http://code.0xdb.org/oxlib/download",
+    url="http://code.0xdb.org/python-oxlib",
+    download_url="http://code.0xdb.org/python-oxlib/download",
     license="GPLv3",
-    packages=['ox'],
+    packages=['oxlib'],
     zip_safe=False,
     keywords = [
     ],
