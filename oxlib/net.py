@@ -82,7 +82,7 @@ def saveUrl(url, filename, overwrite=False):
         dirname = os.path.dirname(filename)
         if not os.path.exists(dirname):
             os.makedirs(dirname)
-        data = getUrl(url)
+        data = readUrl(url)
         f = open(filename, 'w')
         f.write(data)
         f.close()
