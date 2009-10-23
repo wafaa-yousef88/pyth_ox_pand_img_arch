@@ -98,7 +98,10 @@ def _getCacheBase():
     return os.environ.get('oxCACHE', os.path.expanduser('~/.ox/cache'))
 
 def _getCacheDB():
-    return os.path.join(_getCacheBase(), "cache.sqlite")
+    path = _getCacheBase()
+    if not os.path.exists(os.path.dirname(path)):
+        os.makedirs(os.path.exists(os.path.dirname(path)))
+    return os.path.join(path, "cache.sqlite")
 
 def _connectDb():
     conn = sqlite3.connect(_getCacheDB(), timeout=10)

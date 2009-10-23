@@ -20,7 +20,6 @@ setup(
     download_url="http://code.0xdb.org/python-oxlib/download",
     license="GPLv3",
     packages=['oxlib'],
-    zip_safe=False,
     keywords = [
     ],
     classifiers = [
