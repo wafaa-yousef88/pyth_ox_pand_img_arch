@@ -93,6 +93,16 @@ def readUrlUnicode(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeou
         encoding = 'latin-1'
     return unicode(data, encoding)
 
+def saveUrl(url, filename, overwrite=False):
+    if not os.path.exists(filename) or overwrite:
+        dirname = os.path.dirname(filename)
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
+        data = readUrl(url)
+        f = open(filename, 'w')
+        f.write(data)
+        f.close()
+
 def _getCacheBase():
     'cache base is eather ~/.ox/cache or can set via env variable oxCACHE'
     return os.environ.get('oxCACHE', os.path.expanduser('~/.ox/cache'))
