@@ -110,7 +110,7 @@ def _getCacheBase():
 def _getCacheDB():
     path = _getCacheBase()
     if not os.path.exists(os.path.dirname(path)):
-        os.makedirs(os.path.exists(os.path.dirname(path)))
+        os.makedirs(os.path.dirname(path))
     return os.path.join(path, "cache.sqlite")
 
 def _connectDb():
