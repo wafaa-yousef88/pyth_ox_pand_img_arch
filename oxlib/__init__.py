@@ -11,9 +11,5 @@ from text import *
 import cache
 import net
 
-#only works if BitTornado is installed
-try:
-    from torrent import *
-except:
-    pass
+from torrent import *
 

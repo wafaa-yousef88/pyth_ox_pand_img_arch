@@ -1,19 +1,18 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-# GPL 2007
+# GPL 2007-2009
 
 from threading import Event
 import hashlib
-from os import stat
 import os
 
-from BitTornado.BT1.makemetafile import make_meta_file
 from bencode import bencode, bdecode
 
 
 def createTorrent(file, url, params = {}, flag = Event(),
                    progress = lambda x: None, progress_percent = 1):
     "Creates a torrent for a given file, using url as tracker url"
+    from makemetafile import make_meta_file
     return make_meta_file(file, url, params, flag, progress, progress_percent)
 
 def getInfoHash(torrentFile):
@@ -21,14 +20,14 @@ def getInfoHash(torrentFile):
     metainfo_file = open(torrentFile, 'rb')
     metainfo = bdecode(metainfo_file.read())
     info = metainfo['info']
-    return hashlib.sha1(bencode(info)).hexdigest().upper()
+    return hashlib.sha1(bencode(info)).hexdigest()
 
 def getTorrentInfoFromFile(torrentFile):
     f = open(torrentFile, 'rb')
     data = f.read()
     f.close()
     tinfo = getTorrentInfo(data)
-    tinfo['timestamp'] = stat(torrentFile).st_ctime
+    tinfo['timestamp'] = os.stat(torrentFile).st_ctime
     return tinfo
 
 def getTorrentInfo(data):
