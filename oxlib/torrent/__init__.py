@@ -8,6 +8,7 @@ import os
 
 from bencode import bencode, bdecode
 
+__all__ = ['createTorrent', 'getInfoHash', 'getTorrentInfoFromFile', 'getTorrentInfo', 'getFiles', 'getTorrentSize']
 
 def createTorrent(file, url, params = {}, flag = Event(),
                    progress = lambda x: None, progress_percent = 1):

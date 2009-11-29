@@ -10,6 +10,7 @@ import subprocess
 
 import simplejson
 
+__all__ = ['sha1sum', 'oshash', 'avinfo']
 
 def sha1sum(filename):
     sha1 = hashlib.sha1()
