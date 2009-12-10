@@ -19,7 +19,7 @@ setup(
     url="http://code.0xdb.org/python-oxlib",
     download_url="http://code.0xdb.org/python-oxlib/download",
     license="GPLv3",
-    packages=['oxlib'],
+    packages=['oxlib', 'oxlib.torrent'],
     keywords = [
     ],
     classifiers = [
