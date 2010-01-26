@@ -261,7 +261,9 @@ def time2ms(timeString):
     ms = 0.0
     p = timeString.split(':')
     for i in range(len(p)):
-        ms = ms * 60 + float(p[i])
+        _p = p[i]
+        if _p.endswith('.'): _p =_p[:-1]
+        ms = ms * 60 + float(_p)
     return int(ms * 1000)
 
 def shiftTime(offset, timeString):
