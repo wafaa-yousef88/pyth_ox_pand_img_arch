@@ -8,8 +8,10 @@ from format import *
 from html import *
 from iso import *
 from text import *
+from form import *
 import cache
 import net
 
 from torrent import *
+
 
