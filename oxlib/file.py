@@ -60,7 +60,8 @@ def oshash(filename):
         return "IOError"
 
 def avinfo(filename):
-    p = subprocess.Popen(['ffmpeg2theora', '--info', filename], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    info, error = p.communicate()
-    return simplejson.loads(info)
-
+    if os.path.getsize(filename):
+        p = subprocess.Popen(['ffmpeg2theora', '--info', filename], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        info, error = p.communicate()
+        return simplejson.loads(info)
+    return {'path': filename, 'size': 0}
