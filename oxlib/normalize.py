@@ -106,6 +106,8 @@ def canonicalName(name):
     #      - single surname, composed name: 186604
     #        (2: 178315, 3: 6573, 4: 1219, 5: 352)
     # Don't convert names already in the canonical format.
+    if name in ('Unknown Director', ):
+        return name
     if name.find(', ') != -1: return name
     sname = name.split(' ')
     snl = len(sname)
