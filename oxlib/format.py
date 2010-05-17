@@ -77,6 +77,7 @@ def from32(q):
         'L': 1,
     }
     base32 = '0123456789ABCDEFGHIJKLMNOPQRSTUV'
+    q = q.replace('-','')
     q = ''.join([base32[_32map[i.upper()]] for i in q])
     return int(q, 32)
 
