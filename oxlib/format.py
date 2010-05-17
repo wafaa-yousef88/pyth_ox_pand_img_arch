@@ -3,6 +3,83 @@
 import math
 import re
 
+def to32(q):
+    """
+    Converts an integer to base 32
+    We exclude 4 of the 26 letters: I L O U.
+    http://www.crockford.com/wrmg/base32.html
+
+    >>> to32(35)
+    '13'
+    >>> to32(119292)
+    '3MgV'
+    >>> to32(939387374)
+    'wZwTgD'
+    >>> to32(0)
+    '0'
+    >>> to32(-393)
+    Traceback (most recent call last):
+        ...
+    ValueError: must supply a positive integer
+    """
+
+    if q < 0: raise ValueError, "must supply a positive integer"
+    letters = "0123456789ACBEDGFHKJMNQPSRTWVYXZ"
+    converted = []
+    upper = True
+    while q != 0:
+        q, r = divmod(q, 32)
+        l = letters[r]
+        if upper:
+            upper = False
+        else:
+            l = l.lower()
+            upper = True
+        converted.insert(0, l)
+    return "".join(converted) or '0'
+
+def from32(q):
+    _32map = {
+        '0': 0,
+        '1': 1,
+        '2': 2,
+        '3': 3,
+        '4': 4,
+        '5': 5,
+        '6': 6,
+        '7': 7,
+        '8': 8,
+        '9': 9,
+        'A': 10,
+        'B': 11,
+        'C': 12,
+        'D': 13,
+        'E': 14,
+        'F': 15,
+        'G': 16,
+        'H': 17,
+        'J': 18,
+        'K': 19,
+        'M': 20,
+        'N': 21,
+        'P': 22,
+        'Q': 23,
+        'R': 24,
+        'S': 25,
+        'T': 26,
+        'V': 27,
+        'W': 28,
+        'X': 29,
+        'Y': 30,
+        'Z': 31,
+        'O': 0,
+        'I': 1,
+        'L': 1,
+    }
+    base32 = '0123456789ABCDEFGHIJKLMNOPQRSTUV'
+    q = ''.join([base32[_32map[i.upper()]] for i in q])
+    return int(q, 32)
+
 def to36(q):
     """
     Converts an integer to base 36 (a useful scheme for human-sayable IDs
