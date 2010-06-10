@@ -121,6 +121,9 @@ def make_meta_file(file, url, params = {}, flag = Event(),
         data['httpseeds'] = params['real_httpseeds']
     elif params.has_key('httpseeds') and params['httpseeds']:
         data['httpseeds'] = params['httpseeds'].split('|')
+
+    if params.has_key('url-list') and params['url-list']:
+        data['url-list'] = params['url-list'].split('|')
         
     h.write(bencode(data))
     h.close()
