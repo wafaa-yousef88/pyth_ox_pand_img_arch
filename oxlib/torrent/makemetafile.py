@@ -124,7 +124,10 @@ def make_meta_file(file, url, params = {}, flag = Event(),
 
     if params.has_key('url-list') and params['url-list']:
         data['url-list'] = params['url-list'].split('|')
-        
+
+    if params.has_key('playtime') and params['playtime']:
+        data['info']['playtime'] = params['playtime']
+
     h.write(bencode(data))
     h.close()
 
