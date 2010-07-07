@@ -11,15 +11,15 @@ def get_bzr_version():
     return u'unknown'
 
 setup(
-    name="oxlib",
-    version="1.0.%s" % get_bzr_version() ,
-    description="python-oxlib some tools to build tools",
+    name="ox",
+    version="2.0.%s" % get_bzr_version() ,
+    description="python-ox some tools to build tools",
     author="0x",
-    author_email="code@0xdb.org",
-    url="http://code.0xdb.org/python-oxlib",
-    download_url="http://code.0xdb.org/python-oxlib/download",
+    author_email="code@0x2620.org",
+    url="http://code.0x2620.org/python-ox",
+    download_url="http://code.0x2620.org/python-ox/download",
     license="GPLv3",
-    packages=['oxlib', 'oxlib.torrent'],
+    packages=['ox', 'ox.torrent'],
     keywords = [
     ],
     classifiers = [
