@@ -1,1 +1,1 @@
-nosetests --with-doctest oxlib
+nosetests --with-doctest ox
