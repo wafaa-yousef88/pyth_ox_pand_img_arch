@@ -1,22 +1,37 @@
-python-oxlib some tools to build tools
+python-ox some tools to build tools
 
 Depends:
  python2.5
  python-chardet (http://chardet.feedparser.org/)
+ python-feedparser (http://www.feedparser.org/)
+ python-beautifulsoup (http://www.crummy.com/software/BeautifulSoup/)
 
 Usage:
- import oxlib
+ import ox
  
- data = oxlib.cache.readUrl('http:/...')
- text = oxlib.stripTags(data)
- oxlib.normalizeNewlines(text)
- oxlib.formatBytes(len(data))
+ data = ox.cache.readUrl('http:/...')
+ text = ox.stripTags(data)
+ ox.normalizeNewlines(text)
+ ox.formatBytes(len(data))
 
- oxlib.formatBytes(1234567890)
+ ox.formatBytes(1234567890)
  '1.15 GB'
+
+ import ox.web.imdb
+ imdbId = ox.web.imdb.guess('The Matrix')
+ info = ox.web.imdb.Imdb(imdbId)
+ info['year']
+ 1999
 
 Install:
   python setup.py install
 
+Cookies:
+  some ox.web modules require user accont information or cookies to work,
+  those are saved in ~/.ox/auth.json, most basic form looks like this:
+  {
+    "key": "value"
+  }
+
 Tests:
- nosetests --with-doctest oxlib
+ nosetests --with-doctest ox
