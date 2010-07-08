@@ -19,7 +19,7 @@ setup(
     url="http://code.0x2620.org/python-ox",
     download_url="http://code.0x2620.org/python-ox/download",
     license="GPLv3",
-    packages=['ox', 'ox.torrent'],
+    packages=['ox', 'ox.torrent', 'ox.web'],
     keywords = [
     ],
     classifiers = [
