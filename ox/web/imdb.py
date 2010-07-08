@@ -137,7 +137,7 @@ class Imdb(SiteParser):
         },
         'year': {
             'page': 'combined',
-            're': '<a href="/year/(\d{4})/">',
+            're': '<meta name="og:title" content=".*?\((\d{4})\)"',
             'type': 'int'
         }
     }
@@ -146,13 +146,16 @@ class Imdb(SiteParser):
         self.baseUrl = "http://www.imdb.com/title/tt%s/" % id
         super(Imdb, self).__init__()
 
-        if 'runtime' in self:
+        if 'runtime' in self and self['runtime']:
             if 'min' in self['runtime']: base=60
             else: base=1
             self['runtime'] = int(findRe(self['runtime'], '([0-9]+)')) * base
-
+        else:
+            self['runtime'] = 0
         if 'connections' in self:
             cc={}
+            if len(self['connections']) == 2 and isinstance(self['connections'][0], basestring):
+                self['connections'] = [self['connections']]
             for rel, data in self['connections']:
                 cc[unicode(rel)] = re.compile('<a href="/title/tt(\d{7})/">').findall(data)
             self['connections'] = cc
