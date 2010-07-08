@@ -107,6 +107,14 @@ class Imdb(SiteParser):
             're': '<a href="/date/(\d{2})-(\d{2})/">.*?</a> <a href="/year/(\d{4})/">',
             'type': 'date'
         },
+        'reviews': {
+            'page': 'externalreviews',
+            're': [
+                '<ol>(.*?)</ol>',
+                '<li><a href="(http.*?)".*?>(.*?)</a></li>'
+            ],
+            'type': 'list'
+        },
         'runtime': {
             'page': 'combined',
             're': '<h5>Runtime:</h5><div class="info-content">.*?([0-9]+ sec|[0-9]+ min).*?</div>',
