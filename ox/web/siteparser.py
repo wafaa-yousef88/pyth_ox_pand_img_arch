@@ -49,13 +49,13 @@ class SiteParser(dict):
                     data = [f(d) for d in data]
                 else:
                     data = f(data)
-                return data            
+                return data
             if self.regex[key]['type'] == 'float':
                 data = apply_f(float, data)
             elif self.regex[key]['type'] == 'int':
                 data = apply_f(int, data)
             elif self.regex[key]['type'] == 'date':
-                parse_date = lambda d: datetime.strptime('-'.join(d), '%m-%d-%Y').strftime('%Y-%m-%d')
+                parse_date = lambda d: d and datetime.strptime('-'.join(d), '%m-%d-%Y').strftime('%Y-%m-%d')
                 data = apply_f(parse_date, data)
             self[key] = data
 

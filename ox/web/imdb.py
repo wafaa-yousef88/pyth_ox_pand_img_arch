@@ -15,6 +15,15 @@ import google
 
 class Imdb(SiteParser):
     regex =  {
+        'alternative_titles': {
+            'page': 'releaseinfo',
+            're': [
+                'name="akas".*?<table.*?>(.*?)</table>',
+                "td>(.*?)</td>\n\n<td>(.*?)</td>"
+            ],
+            'type': 'list'
+        
+        },
         'cast': {
             'page': 'combined',
             're': '<td class="nm">.*?>(.*?)</a>.*?<td class="char">(.*?)</td>',
@@ -76,7 +85,7 @@ class Imdb(SiteParser):
         },
         'plot': {
             'page': 'plotsummary',
-            're': '<p class="plotpar">(.*?)<i>',
+            're': '</div>.*?<p class="plotpar">(.*?)<i>',
             'type': 'string'
         },
         'poster_id': {
@@ -145,7 +154,7 @@ class Imdb(SiteParser):
         },
         'year': {
             'page': 'combined',
-            're': '<meta name="og:title" content=".*?\((\d{4})\)"',
+            're': '<meta name="og:title" content=".*?\((\d{4})\).*?"',
             'type': 'int'
         }
     }
@@ -160,6 +169,7 @@ class Imdb(SiteParser):
             self['runtime'] = int(findRe(self['runtime'], '([0-9]+)')) * base
         else:
             self['runtime'] = 0
+        if 'votes' in self: self['votes'] = self['votes'].replace(',', '')
         if 'connections' in self:
             cc={}
             if len(self['connections']) == 2 and isinstance(self['connections'][0], basestring):
@@ -167,6 +177,10 @@ class Imdb(SiteParser):
             for rel, data in self['connections']:
                 cc[unicode(rel)] = re.compile('<a href="/title/tt(\d{7})/">').findall(data)
             self['connections'] = cc
+
+        for key in ('countries', 'genres'):
+            self[key] = filter(lambda x: x.lower() != 'home', self[key])
+
 
 def guess(title, director='', timeout=google.DEFAULT_TIMEOUT):
     #FIXME: proper file -> title
