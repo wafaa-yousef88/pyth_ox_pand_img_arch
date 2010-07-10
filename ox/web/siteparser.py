@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 import re
-from datetime import datetime
 
-from ox.cache import readUrlUnicode
-from ox import stripTags, decodeHtml
+from ..cache import readUrlUnicode
+from .. import stripTags, decodeHtml
+from ..utils import datetime
 
 
 def cleanup(key, data, data_type):

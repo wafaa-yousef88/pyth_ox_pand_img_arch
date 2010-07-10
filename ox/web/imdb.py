@@ -26,7 +26,7 @@ class Imdb(SiteParser):
         
         },
         'cast': {
-            'page': 'fullcredits',
+            'page': 'combined',
             're': [
                 '<td class="nm">.*?>(.*?)</a>.*?<td class="char">(.*?)</td>',
                 lambda ll: [stripTags(l) for l in ll]
@@ -34,7 +34,7 @@ class Imdb(SiteParser):
             'type': 'list'
         },
         'cinematographers': {
-            'page': 'fullcredits',
+            'page': 'combined',
             're': [
                 lambda data: data.split('Series Crew')[0],
                 'Cinematography by</a>(.*?)</table>',
@@ -53,7 +53,7 @@ class Imdb(SiteParser):
             'type': 'list'
         },
         'directors': {
-            'page': 'fullcredits',
+            'page': 'combined',
             're': [
                 lambda data: data.split('Series Crew')[0],
                 'Directed by</a>(.*?)</table>',
@@ -62,7 +62,7 @@ class Imdb(SiteParser):
             'type': 'list'
         },
         'editors': {
-            'page': 'fullcredits',
+            'page': 'combined',
             're': [
                 lambda data: data.split('Series Crew')[0],
                 'Film Editing by</a>(.*?)</table>',
@@ -152,7 +152,7 @@ class Imdb(SiteParser):
             'type': 'string'
         },
         'writers': {
-            'page': 'fullcredits',
+            'page': 'combined',
             're': [
                 lambda data: data.split('Series Crew')[0],
                 'Writing credits</a>(.*?)</table>',
