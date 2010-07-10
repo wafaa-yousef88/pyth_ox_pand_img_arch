@@ -108,6 +108,7 @@ class Imdb(SiteParser):
         'producers': {
             'page': 'combined',
             're': [
+                lambda data: data.split('Series Crew')[0],
                 'Produced by</a>(.*?)</table>',
                 '<a href="/name/.*?/">(.*?)</a>'
             ],
