@@ -15,7 +15,7 @@ def cleanup(key, data, data_type):
             data = [decodeHtml(p).strip() for p in data]
         elif isinstance(data[0], list) or isinstance(data[0], tuple):
             data = [cleanup(key, p, data_type) for p in data]
-        while len(data) == 1:
+        while len(data) == 1 and not isinstance(data, basestring):
             data = data[0]
         if data_type == 'list' and isinstance(data, basestring):
             data = [data, ]
@@ -37,12 +37,18 @@ class SiteParser(dict):
             if isinstance(self.regex[key]['re'], basestring):
                 data = re.compile(self.regex[key]['re'], re.DOTALL).findall(data)
                 data = cleanup(key, data, self.regex[key]['type'])
+            elif callable(self.regex[key]['re']):
+                data = self.regex[key]['re'](data)
             else:
                 for r in self.regex[key]['re']:
-                    if isinstance(data, basestring):
-                        data = re.compile(r, re.DOTALL).findall(data)
+                    if callable(r):
+                        f = r
                     else:
-                        data = [re.compile(r, re.DOTALL).findall(d) for d in data]
+                        f = re.compile(r, re.DOTALL).findall
+                    if isinstance(data, basestring):
+                        data = f(data)
+                    else:
+                        data = [f(d) for d in data]
                         data = cleanup(key, data, self.regex[key]['type'])
             def apply_f(f, data):
                 if data and isinstance(data[0], list):
@@ -50,12 +56,13 @@ class SiteParser(dict):
                 else:
                     data = f(data)
                 return data
-            if self.regex[key]['type'] == 'float':
+            if self.regex[key]['type'] == 'float' and data:
                 data = apply_f(float, data)
             elif self.regex[key]['type'] == 'int':
                 data = apply_f(int, data)
             elif self.regex[key]['type'] == 'date':
                 parse_date = lambda d: d and datetime.strptime('-'.join(d), '%m-%d-%Y').strftime('%Y-%m-%d')
                 data = apply_f(parse_date, data)
-            self[key] = data
+            if data:
+                self[key] = data
 

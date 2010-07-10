@@ -7,11 +7,12 @@ import os
 import time
 
 import ox
-from ox import findRe
+from ox import findRe, stripTags
 from ox.normalize import normalizeTitle, normalizeImdbId
 
 from siteparser import SiteParser
 import google
+
 
 class Imdb(SiteParser):
     regex =  {
@@ -25,13 +26,17 @@ class Imdb(SiteParser):
         
         },
         'cast': {
-            'page': 'combined',
-            're': '<td class="nm">.*?>(.*?)</a>.*?<td class="char">(.*?)</td>',
+            'page': 'fullcredits',
+            're': [
+                '<td class="nm">.*?>(.*?)</a>.*?<td class="char">(.*?)</td>',
+                lambda ll: [stripTags(l) for l in ll]
+             ],
             'type': 'list'
         },
         'cinematographers': {
-            'page': 'combined',
+            'page': 'fullcredits',
             're': [
+                lambda data: data.split('Series Crew')[0],
                 'Cinematography by</a>(.*?)</table>',
                 '<a href="/name/.*?/">(.*?)</a>'
             ],
@@ -48,16 +53,18 @@ class Imdb(SiteParser):
             'type': 'list'
         },
         'directors': {
-            'page': 'combined',
+            'page': 'fullcredits',
             're': [
+                lambda data: data.split('Series Crew')[0],
                 'Directed by</a>(.*?)</table>',
                 '<a href="/name/.*?/">(.*?)</a>'
             ],
             'type': 'list'
         },
         'editors': {
-            'page': 'combined',
+            'page': 'fullcredits',
             're': [
+                lambda data: data.split('Series Crew')[0],
                 'Film Editing by</a>(.*?)</table>',
                 '<a href="/name/.*?/">(.*?)</a>'
             ],
@@ -108,7 +115,7 @@ class Imdb(SiteParser):
         },
         'rating': {
             'page': 'combined',
-            're': '<div class="starbar-meta">.*?<b>(.*?)/10</b>',
+            're': '<div class="starbar-meta">.*?<b>([\d,.]?)/10</b>',
             'type': 'float'
         },
         'release_date': {
@@ -141,12 +148,13 @@ class Imdb(SiteParser):
         },
         'votes': {
             'page': 'combined',
-            're': '<a href="ratings" class="tn15more">(.*?) votes</a>',
+            're': '<a href="ratings" class="tn15more">([\d,]*?) votes</a>',
             'type': 'string'
         },
         'writers': {
-            'page': 'combined',
+            'page': 'fullcredits',
             're': [
+                lambda data: data.split('Series Crew')[0],
                 'Writing credits</a>(.*?)</table>',
                 '<a href="/name/.*?/">(.*?)</a>'
             ],
@@ -167,8 +175,8 @@ class Imdb(SiteParser):
             if 'min' in self['runtime']: base=60
             else: base=1
             self['runtime'] = int(findRe(self['runtime'], '([0-9]+)')) * base
-        else:
-            self['runtime'] = 0
+        if 'runtime' in self and not self['runtime']:
+            del self['runtime']
         if 'votes' in self: self['votes'] = self['votes'].replace(',', '')
         if 'connections' in self:
             cc={}
@@ -179,7 +187,8 @@ class Imdb(SiteParser):
             self['connections'] = cc
 
         for key in ('countries', 'genres'):
-            self[key] = filter(lambda x: x.lower() != 'home', self[key])
+            if key in self:
+                self[key] = filter(lambda x: x.lower() != 'home', self[key])
 
 
 def guess(title, director='', timeout=google.DEFAULT_TIMEOUT):
@@ -192,7 +201,7 @@ def guess(title, director='', timeout=google.DEFAULT_TIMEOUT):
     return_url = ''
 
     #lest first try google
-    #i.e. site:imdb.com Michael Stevens Sin
+    #i.e. site:imdb.com Michael Stevens "Sin"
     if director:
         search = 'site:imdb.com %s "%s"' % (director, title)
     else:
