@@ -70,6 +70,11 @@ class Imdb(SiteParser):
             ],
             'type': 'list'
         },
+        'episode_title': {
+            'page': 'combined',
+            're': '<div id="tn15title">.*?<em>(.*?)</em>',
+            'type': 'string'
+        },
         'filming_locations': {
             'page': 'locations',
             're': '<a href="/search/title\?locations=.*?">(.*?)</a>',
@@ -119,7 +124,7 @@ class Imdb(SiteParser):
             're': '<div class="starbar-meta">.*?<b>([\d,.]?)/10</b>',
             'type': 'float'
         },
-        'release_date': {
+        'release date': {
             'page': 'releaseinfo',
             're': '<a href="/date/(\d{2})-(\d{2})/">.*?</a> <a href="/year/(\d{4})/">',
             'type': 'date'
@@ -135,6 +140,21 @@ class Imdb(SiteParser):
         'runtime': {
             'page': 'combined',
             're': '<h5>Runtime:</h5><div class="info-content">.*?([0-9]+ sec|[0-9]+ min).*?</div>',
+            'type': 'string'
+        },
+        'season': {
+            'page': 'combined',
+            're': '\(Season (\d+), Episode \d+\)',
+            'type': 'int'
+        },
+        'episode': {
+            'page': 'combined',
+            're': '\(Season \d+, Episode (\d+)\)',
+            'type': 'int'
+        },
+        'series': {
+            'page': 'combined',
+            're': '<h5>TV Series:</h5>.*?<a href="/title/tt(\d{7})',
             'type': 'string'
         },
         'title': {
@@ -168,10 +188,12 @@ class Imdb(SiteParser):
         }
     }
 
-    def __init__(self, id):
+    def __init__(self, id, timeout=-1):
         self.baseUrl = "http://www.imdb.com/title/tt%s/" % id
-        super(Imdb, self).__init__()
+        super(Imdb, self).__init__(timeout)
 
+        if 'title' in self and self['title'].startswith('"') and self['title'].endswith('"'):
+            self['title'] = self['title'][1:-1]
         if 'runtime' in self and self['runtime']:
             if 'min' in self['runtime']: base=60
             else: base=1
@@ -191,6 +213,17 @@ class Imdb(SiteParser):
             if key in self:
                 self[key] = filter(lambda x: x.lower() != 'home', self[key])
 
+        if 'series' in self:
+            if 'episode_title' in self:
+                self['series_title'] = self['title']
+                self['title'] = "%s: %s" % (self['series_title'], self['episode_title'])
+            if 'episode_title' in self and 'season' in self and 'episode' in self:
+                self['title'] = "%s (S%02dE%02d) %s" % (
+                        self['series_title'], self['season'], self['episode'], self['episode_title'])
+        else:
+            for key in ('series_title', 'episode_title', 'season', 'episode'):
+                if key in self:
+                    del self[key]
 
 def guess(title, director='', timeout=google.DEFAULT_TIMEOUT):
     #FIXME: proper file -> title

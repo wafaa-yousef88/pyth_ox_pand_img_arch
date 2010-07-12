@@ -30,7 +30,7 @@ class SiteParser(dict):
     def getUrl(self, page):
         return "%s%s" % (self.baseUrl, page)
 
-    def __init__(self):
+    def __init__(self, timeout=-1):
         for key in self.regex:
             url = self.getUrl(self.regex[key]['page'])
             data = readUrlUnicode(url)
@@ -58,7 +58,7 @@ class SiteParser(dict):
                 return data
             if self.regex[key]['type'] == 'float' and data:
                 data = apply_f(float, data)
-            elif self.regex[key]['type'] == 'int':
+            elif self.regex[key]['type'] == 'int' and data:
                 data = apply_f(int, data)
             elif self.regex[key]['type'] == 'date':
                 parse_date = lambda d: d and datetime.strptime('-'.join(d), '%m-%d-%Y').strftime('%Y-%m-%d')
