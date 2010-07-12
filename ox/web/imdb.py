@@ -95,6 +95,11 @@ class Imdb(SiteParser):
             're': '<a href="/Sections/Languages/.*?/">(.*?)</a>',
             'type': 'list'
         },
+        'original_title': {
+            'page': 'combined',
+            're': '<span class="title-extra">(.*?) <i>(original title)</i></span>',
+            'type': 'string'
+        },
         'plot': {
             'page': 'plotsummary',
             're': '</div>.*?<p class="plotpar">(.*?)<i>',
