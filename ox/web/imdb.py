@@ -149,12 +149,18 @@ class Imdb(SiteParser):
         },
         'season': {
             'page': 'combined',
-            're': '\(Season (\d+), Episode \d+\)',
+            're': [
+                '<h5>Original Air Date:</h5>.*?<div class="info-content">(.*?)</div>',
+                '\(Season (\d+), Episode \d+\)',
+             ],
             'type': 'int'
         },
         'episode': {
             'page': 'combined',
-            're': '\(Season \d+, Episode (\d+)\)',
+            're': [
+                '<h5>Original Air Date:</h5>.*?<div class="info-content">(.*?)</div>',
+                '\(Season \d+, Episode (\d+)\)',
+             ],
             'type': 'int'
         },
         'series': {
