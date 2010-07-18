@@ -26,7 +26,9 @@ def getUrlByImdbId(imdbId):
     result = find(query)
     if result:
         url = result[0][1]
-        return url
+        data = getMovieData(url)
+        if 'imdb_id' in data:
+            return url
     return ""
 
 def getUrlByImdb(imdbId):
