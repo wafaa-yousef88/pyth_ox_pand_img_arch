@@ -236,6 +236,15 @@ class Imdb(SiteParser):
                 if key in self:
                     del self[key]
 
+class ImdbCombined(Imdb):
+    def __init__(self, id, timeout=-1):
+        _regex = {}
+        for key in self.regex:
+            if self.regex[key]['page'] == 'combined':
+                _regex[key] = self.regex[key]
+        self.regex = _regex
+        super(ImdbCombined, self).__init__(id, timeout)
+
 def guess(title, director='', timeout=google.DEFAULT_TIMEOUT):
     #FIXME: proper file -> title
     title = title.split('-')[0]
