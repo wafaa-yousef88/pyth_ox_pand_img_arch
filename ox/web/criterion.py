@@ -34,17 +34,18 @@ def getData(id):
     except:
         html = ox.cache.getUrl(data["url"])
     data["number"] = findRe(html, "<p class=\"spinenumber\">(.*?)</p>")
-    data["title"] = findRe(html, "<h2 class=\"movietitle\">(.*?)</h2>")
+    data["title"] = findRe(html, "<meta property=['\"]og:title['\"] content=['\"](.*?)['\"]")
     data["director"] = findRe(html, "<h2 class=\"director\">(.*?)</h2>")
-    results = re.compile("<p><strong>(.*?)</strong></p>").findall(html)
+    results = findRe(html, '<div class="left_column">(.*?)</div>')
+    results = re.compile("<li>(.*?)</li>").findall(results)
     data["country"] = results[0]
     data["year"] = results[1]
-    result = findRe(html, "<div class=\"synopsis contentbox lightgray\">(.*?)</div>")
-    data["synopsis"] = findRe(result, "<p>(.*?)</p>")
-    result = findRe(html, "<div class=\"editioninfo\">(.*?)</div>")
+    data["synopsis"] = stripTags(findRe(html, "<p><strong>SYNOPSIS:</strong> (.*?)</p>"))
+
+    result = findRe(html, "<div class=\"purchase\">(.*?)</div>")
     if 'Blu-Ray' in result or 'Essential Art House DVD' in result:
         result = re.compile("<div class=\"editioninfo\">(.*?)</div>", re.DOTALL).findall(html)[1]
-    result = findRe(result, "<a href=\"(.*?)\">")
+    result = findRe(result, "<a href=\"(.*?)\"")
     if not "/boxsets/" in result:
         data["posters"] = [result]
     else:

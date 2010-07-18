@@ -245,6 +245,23 @@ class ImdbCombined(Imdb):
         self.regex = _regex
         super(ImdbCombined, self).__init__(id, timeout)
 
+def getMovieId(title, director='', year=''):
+    '''
+    >>> getMovieId('The Matrix')
+    '0133093'
+    '''
+    if year:
+        title = "%s (%s)" % (title, year)
+    if director:
+        query = 'site:imdb.com %s "%s"' % (director, title)
+    else:
+        query = 'site:imdb.com "%s"' % title
+    print query
+    for (name, url, desc) in google.find(query, 5, timeout=-1):
+        if url.startswith('http://www.imdb.com/title/tt'):
+            return url[28:35]
+    return ''
+
 def guess(title, director='', timeout=google.DEFAULT_TIMEOUT):
     #FIXME: proper file -> title
     title = title.split('-')[0]
