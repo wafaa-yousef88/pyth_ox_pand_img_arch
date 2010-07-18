@@ -256,7 +256,6 @@ def getMovieId(title, director='', year=''):
         query = 'site:imdb.com %s "%s"' % (director, title)
     else:
         query = 'site:imdb.com "%s"' % title
-    print query
     for (name, url, desc) in google.find(query, 5, timeout=-1):
         if url.startswith('http://www.imdb.com/title/tt'):
             return url[28:35]
