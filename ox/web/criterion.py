@@ -75,13 +75,13 @@ def getIds():
 def getIdsByPage(page):
     ids = []
     html = readUrlUnicode("http://www.criterion.com/library/dvd?page=%s" % page)
-    results = re.compile("films/(.*?)\"").findall(html)
+    results = re.compile("films/(\d+)").findall(html)
     for result in results:
         ids.append(result)
     results = re.compile("boxsets/(.*?)\"").findall(html)
     for result in results:
         html = readUrlUnicode("http://www.criterion.com/boxsets/" + result)
-        results = re.compile("films/(.*?)\"").findall(html)
+        results = re.compile("films/(\d+)").findall(html)
         for result in results:
             ids.append(result)
     return set(ids)
