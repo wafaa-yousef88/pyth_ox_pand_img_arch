@@ -64,18 +64,16 @@ def getMovieData(wikipediaUrl):
             value = d[1].strip()
             filmbox[key] = value
     if 'imdb title' in data:
-        filmbox['imdb_id'] = findRe(data, 'imdb title\|.*?(\d*?)\|')
+        filmbox['imdb_id'] = findRe(data, 'imdb title\|.*?(\d+)')
     elif 'imdb episode' in data:
-        filmbox['imdb_id'] = findRe(data, 'imdb episode\|.*?(\d*?)\|')
+        filmbox['imdb_id'] = findRe(data, 'imdb episode\|.*?(\d+)')
     if 'Amg movie' in data:
-        filmbox['amg_id'] = findRe(data, 'Amg movie\|.*?(\d*?)\|')
+        filmbox['amg_id'] = findRe(data, 'Amg movie\|.*?(\d+)')
     if 'amg_id' in filmbox and filmbox['amg_id'].startswith('1:'):
         filmbox['amg_id'] = filmbox['amg_id'][2:]
 
-    if 'rotten-tomatoes' in data:
-        filmbox['rottentomatoes_id'] = findRe(data, 'rotten-tomatoes\|id\=(.*?)\|')
-        if not filmbox['rottentomatoes_id']:
-            filmbox['rottentomatoes_id'] = findRe(data, 'rotten-tomatoes\|(.*?)\|')
+    if 'otten-tomatoes' in data:
+        filmbox['rottentomatoes_id'] = findRe(data, '\{\{Rotten-tomatoes\|id=(.*?)\}\}')
     if 'google video' in data:
         filmbox['google_video_id'] = findRe(data, 'google video\|.*?(\d*?)\|')
     if 'DEFAULTSORT' in data:
