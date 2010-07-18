@@ -46,7 +46,7 @@ def getUrlByAllmovieId(allmovieId):
 def getWikiData(wikipediaUrl):
     url = wikipediaUrl.replace('wikipedia.org/wiki/', 'wikipedia.org/w/index.php?title=')
     url = "%s&action=raw" % url
-    data = readUrlUnicode(url)
+    data = readUrl(url).decode('utf-8')
     return data
 
 def getMovieData(wikipediaUrl):
