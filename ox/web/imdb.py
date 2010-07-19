@@ -9,6 +9,7 @@ import time
 import ox
 from ox import findRe, stripTags
 from ox.normalize import normalizeTitle, normalizeImdbId
+from ox.cache import readUrl
 
 from siteparser import SiteParser
 import google
@@ -108,7 +109,7 @@ class Imdb(SiteParser):
         'poster_id': {
             'page': 'combined',
             're': '/primary-photo/media/rm(.*?)/tt',
-            'type': 'list'
+            'type': 'string'
         },
         'poster_ids': {
             'page': 'posters',
@@ -259,6 +260,15 @@ def getMovieId(title, director='', year=''):
     for (name, url, desc) in google.find(query, 5, timeout=-1):
         if url.startswith('http://www.imdb.com/title/tt'):
             return url[28:35]
+    return ''
+
+def getMoviePoster(imdbId):
+    info = ImdbCombined(imdbId)
+    if 'poster_id' in info:
+        url = "http://www.imdb.com/rg/action-box-title/primary-photo/media/rm%s/tt%s" % (info['poster_id'], imdbId)
+        data = readUrl(url)
+        poster = findRe(data, 'img id="primary-img".*?src="(.*?)"')
+        return poster
     return ''
 
 def guess(title, director='', timeout=google.DEFAULT_TIMEOUT):
