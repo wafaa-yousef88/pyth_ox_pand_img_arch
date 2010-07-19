@@ -32,7 +32,7 @@ def getData(id):
     try:
         html = readUrlUnicode(data["url"])
     except:
-        html = ox.cache.getUrl(data["url"])
+        html = ox.cache.readUrl(data["url"])
     data["number"] = findRe(html, "<p class=\"spinenumber\">(.*?)</p>")
     data["title"] = findRe(html, "<meta property=['\"]og:title['\"] content=['\"](.*?)['\"]")
     data["director"] = findRe(html, "<h2 class=\"director\">(.*?)</h2>")
