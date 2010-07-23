@@ -17,16 +17,41 @@ for article in _articles:
     if article[-1] not in ("'", '-'): article += ' '
     _spArticles.append(article)
 
+_noarticles = (
+    'los angeles',
+    'i am ',
+    'i be area',
+    'i call ',
+    'i come ',
+    'i confess',
+    'i hired ',
+    'i killed ',
+    'i know ',
+    'i live ',
+    'i love',
+    'i married',
+    'i never',
+    'i shot',
+    'i start',
+    'i was',
+)
+
 def canonicalTitle(title):
     """Return the title in the canonic format 'Movie Title, The'.
     
     >>> canonicalTitle('The Movie Title')
     'Movie Title, The'
+
+    >>> canonicalTitle('Los Angeles Plays Itself')
+    'Los Angeles Plays Itself'
     """
     try:
         if _articlesDict.has_key(title.split(', ')[-1].lower()): return title
     except IndexError: pass
     ltitle = title.lower()
+    for start in _noarticles:
+        if ltitle.startswith(start):
+            return title
     for article in _spArticles:
         if ltitle.startswith(article):
             lart = len(article)
