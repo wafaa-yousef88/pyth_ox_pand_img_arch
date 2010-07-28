@@ -7,11 +7,10 @@ import urllib2
 import weakref
 import threading
 import Queue
-import simplejson
-
 
 import ox
 from ox import stripTags
+from ox.utils import json
 
 
 '''
@@ -34,24 +33,39 @@ def readUrl(url, data=None, headers=ox.net.DEFAULT_HEADERS, timeout=DEFAULT_TIME
     return ox.cache.readUrl(url, data, headers, timeout)
 
 def quote_plus(s):
-    return urllib.quote_plus(s.encode('utf-8'))
+    if not isinstance(s, str):
+        s = s.encode('utf-8')
+    return urllib.quote_plus(s)
 
 def find(query, max_results=DEFAULT_MAX_RESULTS, timeout=DEFAULT_TIMEOUT):
-    url = "http://www.google.com/search?q=%s" % quote_plus(query)
-    data = readUrl(url, timeout=timeout)
-    link_re = r'<a href="(?P<url>[^"]*?)" class=l.*?>(?P<name>.*?)</a>' +  \
-              r'.*?(?:<br>|<table.*?>)' +  \
-              r'(?P<desc>.*?)' + '(?:<font color=#008000>|<a)'
+    """
+    Return max_results tuples with title, url, description 
+
+    >>> find("The Matrix site:imdb.com", 1)[0][0]
+    u'The Matrix (1999)'
+
+    >>> find("The Matrix site:imdb.com", 1)[0][1]
+    u'http://www.imdb.com/title/tt0133093/'
+    """
+    _results =  _find(query)
     results = []
-    for match in re.compile(link_re, re.DOTALL).finditer(data):
-        (name, url, desc) = match.group('name', 'url', 'desc')
-        results.append((stripTags(name), url, stripTags(desc)))
-    if len(results) > max_results:
-        results = results[:max_results]
+    for r in _results:
+        results.append((r['titleNoFormatting'], r['unescapedUrl'], stripTags(r['content'])))
+        if len(results) >= max_results:
+            break
     return results
 
-def _find(query):
+def _find(query, timeout=DEFAULT_TIMEOUT):
+    """
+    Return parsed json results from google ajax api
+
+    >>> _find("The Matrix site:imdb.com")[0]['titleNoFormatting']
+    u'The Matrix (1999)'
+
+    >>> _find("The Matrix site:imdb.com")[0]['url']
+    u'http://www.imdb.com/title/tt0133093/'
+    """
     url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=%s' % quote_plus(query)
-    results = simplejson.loads(ox.cache.readUrlUnicode(url))['responseData']['results']
+    results = json.loads(ox.cache.readUrlUnicode(url, timeout=timeout))['responseData']['results']
     return results
 

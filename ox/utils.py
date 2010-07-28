@@ -5,3 +5,8 @@ try:
 except:
     from datetime import datetime
 
+try:
+    import simplejson as json
+except:
+    import json
+
