@@ -8,7 +8,7 @@ import sys
 import struct
 import subprocess
 
-import simplejson
+from ox.utils import json
 
 __all__ = ['sha1sum', 'oshash', 'avinfo']
 
@@ -63,5 +63,5 @@ def avinfo(filename):
     if os.path.getsize(filename):
         p = subprocess.Popen(['ffmpeg2theora', '--info', filename], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         info, error = p.communicate()
-        return simplejson.loads(info)
+        return json.loads(info)
     return {'path': filename, 'size': 0}

@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from urllib import urlencode
 
-import simplejson
+from ox.utils import json
 from ox.cache import readUrl, readUrlUnicode
 from ox import findRe, decodeHtml
 
@@ -109,7 +109,7 @@ def find(query, max_results=10):
     data = readUrl(url)
     if not data:
         data  = readUrl(url, timeout=0)
-    result = simplejson.loads(data)
+    result = json.loads(data)
     results = []
     if result and 'query' in result:
         for r in result['query']['search']:

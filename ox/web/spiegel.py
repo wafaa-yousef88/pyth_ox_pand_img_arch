@@ -128,7 +128,7 @@ def archiveIssues():
     '''
     p = {}
     import os
-    import simplejson
+    from ox.utils import json
     import time
     archivePath = '/Volumes/Rolux Home/Desktop/Data/spiegel.de/Der Spiegel'
     localtime = time.localtime()
@@ -148,7 +148,7 @@ def archiveIssues():
                     os.makedirs(dirname)
                 filename = '%s/Der Spiegel %d %02d.json' % (dirname, y, w)
                 if not os.path.exists(filename):
-                    data = simplejson.dumps(issue, ensure_ascii = False)
+                    data = json.dumps(issue, ensure_ascii = False)
                     f = open(filename, 'w')
                     f.write(data)
                     f.close()
@@ -193,7 +193,7 @@ def archiveNews():
     this is just an example of an archiving application
     '''
     import os
-    import simplejson
+    from ox.utils import json
     import time
 
     count = {}
@@ -229,7 +229,7 @@ def archiveNews():
                     else:
                         filename = dirname + '/' + new['url'] + '.json'
                     if not os.path.exists(filename) or True:
-                        data = simplejson.dumps(new, ensure_ascii = False)
+                        data = json.dumps(new, ensure_ascii = False)
                         f = open(filename, 'w')
                         f.write(data)
                         f.close()

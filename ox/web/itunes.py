@@ -174,14 +174,14 @@ class ItunesMovie:
         return data
 
 if __name__ == '__main__':
-    import simplejson
+    from ox.utils import json
     data = ItunesAlbum(title = 'So Red the Rose', artist = 'Arcadia').getData()
-    print simplejson.dumps(data, sort_keys = True, indent = 4)
+    print json.dumps(data, sort_keys = True, indent = 4)
     data = ItunesMovie(title = 'The Matrix', director = 'Wachowski').getData()
-    print simplejson.dumps(data, sort_keys = True, indent = 4)
+    print json.dumps(data, sort_keys = True, indent = 4)
     for v in data['relatedMovies']:
         data = ItunesMovie(id = v['id']).getData()
-        print simplejson.dumps(data, sort_keys = True, indent = 4)
+        print json.dumps(data, sort_keys = True, indent = 4)
     data = ItunesMovie(id='272960052').getData()
-    print simplejson.dumps(data, sort_keys = True, indent = 4)
+    print json.dumps(data, sort_keys = True, indent = 4)
 

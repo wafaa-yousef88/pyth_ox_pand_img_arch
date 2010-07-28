@@ -2,7 +2,8 @@
 # vi:si:et:sw=4:sts=4:ts=4
 # GPL 2009
 import os
-import simplejson
+
+from ox.utils import json
 
 
 def get(key):
@@ -12,7 +13,7 @@ def get(key):
         f = open(user_auth, "r")
         data = f.read()
         f.close()
-        auth = simplejson.loads(data)
+        auth = json.loads(data)
     if key in auth:
         return auth[key]
     print "please add key %s to json file '%s'" % (key, user_auth)

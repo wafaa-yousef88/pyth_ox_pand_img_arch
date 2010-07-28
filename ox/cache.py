@@ -11,7 +11,7 @@ import urllib2
 import sqlite3
 
 import chardet
-import simplejson
+from ox.utils import json
 
 import net
 from net import DEFAULT_HEADERS, getEncoding
@@ -45,7 +45,7 @@ def exists(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout):
 def getHeaders(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout):
     url_headers = _readUrlCache(url, data, headers, timeout, "headers")
     if url_headers:
-        url_headers = simplejson.loads(url_headers)
+        url_headers = json.loads(url_headers)
     else:
         url_headers = net.getHeaders(url, data, headers)
         _saveUrlCache(url, data, -1, url_headers)
@@ -182,7 +182,7 @@ def _saveUrlCache(url, post_data, data, headers):
         only_headers = 1
         data = ""
     created = time.mktime(time.localtime())
-    t = (url_hash, domain, url, post_data, simplejson.dumps(headers), created, sqlite3.Binary(data), only_headers)
+    t = (url_hash, domain, url, post_data, json.dumps(headers), created, sqlite3.Binary(data), only_headers)
     c.execute(u"""INSERT OR REPLACE INTO cache values (?, ?, ?, ?, ?, ?, ?, ?)""", t)
 
     # Save (commit) the changes and clean up
