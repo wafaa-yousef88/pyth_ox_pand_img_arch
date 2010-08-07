@@ -22,9 +22,9 @@ def getData(id):
 def getId(url):
     return url.split("/")[-2]
 
-def getPostersByUrl(url, group=True):
+def getPostersByUrl(url, group=True, timeout=-1):
     posters = []
-    html = readUrlUnicode(url)
+    html = readUrlUnicode(url, timeout=timeout)
     if url in html:
         if group:
             results = re.compile('<a href="(http://www.movieposterdb.com/group/.+?)\??">', re.DOTALL).findall(html)
@@ -32,7 +32,7 @@ def getPostersByUrl(url, group=True):
                 posters += getPostersByUrl(result, False)
         results = re.compile('<a href="(http://www.movieposterdb.com/poster/.+?)">', re.DOTALL).findall(html)
         for result in results:
-            html = readUrlUnicode(result)
+            html = readUrlUnicode(result, timeout=timeout)
             posters.append(findRe(html, '"(http://www.movieposterdb.com/posters/.+?\.jpg)"'))
     return posters
 
