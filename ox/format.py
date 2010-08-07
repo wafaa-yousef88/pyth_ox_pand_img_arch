@@ -39,9 +39,24 @@ def to32(q):
     return "".join(converted) or '0'
 
 def from32(q):
+    """
+    Converts an base 32 string to an integer
+    We exclude 4 of the 26 letters: I L O U.
+    http://www.crockford.com/wrmg/base32.html
+
+    >>> form32(to32(35))
+    35
+    >>> form32(to32(119292))
+    119292
+    >>> from32(to32(0))
+    0
+    """
     _32map = {
         '0': 0,
+        'O': 0,
         '1': 1,
+        'I': 1,
+        'L': 1,
         '2': 2,
         '3': 3,
         '4': 4,
@@ -72,11 +87,8 @@ def from32(q):
         'X': 29,
         'Y': 30,
         'Z': 31,
-        'O': 0,
-        'I': 1,
-        'L': 1,
     }
-    base32 = '0123456789ABCDEFGHIJKLMNOPQRSTUV'
+    base32 = "0123456789ACBEDGFHKJMNQPSRTWVYXZ"
     q = q.replace('-','')
     q = ''.join([base32[_32map[i.upper()]] for i in q])
     return int(q, 32)
