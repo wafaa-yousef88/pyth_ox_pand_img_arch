@@ -4,35 +4,43 @@ from urllib import quote, unquote
 import httplib
 import xml.etree.ElementTree as ET
 import re
+from urlparse import parse_qs
 
 import feedparser
 from ox.cache import readUrl, readUrlUnicode
 from ox import findString, findRe
 
-
 def getVideoKey(youtubeId):
-    data = readUrl("http://www.youtube.com/get_video_info?&video_id=%s" % youtubeId)
-    match = re.compile("token=(.+)&thumbnail").findall(data)
-    if match:
-        return unquote(match[0])
+    for el_type in ['&el=embedded', '&el=detailpage', '&el=vevo', '']:
+        video_info_url = 'http://www.youtube.com/get_video_info?&video_id=%s%s&ps=default&eurl=&gl=US&hl=en' % (youtubeId, el_type)
+        try:
+            data = readUrl(video_info_url)
+            video_info = parse_qs(data)
+            if 'token' in video_info:
+                return video_info['token'][0]
+        except (urllib2.URLError, httplib.HTTPException, socket.error), err:
+            return
     return False
  
 def getVideoUrl(youtubeId, format='mp4'):
     youtubeKey = getVideoKey(youtubeId)
+
+    fmt = None
+    if format == 'webm':
+        fmt=45
     if format == '1080p':
         fmt=37
-        url = "http://youtube.com/get_video.php?video_id=%s&t=%s&fmt=%s" % (youtubeId, youtubeKey, fmt)
     if format == '720p':
         fmt=22
-        url = "http://youtube.com/get_video.php?video_id=%s&t=%s&fmt=%s" % (youtubeId, youtubeKey, fmt)
     elif format == 'mp4':
         fmt=18
-        url = "http://youtube.com/get_video.php?video_id=%s&t=%s&fmt=%s" % (youtubeId, youtubeKey, fmt)
     elif format == 'high':
         fmt=35
-        url = "http://youtube.com/get_video.php?video_id=%s&t=%s&fmt=%s" % (youtubeId, youtubeKey, fmt)
-    else:
-        url = "http://youtube.com/get_video.php?video_id=%s&t=%s" % (youtubeId, youtubeKey)
+    url_template = "http://www.youtube.com/get_video?video_id=%s&t=%s=&eurl=&el=&ps=&asv="
+    url = url_template % (youtubeId, youtubeKey)
+    if fmt:
+        url += "&fmt=%d"%fmt
+
     return url
 
 def getMovieInfo(youtubeId, video_url_base=None):
@@ -58,6 +66,7 @@ def getInfoFromAtom(entry, video_url_base=None):
     else:
         info['flv'] = getVideoUrl(info['id'], 'flv')
         info['flv_high'] = getVideoUrl(info['id'], 'high')
+        info['webm'] = getVideoUrl(info['id'], 'webm')
         info['mp4'] = getVideoUrl(info['id'], 'mp4')
         info['720p'] = getVideoUrl(info['id'], '720p')
         info['1080p'] = getVideoUrl(info['id'], '1080p')
