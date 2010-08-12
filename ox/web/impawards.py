@@ -23,10 +23,14 @@ def getData(id):
         'url': getUrl(id)
     }
     html = readUrlUnicode(data['url'])
-    data['imdbId'] = findRe(html, 'imdb.com/title/tt(.*?) ')
+    data['imdbId'] = findRe(html, 'imdb.com/title/tt(\d{7})')
     data['title'] = stripTags(findRe(html, '<p class="name white">(.*?) \(<a href="alpha1.html">'))
     data['year'] = findRe(html, '\(<a href="alpha1.html">(.*?)</a>\)')
     data['posters'] = []
+    poster = findRe(html, '<img src="(posters.*?)" alt=')
+    if poster:
+        poster = 'http://www.impawards.com/%s/%s' % (data['year'], poster)
+        data['posters'].append(poster)
     results = re.compile('<a href = (%s.*?html)' % id[5:], re.DOTALL).findall(html)
     for result in results:
         result = result.replace('_xlg.html', '.html')
