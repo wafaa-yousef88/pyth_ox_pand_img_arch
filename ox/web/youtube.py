@@ -50,7 +50,7 @@ def getInfoFromAtom(entry, video_url_base=None):
     if 'media_keywords' in entry:
         info['keywords'] = entry['media_keywords'].split(', ')
     info['url'] = entry['links'][0]['href']
-    info['id'] = findString(info['url'], "/watch?v=") 
+    info['id'] = findRe(info['url'], r'\?v=(.*?)&') 
     info['thumbnail'] = "http://img.youtube.com/vi/%s/0.jpg" % info['id']
     if video_url_base:
         info['flv'] = "%s/%s.%s" % (video_url_base, info['id'], 'flv')
