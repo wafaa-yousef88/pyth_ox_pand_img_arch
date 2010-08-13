@@ -70,7 +70,9 @@ def getInfoFromAtom(entry, video_url_base=None):
         info['mp4'] = getVideoUrl(info['id'], 'mp4')
         info['720p'] = getVideoUrl(info['id'], '720p')
         info['1080p'] = getVideoUrl(info['id'], '1080p')
-    info['embed'] = '<object width="425" height="355"><param name="movie" value="http://www.youtube.com/v/%s&hl=en"></param><param name="wmode" value="transparent"></param><embed src="http://www.youtube.com/v/%s&hl=en" type="application/x-shockwave-flash" wmode="transparent" width="425" height="355"></embed></object>' % (info['id'], info['id'])
+    info['embed_flash'] = '<object width="425" height="355"><param name="movie" value="http://www.youtube.com/v/%s&hl=en"></param><param name="wmode" value="transparent"></param><embed src="http://www.youtube.com/v/%s&hl=en" type="application/x-shockwave-flash" wmode="transparent" width="425" height="355"></embed></object>' % (info['id'], info['id'])
+    info['embed'] = '<iframe class="youtube-player" width="425" height="355" src="http://www.youtube.com/embed/%s" frameborder="0"></iframe>' % info['id']
+
     return info
 
 def find(query, max_results=10, offset=1, orderBy='relevance', video_url_base=None):
