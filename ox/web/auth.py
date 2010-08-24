@@ -19,3 +19,16 @@ def get(key):
     print "please add key %s to json file '%s'" % (key, user_auth)
     return ""
 
+def update(key, value):
+    user_auth = os.environ.get('oxAUTH', os.path.expanduser('~/.ox/auth.json'))
+    auth = {}
+    if os.path.exists(user_auth):
+        f = open(user_auth, "r")
+        data = f.read()
+        f.close()
+        auth = json.loads(data)
+    auth[key] = value
+    f = open(user_auth, "w")
+    f.write(json.dumps(auth, indent=2))
+    f.close()
+    
