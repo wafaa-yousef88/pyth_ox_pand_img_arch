@@ -2,6 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 # GPL 2008
 import re
+import unicodedata
 
 _articles = ('the', 'la', 'a', 'die', 'der', 'le', 'el',
              "l'", 'il', 'das', 'les', 'o', 'ein', 'i', 'un', 'los', 'de',
@@ -190,4 +191,9 @@ def normalizePath(path):
     path = path.replace(':', '_').replace('/', '')
     if path.endswith('.'): path = path[:-1] + '_'
     return path
+
+def stripAccents(s):
+    if isinstance(s, str):
+        s = unicode(s)
+    return ''.join((c for c in unicodedata.normalize('NFD', s) if unicodedata.category(c) != 'Mn'))
 
