@@ -188,7 +188,7 @@ def normalizeName(name):
     return name
 
 def normalizePath(path):
-    path = path.replace(':', '_').replace('/', '')
+    path = path.replace(':', '_').replace('/', '_')
     if path.endswith('.'): path = path[:-1] + '_'
     return path
 
