@@ -2,21 +2,75 @@
 # vi:si:et:sw=4:sts=4:ts=4
 import math
 import re
+import string
 
 def to32(q):
     """
     Converts an integer to base 32
     We exclude 4 of the 26 letters: I L O U.
     http://www.crockford.com/wrmg/base32.html
+    >>> to32(0)
+    '0'
+
+    >>> to32(10)
+    'A'
+    >>> to32(11)
+    'B'
+    >>> to32(12)
+    'C'
+    >>> to32(13)
+    'D'
+    >>> to32(14)
+    'E'
+    >>> to32(15)
+    'F'
+    >>> to32(16)
+    'G'
+    >>> to32(17)
+    'H'
+    >>> to32(18)
+    'J'
+    >>> to32(19)
+    'K'
+    >>> to32(20)
+    'M'
+    >>> to32(21)
+    'N'
+    >>> to32(22)
+    'P'
+    >>> to32(23)
+    'Q'
+    >>> to32(24)
+    'R'
+    >>> to32(25)
+    'S'
+    >>> to32(26)
+    'T'
+    >>> to32(27)
+    'V'
+    >>> to32(28)
+    'W'
+    >>> to32(29)
+    'X'
+    >>> to32(30)
+    'Y'
+    >>> to32(31)
+    'Z'
+    >>> to32(32)
+    '10'
+    >>> to32(33)
+    '11'
+    >>> to32(34)
+    '12'
 
     >>> to32(35)
     '13'
     >>> to32(119292)
-    '3MgV'
+    '3MfW'
     >>> to32(939387374)
-    'wZwTgD'
-    >>> to32(0)
-    '0'
+    'vZvTfE'
+    >>> from32(to32(939387374))
+    939387374
     >>> to32(-393)
     Traceback (most recent call last):
         ...
@@ -24,7 +78,7 @@ def to32(q):
     """
 
     if q < 0: raise ValueError, "must supply a positive integer"
-    letters = "0123456789ACBEDGFHKJMNQPSRTWVYXZ"
+    letters = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
     converted = []
     upper = True
     while q != 0:
@@ -44,9 +98,9 @@ def from32(q):
     We exclude 4 of the 26 letters: I L O U.
     http://www.crockford.com/wrmg/base32.html
 
-    >>> form32(to32(35))
+    >>> from32(to32(35))
     35
-    >>> form32(to32(119292))
+    >>> from32(to32(119292))
     119292
     >>> from32(to32(0))
     0
@@ -88,7 +142,7 @@ def from32(q):
         'Y': 30,
         'Z': 31,
     }
-    base32 = "0123456789ACBEDGFHKJMNQPSRTWVYXZ"
+    base32 = ('0123456789' +string.ascii_uppercase)[:32]
     q = q.replace('-','')
     q = ''.join([base32[_32map[i.upper()]] for i in q])
     return int(q, 32)

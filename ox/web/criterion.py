@@ -18,13 +18,13 @@ def getUrl(id):
 def getData(id):
     '''
     >>> getData('1333')['imdbId']
-    '0060304'
+    u'0060304'
 
     >>> getData('236')['posters'][0]
-    'http://criterion_production.s3.amazonaws.com/release_images/1586/ThirdManReplace.jpg'
+    u'http://criterion_production.s3.amazonaws.com/release_images/1586/ThirdManReplace.jpg'
 
     >>> getData('786')['posters'][0]
-    'http://criterion_production.s3.amazonaws.com/product_images/185/343_box_348x490.jpg'
+    u'http://criterion_production.s3.amazonaws.com/product_images/185/343_box_348x490.jpg'
     '''
     data = {
         "url": getUrl(id)
@@ -50,7 +50,7 @@ def getData(id):
         data["posters"] = [result]
     else:
         html_ = readUrlUnicode(result)
-        result = findRe(html_, "<a href=\"http://www.criterion.com/films/%s\">(.*?)</a>" % id)
+        result = findRe(html_, '<a href="http://www.criterion.com/films/%s.*?">(.*?)</a>' % id)
         result = findRe(result, "src=\"(.*?)\"")
         data["posters"] = [result.replace("_w100", "")]
     result = findRe(html, "<img alt=\"Film Still\" height=\"252\" src=\"(.*?)\"")
@@ -60,6 +60,7 @@ def getData(id):
     else:
         data["stills"] = [findRe(html, "\"thumbnailURL\", \"(.*?)\"")]
         data["trailers"] = [findRe(html, "\"videoURL\", \"(.*?)\"")]
+
     data['imdbId'] = imdb.getMovieId(data['title'], data['director'], data['year'])
     return data
 

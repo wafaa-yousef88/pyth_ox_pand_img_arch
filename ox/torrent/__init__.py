@@ -3,7 +3,7 @@
 # GPL 2007-2009
 
 from threading import Event
-import hashlib
+from hashlib import sha1
 import os
 
 from bencode import bencode, bdecode
@@ -21,7 +21,7 @@ def getInfoHash(torrentFile):
     metainfo_file = open(torrentFile, 'rb')
     metainfo = bdecode(metainfo_file.read())
     info = metainfo['info']
-    return hashlib.sha1(bencode(info)).hexdigest()
+    return sha1(bencode(info)).hexdigest()
 
 def getTorrentInfoFromFile(torrentFile):
     f = open(torrentFile, 'rb')
@@ -32,6 +32,8 @@ def getTorrentInfoFromFile(torrentFile):
     return tinfo
 
 def getTorrentInfo(data):
+    from bencode import bencode
+
     "Returns Torrent Info from torrent file"
     tinfo = {}
     metainfo = bdecode(data)
@@ -52,7 +54,7 @@ def getTorrentInfo(data):
         if key != 'info':
             tinfo[key] = metainfo[key]
     tinfo['size'] = file_length
-    tinfo['hash'] = hashlib.sha1(bencode(info)).hexdigest()
+    tinfo['hash'] = sha1(bencode(info)).hexdigest()
     tinfo['announce'] = metainfo['announce']
     return tinfo
 

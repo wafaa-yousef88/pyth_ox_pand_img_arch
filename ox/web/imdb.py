@@ -249,14 +249,20 @@ class ImdbCombined(Imdb):
 def getMovieId(title, director='', year=''):
     '''
     >>> getMovieId('The Matrix')
-    '0133093'
+    u'0133093'
+
+    >>> getMovieId('2 or 3 Things I Know About Her', 'Jean-Luc Godard')
+    u'0060304'
+
+    >>> getMovieId('2 or 3 Things I Know About Her', 'Jean-Luc Godard', '1967')
+    u'0060304'
     '''
-    if year:
-        title = "%s (%s)" % (title, year)
     if director:
-        query = 'site:imdb.com %s "%s"' % (director, title)
+        query = 'site:imdb.com %s "%s" ' % (director, title)
     else:
-        query = 'site:imdb.com "%s"' % title
+        query = 'site:imdb.com "%s" ' % title
+    if year:
+        query += year
     for (name, url, desc) in google.find(query, 5, timeout=-1):
         if url.startswith('http://www.imdb.com/title/tt'):
             return url[28:35]

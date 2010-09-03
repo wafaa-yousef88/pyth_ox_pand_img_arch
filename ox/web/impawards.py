@@ -14,7 +14,7 @@ def getData(id):
     u'0102926'
 
     >>> getData('1991/silence_of_the_lambs')['posters'][0]
-    u'http://www.impawards.com/1991/posters/silence_of_the_lambs_ver1_xlg.jpg'
+    u'http://www.impawards.com/1991/posters/silence_of_the_lambs_ver1.jpg'
 
     >>> getData('1991/silence_of_the_lambs')['url']
     u'http://www.impawards.com/1991/silence_of_the_lambs_ver1.html'
@@ -77,10 +77,10 @@ def getIdsByPage(page):
     return set(ids)
 
 def getUrl(id):
-    url = "http://www.impawards.com/%s.html" % id
+    url = u"http://www.impawards.com/%s.html" % id
     html = readUrlUnicode(url)
     if findRe(html, "No Movie Posters on This Page"):
-        url = "http://www.impawards.com/%s_ver1.html" % id
+        url = u"http://www.impawards.com/%s_ver1.html" % id
     return url
 
 if __name__ == '__main__':
