@@ -9,69 +9,34 @@ def to32(q):
     Converts an integer to base 32
     We exclude 4 of the 26 letters: I L O U.
     http://www.crockford.com/wrmg/base32.html
+
+    >>> for i in range(0, 1000): assert from32(to32(i)) == i
+    
     >>> to32(0)
     '0'
 
-    >>> to32(10)
-    'A'
-    >>> to32(11)
-    'B'
-    >>> to32(12)
-    'C'
-    >>> to32(13)
-    'D'
-    >>> to32(14)
-    'E'
-    >>> to32(15)
-    'F'
-    >>> to32(16)
-    'G'
-    >>> to32(17)
-    'H'
-    >>> to32(18)
-    'J'
-    >>> to32(19)
-    'K'
-    >>> to32(20)
-    'M'
-    >>> to32(21)
-    'N'
-    >>> to32(22)
-    'P'
-    >>> to32(23)
-    'Q'
-    >>> to32(24)
-    'R'
-    >>> to32(25)
-    'S'
-    >>> to32(26)
-    'T'
-    >>> to32(27)
-    'V'
-    >>> to32(28)
-    'W'
-    >>> to32(29)
-    'X'
-    >>> to32(30)
-    'Y'
-    >>> to32(31)
-    'Z'
+    >>> to32(347485647)
+    'aBcDeF'
+
+    >>> to32(555306645)
+    'gHjKmN'
+
+    >>> to32(555306645)
+    'gHjKmN'
+
+    >>> to32(800197332334559L)
+    'pQrStVwXyZ'
+
     >>> to32(32)
     '10'
-    >>> to32(33)
-    '11'
-    >>> to32(34)
-    '12'
 
-    >>> to32(35)
-    '13'
     >>> to32(119292)
     '3MfW'
+
     >>> to32(939387374)
     'vZvTfE'
-    >>> from32(to32(939387374))
-    939387374
-    >>> to32(-393)
+
+    >>> to32(-1)
     Traceback (most recent call last):
         ...
     ValueError: must supply a positive integer
@@ -98,12 +63,17 @@ def from32(q):
     We exclude 4 of the 26 letters: I L O U.
     http://www.crockford.com/wrmg/base32.html
 
-    >>> from32(to32(35))
-    35
-    >>> from32(to32(119292))
-    119292
-    >>> from32(to32(0))
-    0
+    >>> from32('A')
+    10
+
+    >>> from32('i')
+    1
+
+    >>> from32('Li1l')
+    33825
+
+    >>> from32('10')
+    32
     """
     _32map = {
         '0': 0,
