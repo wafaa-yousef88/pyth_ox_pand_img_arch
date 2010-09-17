@@ -44,7 +44,9 @@ def getData(id):
 
     result = findRe(html, "<div class=\"purchase\">(.*?)</div>")
     if 'Blu-Ray' in result or 'Essential Art House DVD' in result:
-        result = re.compile('<h3 class="section_title first">Other Editions</h3>(.*?)</div>', re.DOTALL).findall(html)[0]
+        r = re.compile('<h3 class="section_title first">Other Editions</h3>(.*?)</div>', re.DOTALL).findall(html)
+        if r:
+            result = r[0]
     result = findRe(result, "<a href=\"(.*?)\"")
     if not "/boxsets/" in result:
         data["posters"] = [result]
