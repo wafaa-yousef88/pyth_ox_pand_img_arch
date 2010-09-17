@@ -99,11 +99,11 @@ def wrapText(text, max_width, max_lines, font_file, font_size):
         if max_lines:
             # test if the same number of lines
             # can be achieved with shorter lines
-            best_lines = len(wrap_text(text, max_width, 0, font_file, font_size))
+            best_lines = len(wrapText(text, max_width, 0, font_file, font_size))
             test_lines = best_lines
             while test_lines == best_lines:
                 max_width -= 1
-                test_lines = len(wrap_text(text, max_width, 0, font_file, font_size))
+                test_lines = len(wrapText(text, max_width, 0, font_file, font_size))
             max_width += 1
         words = []
         spaces = []
