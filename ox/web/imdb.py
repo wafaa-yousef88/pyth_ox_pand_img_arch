@@ -269,12 +269,21 @@ def getMovieId(title, director='', year=''):
     return ''
 
 def getMoviePoster(imdbId):
+    '''
+    >>> getMoviePoster('0133093')
+    'http://ia.media-imdb.com/images/M/MV5BMjEzNjg1NTg2NV5BMl5BanBnXkFtZTYwNjY3MzQ5._V1._SX338_SY475_.jpg'
+
+    >>> getMoviePoster('0994352')
+    'http://ia.media-imdb.com/images/M/MV5BMjA3NzMyMzU1MV5BMl5BanBnXkFtZTcwNjc1ODUwMg@@._V1._SX594_SY755_.jpg'
+    '''
     info = ImdbCombined(imdbId)
     if 'poster_id' in info:
         url = "http://www.imdb.com/rg/action-box-title/primary-photo/media/rm%s/tt%s" % (info['poster_id'], imdbId)
         data = readUrl(url)
         poster = findRe(data, 'img id="primary-img".*?src="(.*?)"')
         return poster
+    elif 'series' in info:
+        return getMoviePoster(info['series'])
     return ''
 
 def guess(title, director='', timeout=google.DEFAULT_TIMEOUT):
