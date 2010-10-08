@@ -9,11 +9,19 @@ import time
 import ox
 from ox import findRe, stripTags
 from ox.normalize import normalizeTitle, normalizeImdbId
+import ox.cache
 from ox.cache import readUrl
 
 from siteparser import SiteParser
 import google
 
+def readUrl(url, data=None, headers=ox.cache.DEFAULT_HEADERS, timeout=ox.cache.cache_timeout, valid=None):
+    headers = headers.copy()
+    headers["Cookie"] = 'session-id=061-6553581-0286357; uu=bl8Nra2zsmTjesDEOxamlwVkXrKj8h6ygOFd1LDhKNGwxHjk4LQopMCxSNGTU3nl88Ro5FCSHrKjUi2RoREt4SEhDZGA8Q4SILFsUfUFbhLFgr6EZTD4RYTFSEWWwr4UV+K+l/eivpfX51v2Y1JrhvCg/ZEg4QxRsLEcUYDivmGwwW3hINGNodNSvhGz0h6ypaRIUuPyHvWQ8paioNENkaDRndHw4r4RsKEt4SDRndHzwr4Rs9IesqPUWCLg4h6yoMGNISDRndHD4r4Rs9IesqPyHvLjom6Co=; cs=pReiGikHkbKk4Fhkk8Meyw5/E6t6mVT9+v+ACx7KZ/rpfwPtXklU/c7BdHWNegduvco3rq7p9+7eSVT9yK4Uvd5JVMtpSdz9/kliy+7BVP392hR17RoHzq1ad36dSlRdWF+Srs7fYurOSVS9XlkU3f5pVP3+SVS9vhkkzf; session-id-time=1286639981'
+    return ox.cache.readUrl(url, data, headers, timeout)
+
+def readUrlUnicode(url, timeout=ox.cache.cache_timeout):
+   return ox.cache.readUrlUnicode(url, _readUrl=readUrl, timeout=timeout)
 
 class Imdb(SiteParser):
     regex =  {
@@ -200,14 +208,12 @@ class Imdb(SiteParser):
         }
     }
 
+    def readUrlUnicode(self, url, timeout):
+        return readUrlUnicode(url, timeout)
+
     def __init__(self, id, timeout=-1):
         self.baseUrl = "http://www.imdb.com/title/tt%s/" % id
         super(Imdb, self).__init__(timeout)
-
-        if 'alternative_titles' in self:
-            for t in self['alternative_titles']:
-                if len(t)>1 and 'imdb display title' in t[1]:
-                    self['title'] = t[0]
 
         if 'title' in self and self['title'].startswith('"') and self['title'].endswith('"'):
             self['title'] = self['title'][1:-1]
@@ -246,7 +252,7 @@ class ImdbCombined(Imdb):
     def __init__(self, id, timeout=-1):
         _regex = {}
         for key in self.regex:
-            if self.regex[key]['page'] == 'combined' or key == 'alternative_titles':
+            if self.regex[key]['page'] == 'combined':
                 _regex[key] = self.regex[key]
         self.regex = _regex
         super(ImdbCombined, self).__init__(id, timeout)
