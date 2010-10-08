@@ -205,9 +205,9 @@ class Imdb(SiteParser):
         super(Imdb, self).__init__(timeout)
 
         if 'alternative_titles' in self:
-            for t, i in self['alternative_titles']:
-                if 'imdb display title' in i:
-                    self['title'] = t
+            for t in self['alternative_titles']:
+                if len(t)>1 and 'imdb display title' in t[1]:
+                    self['title'] = t[0]
 
         if 'title' in self and self['title'].startswith('"') and self['title'].endswith('"'):
             self['title'] = self['title'][1:-1]
