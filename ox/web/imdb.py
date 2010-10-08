@@ -21,7 +21,7 @@ class Imdb(SiteParser):
             'page': 'releaseinfo',
             're': [
                 'name="akas".*?<table.*?>(.*?)</table>',
-                "td>(.*?)</td>\n\n<td>(.*?)</td>"
+                "td>(.*?)</td>.*?<td>(.*?)</td>"
             ],
             'type': 'list'
         
@@ -203,6 +203,11 @@ class Imdb(SiteParser):
     def __init__(self, id, timeout=-1):
         self.baseUrl = "http://www.imdb.com/title/tt%s/" % id
         super(Imdb, self).__init__(timeout)
+
+        if 'alternative_titles' in self:
+            for t, i in self['alternative_titles']:
+                if 'imdb display title' in i:
+                    self['title'] = t
 
         if 'title' in self and self['title'].startswith('"') and self['title'].endswith('"'):
             self['title'] = self['title'][1:-1]
