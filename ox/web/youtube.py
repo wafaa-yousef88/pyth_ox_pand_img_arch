@@ -7,14 +7,14 @@ import re
 from urlparse import parse_qs
 
 import feedparser
-from ox.cache import readUrl, readUrlUnicode
+from ox.cache import readUrl, readUrlUnicode, cache_timeout
 from ox import findString, findRe
 
-def getVideoKey(youtubeId):
+def getVideoKey(youtubeId, timeout=cache_timeout):
     for el_type in ['&el=embedded', '&el=detailpage', '&el=vevo', '']:
         video_info_url = 'http://www.youtube.com/get_video_info?&video_id=%s%s&ps=default&eurl=&gl=US&hl=en' % (youtubeId, el_type)
         try:
-            data = readUrl(video_info_url)
+            data = readUrl(video_info_url, timeout=timeout)
             video_info = parse_qs(data)
             if 'token' in video_info:
                 return video_info['token'][0]
@@ -22,8 +22,8 @@ def getVideoKey(youtubeId):
             return
     return False
  
-def getVideoUrl(youtubeId, format='mp4'):
-    youtubeKey = getVideoKey(youtubeId)
+def getVideoUrl(youtubeId, format='mp4', timeout=cache_timeout):
+    youtubeKey = getVideoKey(youtubeId, timeout=timeout)
 
     fmt = None
     if format == 'webm':
