@@ -21,7 +21,7 @@ def readUrlUnicode(url, timeout=cache.cache_timeout):
 
 def downloadText(id, filename=None):
     #FIXME, what about the cache, this keeps all pdfs in oxcache...
-    url='http://a.aaaarg.org/node/%d/download' % id
+    url='http://aaaaarg.org/node/%d/download' % id
     data = readUrl(url, timeout=-1)
     headers = cache.getHeaders(url, timeout=-1)
     if filename:
@@ -32,7 +32,7 @@ def downloadText(id, filename=None):
 
 def getTextByLetter(letter):
     texts = []
-    url = 'http://a.aaaarg.org/library/%s' % letter
+    url = 'http://aaaaarg.org/library/%s' % letter
     data = readUrlUnicode(url)
     txts = re.compile('<li class="author">(.*?)</li><li class="title"><a href="(.*?)">(.*?)</a></li>').findall(data)
     author = 'Unknown Author'
@@ -53,9 +53,25 @@ def getTextByLetter(letter):
          })
     return texts
 
+def getData(id):
+    url = "http://aaaaarg.org/node/%s"%id
+    data=readUrlUnicode(url)
+
+    title = findRe(data, '<h2>(.*?)</h2>')
+    author = findRe(data, '<div class="author"><em>written by (.*?)</em></div>')
+    links = re.compile('<a href="http://anonym.to/\?(.*?)" class="link-to-text">').findall(data)
+
+    return {
+        'aaaaarg': id,
+        'links': links,
+        'title': title,
+        'author': author
+    }
+
 def getTexts():
     texts = []
     for letter in string.letters[:26]:
         texts += getTextByLetter(letter)
+    texts += getTextByLetter('date')
     return texts
 
