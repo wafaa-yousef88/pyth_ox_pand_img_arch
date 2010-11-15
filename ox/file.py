@@ -4,6 +4,7 @@
 from __future__ import division
 import os
 import hashlib
+import re
 import sys
 import struct
 import subprocess
@@ -63,5 +64,13 @@ def avinfo(filename):
     if os.path.getsize(filename):
         p = subprocess.Popen(['ffmpeg2theora', '--info', filename], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         info, error = p.communicate()
-        return json.loads(info)
+        try:
+            info = json.loads(info)
+        except:
+            #remove metadata, can be broken
+            reg = re.compile('"metadata": {.*?},', re.DOTALL)
+            info = re.sub(reg, '', info)
+            info = json.loads(info)
+        return info
+
     return {'path': filename, 'size': 0}
