@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 # vi:si:et:sw=4:sts=4:ts=4
 # encoding: utf-8
-from distutils.core import setup
+try:
+    from setuptools import setup
+except:
+    from distutils.core import setup
 
 def get_bzr_version():
     import os
@@ -20,6 +23,7 @@ setup(
     download_url="http://code.0x2620.org/python-ox/download",
     license="GPLv3",
     packages=['ox', 'ox.torrent', 'ox.web'],
+    install_requires=['chardet', 'feedparser'],
     keywords = [
     ],
     classifiers = [
