@@ -4,8 +4,8 @@ Depends:
  python2.5
  python-chardet (http://chardet.feedparser.org/)
  python-feedparser (http://www.feedparser.org/)
- python-lxml (http://codespeak.net/lxml/)
- django (optional, otherwise dates < 1900 are not supported)
+ python-lxml (http://codespeak.net/lxml/)          [optional]
+ django (otherwise dates < 1900 are not supported) [optional]
 
 Usage:
  import ox
