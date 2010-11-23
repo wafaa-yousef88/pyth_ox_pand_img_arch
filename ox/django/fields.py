@@ -1,7 +1,7 @@
 import time
 
 from django.db import models
-from django.utils import simplejson as json
+from ox.utils import json
 
 
 def to_json(python_object):
