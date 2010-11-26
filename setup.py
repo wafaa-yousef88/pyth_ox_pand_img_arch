@@ -22,7 +22,7 @@ setup(
     url="http://code.0x2620.org/python-ox",
     download_url="http://code.0x2620.org/python-ox/download",
     license="GPLv3",
-    packages=['ox', 'ox.django'. 'ox.torrent', 'ox.web'],
+    packages=['ox', 'ox.django', 'ox.torrent', 'ox.web'],
     install_requires=['chardet', 'feedparser'],
     keywords = [
     ],
