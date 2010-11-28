@@ -61,12 +61,20 @@ class Imdb(SiteParser):
             're': '<a href="/Sections/Countries/.*?/">(.*?)</a>',
             'type': 'list'
         },
+        'creators': {
+            'page': 'combined',
+            're': [
+                '<h5>Creators:</h5>.*?<div class="info-content">(.*?)</div>',
+                '<a href="/name/.*?>(.*?)</a>'
+            ],
+            'type': 'list'
+        },
         'directors': {
             'page': 'combined',
             're': [
                 lambda data: data.split('Series Crew')[0],
                 'Directed by</a>(.*?)</table>',
-                '<a href="/name/.*?/">(.*?)</a>'
+                '<a href="/name/.*?>(.*?)</a>'
             ],
             'type': 'list'
         },
@@ -75,7 +83,7 @@ class Imdb(SiteParser):
             're': [
                 lambda data: data.split('Series Crew')[0],
                 'Film Editing by</a>(.*?)</table>',
-                '<a href="/name/.*?/">(.*?)</a>'
+                '<a href="/name/.*?>(.*?)</a>'
             ],
             'type': 'list'
         },
@@ -236,6 +244,9 @@ class Imdb(SiteParser):
             if key in self:
                 self[key] = filter(lambda x: x.lower() != 'home', self[key])
 
+        if 'creators' in self:
+            self['directors'] = self['creators']
+            del self['creators']
         if 'series' in self:
             if 'episode_title' in self:
                 self['series_title'] = self['title']
@@ -243,6 +254,11 @@ class Imdb(SiteParser):
             if 'episode_title' in self and 'season' in self and 'episode' in self:
                 self['title'] = "%s (S%02dE%02d) %s" % (
                         self['series_title'], self['season'], self['episode'], self['episode_title'])
+            for key in ('directors', 'year'):
+                self['episode_%s'%key] = self[key]
+            series = Imdb(self['series'])
+            for key in ['directors', 'year']:
+                self[key] =series[key]
         else:
             for key in ('series_title', 'episode_title', 'season', 'episode'):
                 if key in self:
