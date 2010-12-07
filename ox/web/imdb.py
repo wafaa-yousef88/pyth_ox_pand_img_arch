@@ -211,7 +211,7 @@ class Imdb(SiteParser):
         },
         'year': {
             'page': 'combined',
-            're': '<meta name="og:title" content=".*?\((\d{4})\).*?"',
+            're': '="og:title" content=".*?\((\d{4})\).*?"',
             'type': 'int'
         }
     }
@@ -255,10 +255,12 @@ class Imdb(SiteParser):
                 self['title'] = "%s (S%02dE%02d) %s" % (
                         self['series_title'], self['season'], self['episode'], self['episode_title'])
             for key in ('directors', 'year'):
-                self['episode_%s'%key] = self[key]
+                if key in self:
+                    self['episode_%s'%key] = self[key]
             series = Imdb(self['series'])
             for key in ['directors', 'year']:
-                self[key] =series[key]
+                if key in series:
+                    self[key] =series[key]
         else:
             for key in ('series_title', 'episode_title', 'season', 'episode'):
                 if key in self:
