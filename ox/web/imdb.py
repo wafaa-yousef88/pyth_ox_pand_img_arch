@@ -317,10 +317,13 @@ def getMoviePoster(imdbId):
 
 def guess(title, director='', timeout=google.DEFAULT_TIMEOUT):
     #FIXME: proper file -> title
+    '''
+    //this is not needed
     title = title.split('-')[0]
     title = title.split('(')[0]
     title = title.split('.')[0]
     title = title.strip()
+    '''
     imdb_url = 'http://www.imdb.com/find?q=%s' % quote(title.encode('utf-8'))
     return_url = ''
 
@@ -330,6 +333,7 @@ def guess(title, director='', timeout=google.DEFAULT_TIMEOUT):
         search = 'site:imdb.com %s "%s"' % (director, title)
     else:
         search = 'site:imdb.com "%s"' % title
+
     for (name, url, desc) in google.find(search, 2, timeout=timeout):
         if url.startswith('http://www.imdb.com/title/tt'):
              return normalizeImdbId(int(ox.intValue(url)))
