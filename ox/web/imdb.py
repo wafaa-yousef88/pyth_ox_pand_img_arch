@@ -17,13 +17,19 @@ import google
 
 def readUrl(url, data=None, headers=ox.cache.DEFAULT_HEADERS, timeout=ox.cache.cache_timeout, valid=None):
     headers = headers.copy()
-    headers["Cookie"] = 'session-id=061-6553581-0286357; uu=bl8Nra2zsmTjesDEOxamlwVkXrKj8h6ygOFd1LDhKNGwxHjk4LQopMCxSNGTU3nl88Ro5FCSHrKjUi2RoREt4SEhDZGA8Q4SILFsUfUFbhLFgr6EZTD4RYTFSEWWwr4UV+K+l/eivpfX51v2Y1JrhvCg/ZEg4QxRsLEcUYDivmGwwW3hINGNodNSvhGz0h6ypaRIUuPyHvWQ8paioNENkaDRndHw4r4RsKEt4SDRndHzwr4Rs9IesqPUWCLg4h6yoMGNISDRndHD4r4Rs9IesqPyHvLjom6Co=; cs=pReiGikHkbKk4Fhkk8Meyw5/E6t6mVT9+v+ACx7KZ/rpfwPtXklU/c7BdHWNegduvco3rq7p9+7eSVT9yK4Uvd5JVMtpSdz9/kliy+7BVP392hR17RoHzq1ad36dSlRdWF+Srs7fYurOSVS9XlkU3f5pVP3+SVS9vhkkzf; session-id-time=1286639981'
     return ox.cache.readUrl(url, data, headers, timeout)
 
 def readUrlUnicode(url, timeout=ox.cache.cache_timeout):
    return ox.cache.readUrlUnicode(url, _readUrl=readUrl, timeout=timeout)
 
 class Imdb(SiteParser):
+    '''
+    >>> Imdb('0068646')['title']
+    u'The Godfather'
+
+    >>> Imdb('0133093')['title']
+    u'The Matrix'
+    '''
     regex =  {
         'alternative_titles': {
             'page': 'releaseinfo',
@@ -112,11 +118,6 @@ class Imdb(SiteParser):
             're': '<a href="/Sections/Languages/.*?/">(.*?)</a>',
             'type': 'list'
         },
-        'original_title': {
-            'page': 'combined',
-            're': '<span class="title-extra">(.*?) <i>(original title)</i></span>',
-            'type': 'string'
-        },
         'plot': {
             'page': 'plotsummary',
             're': '</div>.*?<p class="plotpar">(.*?)<i>',
@@ -185,7 +186,7 @@ class Imdb(SiteParser):
             're': '<h5>TV Series:</h5>.*?<a href="/title/tt(\d{7})',
             'type': 'string'
         },
-        'title': {
+        'original_title': {
             'page': 'combined',
             're': '<h1>(.*?) <span>',
             'type': 'string'
@@ -220,8 +221,20 @@ class Imdb(SiteParser):
         return readUrlUnicode(url, timeout)
 
     def __init__(self, id, timeout=-1):
-        self.baseUrl = "http://www.imdb.com/title/tt%s/" % id
+        #use akas.imdb.com to always get original title:
+        #http://www.imdb.com/help/show_leaf?titlelanguagedisplay
+        self.baseUrl = "http://akas.imdb.com/title/tt%s/" % id
         super(Imdb, self).__init__(timeout)
+
+        def is_international_title(t):
+            if 'usa' in t[1].lower(): return True
+            if 'international' in t[1].lower(): return True
+            return False
+        ititle = filter(is_international_title, self['alternative_titles'])
+        if ititle:
+            self['english_title'] = ititle[0][0]
+
+        self['title'] = self.get('english_title', self['original_title'])
 
         if 'title' in self and self['title'].startswith('"') and self['title'].endswith('"'):
             self['title'] = self['title'][1:-1]
@@ -363,7 +376,6 @@ def guess(title, director='', timeout=google.DEFAULT_TIMEOUT):
         return return_url[28:35]
 
     return None
-
 
 if __name__ == "__main__":
     import json
