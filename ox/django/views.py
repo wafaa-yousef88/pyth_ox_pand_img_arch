@@ -20,6 +20,5 @@ def task_status(request, task_id):
         response['data'].update({'result':    str(res.args[0]),
                                  'exc':       get_full_cls_name(res.__class__),
                                  'traceback': traceback})
-        response['status'] = 500
     return response
 
