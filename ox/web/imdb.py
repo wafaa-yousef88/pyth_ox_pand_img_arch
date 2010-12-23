@@ -64,7 +64,11 @@ class Imdb(SiteParser):
         },
         'countries': {
             'page': 'combined',
-            're': '<a href="/Sections/Countries/.*?/">(.*?)</a>',
+            're': [
+                '<div class="info"><h5>Country:</h5>.*?<div class="info">',
+                #'<a href="/country/.*?">(.*?)</a>', #links changed to work with existing caches, just take all links
+                '<a.*?>(.*?)</a>',
+            ],
             'type': 'list'
         },
         'creators': {
