@@ -345,6 +345,12 @@ def guess(title, director='', timeout=google.DEFAULT_TIMEOUT):
     title = title.split('.')[0]
     title = title.strip()
     '''
+    static = {
+        (u"Histoire(s) du cinema: Le controle de l'univers", 'Jean-Luc Godard'): '0179214'
+        (u"Histoire(s) du cinéma: Le contrôle de l'univers", 'Jean-Luc Godard'): '0179214',
+    }.get((title, director), None)
+    if static:
+        return static
     imdb_url = 'http://www.imdb.com/find?q=%s' % quote(title.encode('utf-8'))
     return_url = ''
 
