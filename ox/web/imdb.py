@@ -238,7 +238,7 @@ class Imdb(SiteParser):
             if 'usa' in t[1].lower(): return True
             if 'international' in t[1].lower(): return True
             return False
-        ititle = filter(is_international_title, self['alternative_titles'])
+        ititle = filter(is_international_title, self.get('alternative_titles', []))
         if ititle:
             self['english_title'] = ititle[0][0]
 
