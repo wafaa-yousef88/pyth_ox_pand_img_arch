@@ -119,7 +119,11 @@ class Imdb(SiteParser):
         },
         'languages': {
             'page': 'combined',
-            're': '<a href="/Sections/Languages/.*?/">(.*?)</a>',
+            're': [
+                '<div class="info"><h5>Language:</h5>.*?<div class="info">',
+                #'<a href="/language/.*?">(.*?)</a>', #links changed to work with existing caches, just take all links
+                '<a.*?>(.*?)</a>',
+            ],
             'type': 'list'
         },
         'plot': {
