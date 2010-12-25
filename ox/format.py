@@ -16,22 +16,22 @@ def to32(q):
     '0'
 
     >>> to32(347485647)
-    'AbCdEf'
+    'ABCDEF'
 
     >>> to32(555306645)
-    'GhJkMn'
+    'GHJKMN'
 
     >>> to32(800197332334559L)
-    'PqRsTvWxYz'
+    'PQRSTVWXYZ'
 
     >>> to32(32)
     '10'
 
     >>> to32(119292)
-    '3mFw'
+    '3MFW'
 
     >>> to32(939387374)
-    'VzVtFe'
+    'VZVTFE'
 
     >>> to32(-1)
     Traceback (most recent call last):
@@ -42,15 +42,9 @@ def to32(q):
     if q < 0: raise ValueError, "must supply a positive integer"
     letters = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
     converted = []
-    upper = False
     while q != 0:
         q, r = divmod(q, 32)
         l = letters[r]
-        if upper:
-            upper = False
-        else:
-            l = l.lower()
-            upper = True
         converted.insert(0, l)
     return "".join(converted) or '0'
 
