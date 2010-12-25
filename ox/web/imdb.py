@@ -235,6 +235,7 @@ class Imdb(SiteParser):
         super(Imdb, self).__init__(timeout)
 
         def is_international_title(t):
+            if 'working title' in t[1].lower(): return False
             if 'usa' in t[1].lower(): return True
             if 'international' in t[1].lower(): return True
             return False
