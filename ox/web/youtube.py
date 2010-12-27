@@ -23,6 +23,10 @@ def getVideoKey(youtubeId, timeout=cache_timeout):
     return False
  
 def getVideoUrl(youtubeId, format='mp4', timeout=cache_timeout):
+    """
+        youtubeId - if of video
+        format - video format, options: webm, 1080p, 720p, mp4, high
+    """
     youtubeKey = getVideoKey(youtubeId, timeout=timeout)
 
     fmt = None

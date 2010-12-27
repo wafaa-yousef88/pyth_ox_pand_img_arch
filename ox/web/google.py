@@ -47,7 +47,7 @@ def find(query, max_results=DEFAULT_MAX_RESULTS, timeout=DEFAULT_TIMEOUT):
     >>> find("The Matrix site:imdb.com", 1)[0][1]
     u'http://www.imdb.com/title/tt0133093/'
     """
-    _results =  _find(query)
+    _results =  _find(query, timeout=timeout)
     results = []
     for r in _results:
         results.append((r['titleNoFormatting'], r['unescapedUrl'], stripTags(r['content'])))
