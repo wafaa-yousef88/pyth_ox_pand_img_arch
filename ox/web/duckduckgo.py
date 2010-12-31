@@ -9,9 +9,9 @@ from ox.cache import readUrlUnicode
 
 
 def find(query, timeout=ox.cache.cache_timeout):
-    params = urllib.urlencode({'q': query})
     if isinstance(query, unicode):
         query = query.encode('utf-8')
+    params = urllib.urlencode({'q': query})
     url = 'http://duckduckgo.com/html/?' + params
     data = readUrlUnicode(url, timeout=timeout)
     results = []
