@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 import urllib2
-from urllib import quote, unquote
+import urllib
 import re
 import os
 import time
@@ -298,7 +298,7 @@ class ImdbCombined(Imdb):
         self.regex = _regex
         super(ImdbCombined, self).__init__(id, timeout)
 
-def getMovieId(title, director='', year=''):
+def getMovieId(title, director='', year='', timeout=-1):
     '''
     >>> getMovieId('The Matrix')
     u'0133093'
@@ -308,16 +308,38 @@ def getMovieId(title, director='', year=''):
 
     >>> getMovieId('2 or 3 Things I Know About Her', 'Jean-Luc Godard', '1967')
     u'0060304'
+
+    >>> getMovieId(u'Histoire(s) du cinema: Le controle de l'univers', 'Jean-Luc Godard')
+    u'0179214'
+
+    >>> getMovieId(u"Histoire(s) du cinéma: Le contrôle de l'univers", 'Jean-Luc Godard')
+    u'0179214'
     '''
+    if isinstance(title, unicode):
+        title = title.encode('utf-8')
+    params = {'s':'tt','q': title}
     if director:
-        query = 'site:imdb.com %s "%s" ' % (director, title)
-    else:
-        query = 'site:imdb.com "%s" ' % title
+        if isinstance(director, unicode):
+            director = director.encode('utf-8')
+        params['q'] = '"%s" %s' % (title, director)
     if year:
-        query += year
-    for (name, url, desc) in google.find(query, 5, timeout=-1):
-        if url.startswith('http://www.imdb.com/title/tt'):
-            return url[28:35]
+        params['q'] = '"%s (%s)" %s' % (title, year, director)
+    params = urllib.urlencode(params)
+    url = "http://akas.imdb.com/find?" + params
+    #print url
+
+    data = readUrlUnicode(url, timeout=timeout)
+    #if search results in redirect, get id of current page
+    r = '<meta property="og:url" content="http://www.imdb.com/title/tt(\d{7})/" />'
+    results = re.compile(r).findall(data)    
+    if results:
+        return results[0]
+    #otherwise get first result
+    r = '<td valign="top">.*?<a href="/title/tt(\d{7})/"'
+    results = re.compile(r).findall(data)    
+    if results:
+        return results[0]
+    #or nothing
     return ''
 
 def getMoviePoster(imdbId):
@@ -338,60 +360,8 @@ def getMoviePoster(imdbId):
         return getMoviePoster(info['series'])
     return ''
 
-def guess(title, director='', timeout=google.DEFAULT_TIMEOUT):
-    #FIXME: proper file -> title
-    '''
-    //this is not needed
-    title = title.split('-')[0]
-    title = title.split('(')[0]
-    title = title.split('.')[0]
-    title = title.strip()
-    '''
-    static = {
-        (u"Histoire(s) du cinema: Le controle de l'univers", 'Jean-Luc Godard'): '0179214',
-        (u"Histoire(s) du cinéma: Le contrôle de l'univers", 'Jean-Luc Godard'): '0179214',
-    }.get((title, director), None)
-    if static:
-        return static
-    imdb_url = 'http://www.imdb.com/find?q=%s' % quote(title.encode('utf-8'))
-    return_url = ''
-
-    #lest first try google
-    #i.e. site:imdb.com Michael Stevens "Sin"
-    if director:
-        search = 'site:imdb.com %s "%s"' % (director, title)
-    else:
-        search = 'site:imdb.com "%s"' % title
-
-    for (name, url, desc) in google.find(search, 2, timeout=timeout):
-        if url.startswith('http://www.imdb.com/title/tt'):
-             return normalizeImdbId(int(ox.intValue(url)))
-
-    try:
-        req = urllib2.Request(imdb_url, None, ox.net.DEFAULT_HEADERS)
-        u = urllib2.urlopen(req)
-        data = u.read()
-        return_url = u.url
-        u.close()
-    except:
-        return None
-    if return_url.startswith('http://www.imdb.com/title/tt'):
-        return return_url[28:35]
-    if data:
-        imdb_id = findRe(data.replace('\n', ' '), 'Popular Results.*?<ol><li>.*?<a href="/title/tt(.......)')
-        if imdb_id:
-            return imdb_id
-
-    imdb_url = 'http://www.imdb.com/find?q=%s;s=tt;site=aka' % quote(title.encode('utf-8'))
-    req = urllib2.Request(imdb_url, None, ox.net.DEFAULT_HEADERS)
-    u = urllib2.urlopen(req)
-    data = u.read()
-    return_url = u.url
-    u.close()
-    if return_url.startswith('http://www.imdb.com/title/tt'):
-        return return_url[28:35]
-
-    return None
+def guess(title, director='', timeout=-1):
+    return getMovieId(title, director, timeout=timeout)
 
 if __name__ == "__main__":
     import json
