@@ -66,6 +66,6 @@ def _find(query, timeout=DEFAULT_TIMEOUT):
     u'http://www.imdb.com/title/tt0133093/'
     """
     url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=%s' % quote_plus(query)
-    results = json.loads(ox.cache.readUrlUnicode(url, timeout=timeout))['responseData']['results']
+    results = json.loads(ox.cache.readUrl(url, timeout=timeout))['responseData']['results']
     return results
 
