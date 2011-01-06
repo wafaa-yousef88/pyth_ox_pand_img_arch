@@ -152,7 +152,7 @@ class Imdb(SiteParser):
         },
         'rating': {
             'page': 'combined',
-            're': '<div class="starbar-meta">.*?<b>([\d,.]?)/10</b>',
+            're': '<div class="starbar-meta">.*?<b>([\d,.]+?)/10</b>',
             'type': 'float'
         },
         'release date': {
