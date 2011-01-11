@@ -11,7 +11,9 @@ class HttpErrorJson(Http404):
     def __init__(self, response):
         self.response = response
 
-def json_response(data={}, status=200, text='ok'):
+def json_response(data=None, status=200, text='ok'):
+    if not data:
+        data = {}
     return {'status': {'code': status, 'text': text}, 'data': data}
 
 def render_to_json_response(dictionary, content_type="text/json", status=200):
