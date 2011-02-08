@@ -27,7 +27,7 @@ def getData(id):
     data['title'] = stripTags(findRe(html, '<p class="name white">(.*?) \(<a href="alpha1.html">'))
     data['year'] = findRe(html, '\(<a href="alpha1.html">(.*?)</a>\)')
     data['posters'] = []
-    poster = findRe(html, '<img src="(posters.*?)" alt=')
+    poster = findRe(html, '<img src="(posters.*?)"')
     if poster:
         poster = 'http://www.impawards.com/%s/%s' % (data['year'], poster)
         data['posters'].append(poster)
@@ -42,7 +42,7 @@ def getData(id):
             html = readUrlUnicode(url)
             poster = 'http://www.impawards.com/%s/%s' % (data['year'], findRe(html, '<img SRC="(.*?)"'))
         else:
-            poster = 'http://www.impawards.com/%s/%s' % (data['year'], findRe(html, '<img src="(posters.*?)" alt='))
+            poster = 'http://www.impawards.com/%s/%s' % (data['year'], findRe(html, '<img src="(posters.*?)"'))
         data['posters'].append(poster)
     return data
 
