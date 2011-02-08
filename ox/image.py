@@ -52,7 +52,7 @@ def getImageHeat(image_file):
     return image_heat / 256
 
 def getImageHSL(image_file):
-    image = Image.open(image_file).resize((1, 1), Image.ANTIALIAS)
+    image = Image.open(image_file).convert('RGB').resize((1, 1), Image.ANTIALIAS)
     return getHSL(image.getpixel((0, 0)))
 
 def getRGB(hsl):
