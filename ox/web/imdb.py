@@ -315,15 +315,12 @@ def getMovieId(title, director='', year='', timeout=-1):
     >>> getMovieId(u"Histoire(s) du cinéma: Le contrôle de l'univers", 'Jean-Luc Godard')
     u'0179214'
     '''
-    if isinstance(title, unicode):
-        title = title.encode('utf-8')
     params = {'s':'tt','q': title}
     if director:
-        if isinstance(director, unicode):
-            director = director.encode('utf-8')
-        params['q'] = '"%s" %s' % (title, director)
+        params['q'] = u'"%s" %s' % (title, director)
     if year:
-        params['q'] = '"%s (%s)" %s' % (title, year, director)
+        params['q'] = u'"%s (%s)" %s' % (title, year, director)
+    params['q'] = params['q'].encode('utf-8')
     params = urllib.urlencode(params)
     url = "http://akas.imdb.com/find?" + params
     #print url
