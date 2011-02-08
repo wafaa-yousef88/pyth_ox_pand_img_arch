@@ -42,10 +42,10 @@ def find(query, max_results=DEFAULT_MAX_RESULTS, timeout=DEFAULT_TIMEOUT):
     Return max_results tuples with title, url, description 
 
     >>> find("The Matrix site:imdb.com", 1)[0][0]
-    u'The Matrix (1999)'
+    'The Matrix (1999) - IMDb'
 
     >>> find("The Matrix site:imdb.com", 1)[0][1]
-    u'http://www.imdb.com/title/tt0133093/'
+    'http://www.imdb.com/title/tt0133093/'
     """
     _results =  _find(query, timeout=timeout)
     results = []
@@ -60,10 +60,10 @@ def _find(query, timeout=DEFAULT_TIMEOUT):
     Return parsed json results from google ajax api
 
     >>> _find("The Matrix site:imdb.com")[0]['titleNoFormatting']
-    u'The Matrix (1999)'
+    'The Matrix (1999) - IMDb'
 
     >>> _find("The Matrix site:imdb.com")[0]['url']
-    u'http://www.imdb.com/title/tt0133093/'
+    'http://www.imdb.com/title/tt0133093/'
     """
     url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=%s' % quote_plus(query)
     results = json.loads(ox.cache.readUrl(url, timeout=timeout))['responseData']['results']

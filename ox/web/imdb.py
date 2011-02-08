@@ -309,7 +309,7 @@ def getMovieId(title, director='', year='', timeout=-1):
     >>> getMovieId('2 or 3 Things I Know About Her', 'Jean-Luc Godard', '1967')
     u'0060304'
 
-    >>> getMovieId(u'Histoire(s) du cinema: Le controle de l'univers', 'Jean-Luc Godard')
+    >>> getMovieId(u"Histoire(s) du cinema: Le controle de l'univers", 'Jean-Luc Godard')
     u'0179214'
 
     >>> getMovieId(u"Histoire(s) du cinéma: Le contrôle de l'univers", 'Jean-Luc Godard')
