@@ -68,17 +68,17 @@ def getData(id):
 
 def getIds():
     ids = []
-    html = readUrlUnicode("http://www.criterion.com/library/dvd")
-    results = re.compile("page=(.*?)\"").findall(html)
-    pages = int(results[len(results) - 2])
-    for page in range(pages, 0, -1):
+    html = readUrlUnicode("http://www.criterion.com/library/expanded_view?m=dvd&p=1&pp=50&s=spine")
+    results = re.compile("\&amp;p=(\d+)\&").findall(html)
+    pages = max(map(int, results))
+    for page in range(1, pages):
         for id in getIdsByPage(page):
             ids.append(id)
     return map(lambda id: str(id), sorted(map(lambda id: int(id), set(ids))))
 
 def getIdsByPage(page):
     ids = []
-    html = readUrlUnicode("http://www.criterion.com/library/dvd?page=%s" % page)
+    html = readUrlUnicode("http://www.criterion.com/library/expanded_view?m=dvd&p=%s&pp=50&s=spine" % page)
     results = re.compile("films/(\d+)").findall(html)
     for result in results:
         ids.append(result)
