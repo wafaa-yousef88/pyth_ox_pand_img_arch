@@ -1,26 +1,32 @@
 import time
+import datetime
 
 from django.db import models
 from ox.utils import json
 
 
 def to_json(python_object):
-    if isinstance(python_object, time.struct_time):          
-        return {'__class__': 'time.asctime',
-                '__value__': time.asctime(python_object)}    
     if isinstance(python_object, bytes):
         return {'__class__': 'bytes',
                 '__value__': list(python_object)}
+    if isinstance(python_object, datetime.datetime):
+        return {'__class__': 'datetime.datetime',
+                '__value__': python_object.strftime('%Y-%m-%dT%H:%M:%SZ')}
+    if isinstance(python_object, time.struct_time):
+        return {'__class__': 'time.asctime',
+                '__value__': time.asctime(python_object)}
     raise TypeError(repr(python_object) + ' is not JSON serializable')
 
-def from_json(json_object):                                  
-    if '__class__' in json_object:                            
-        if json_object['__class__'] == 'time.asctime':
-            return time.strptime(json_object['__value__'])    
+def from_json(json_object):
+    if '__class__' in json_object:
         if json_object['__class__'] == 'bytes':
-            return bytes(json_object['__value__'])            
+            return bytes(json_object['__value__'])
+        if json_object['__class__'] == 'datetime.datetime':
+            return datetime.datetime.strptime(json_object['__value__'], '%Y-%m-%dT%H:%M:%SZ')
+        if json_object['__class__'] == 'time.asctime':
+            return time.strptime(json_object['__value__'])
     return json_object
-    
+
 class DictField(models.TextField):
     """DictField is a textfield that contains JSON-serialized dictionaries."""
 

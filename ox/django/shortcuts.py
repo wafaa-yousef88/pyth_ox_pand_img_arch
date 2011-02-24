@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+from datetime import datetime 
 from django.http import HttpResponse, Http404
 try:
     import simplejson as json
@@ -16,6 +17,11 @@ def json_response(data=None, status=200, text='ok'):
         data = {}
     return {'status': {'code': status, 'text': text}, 'data': data}
 
+def _to_json(python_object):
+    if isinstance(python_object, datetime):          
+        python_object.strftime('%Y-%m-%dT%H:%M:%SZ')
+    raise TypeError(repr(python_object) + ' is not JSON serializable')
+
 def render_to_json_response(dictionary, content_type="text/json", status=200):
     indent=None
     if settings.DEBUG:
@@ -25,7 +31,8 @@ def render_to_json_response(dictionary, content_type="text/json", status=200):
         print json.dumps(dictionary, indent=2)
     if 'status' in dictionary and 'code' in dictionary['status']:
 			status = dictionary['status']['code']
-    return HttpResponse(json.dumps(dictionary, indent=indent),
+
+    return HttpResponse(json.dumps(dictionary, indent=indent, default=_to_json),
                         content_type=content_type, status=status)
 
 def get_object_or_404_json(klass, *args, **kwargs):
