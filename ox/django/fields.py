@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+# vi:si:et:sw=4:sts=4:ts=4
 import time
 import datetime
 
@@ -6,15 +8,18 @@ from ox.utils import json
 
 
 def to_json(python_object):
-    if isinstance(python_object, bytes):
-        return {'__class__': 'bytes',
-                '__value__': list(python_object)}
     if isinstance(python_object, datetime.datetime):
         return {'__class__': 'datetime.datetime',
                 '__value__': python_object.strftime('%Y-%m-%dT%H:%M:%SZ')}
     if isinstance(python_object, time.struct_time):
         return {'__class__': 'time.asctime',
                 '__value__': time.asctime(python_object)}
+    try:
+        if isinstance(python_object, bytes):
+            return {'__class__': 'bytes',
+                '__value__': list(python_object)}
+    except:
+        pass
     raise TypeError(repr(python_object) + ' is not JSON serializable')
 
 def from_json(json_object):
