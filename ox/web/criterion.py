@@ -33,9 +33,10 @@ def getData(id):
         html = readUrlUnicode(data["url"])
     except:
         html = ox.cache.readUrl(data["url"])
-    data["number"] = findRe(html, "<p class=\"spinenumber\">(.*?)</p>")
+    data["number"] = findRe(html, "<li>Spine #(\d+)")
+
     data["title"] = findRe(html, "<meta property=['\"]og:title['\"] content=['\"](.*?)['\"]")
-    data["director"] = findRe(html, "<h2 class=\"director\">(.*?)</h2>")
+    data["director"] = stripTags(findRe(html, "<h2 class=\"director\">(.*?)</h2>"))
     results = findRe(html, '<div class="left_column">(.*?)</div>')
     results = re.compile("<li>(.*?)</li>").findall(results)
     data["country"] = results[0]
