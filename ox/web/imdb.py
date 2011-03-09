@@ -315,11 +315,28 @@ def getMovieId(title, director='', year='', timeout=-1):
     >>> getMovieId(u"Histoire(s) du cinéma: Le contrôle de l'univers", 'Jean-Luc Godard')
     u'0179214'
     '''
+    #print (title, director)
+    imdbId = {
+        (u'Le jour se l\xe8ve', u'Marcel Carn\xe9'): '0031514',
+        (u'Wings', u'Larisa Shepitko'): '0061196',
+        (u'The Ascent', u'Larisa Shepitko'): '0075404',
+        (u'Fanny and Alexander', u'Ingmar Bergman'): '0083922',
+        (u'Torment', u'Alf Sj\xf6berg'): '0036914',
+        (u'Crisis', u'Ingmar Bergman'): '0038675',
+        (u'To Joy', u'Ingmar Bergman'): '0043048',
+        (u'Humain, trop humain', u'Louis Malle'): '0071635',
+        (u'Place de la R\xe9publique', u'Louis Malle'): '0071999',
+        (u'God\u2019s Country', u'Louis Malle'): '0091125',
+
+    }.get((title, director), None)
+    if imdbId:
+        return imdbId
     params = {'s':'tt','q': title}
     if director:
         params['q'] = u'"%s" %s' % (title, director)
     if year:
         params['q'] = u'"%s (%s)" %s' % (title, year, director)
+    google_query = "site:imdb.com %s" % params['q']
     params['q'] = params['q'].encode('utf-8')
     params = urllib.urlencode(params)
     url = "http://akas.imdb.com/find?" + params
@@ -333,9 +350,14 @@ def getMovieId(title, director='', year='', timeout=-1):
         return results[0]
     #otherwise get first result
     r = '<td valign="top">.*?<a href="/title/tt(\d{7})/"'
-    results = re.compile(r).findall(data)    
+    results = re.compile(r).findall(data)
     if results:
         return results[0]
+
+    #print google_query
+    results = google.find(google_query)
+    if results:
+        return findRe(results[0][1], 'title/tt(\d{7})')
     #or nothing
     return ''
 

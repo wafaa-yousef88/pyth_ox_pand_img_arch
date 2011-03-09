@@ -36,6 +36,7 @@ def getData(id):
     data["number"] = findRe(html, "<li>Spine #(\d+)")
 
     data["title"] = findRe(html, "<meta property=['\"]og:title['\"] content=['\"](.*?)['\"]")
+    data["title"] = data["title"].split(u' \u2014 The Television Version')[0]
     data["director"] = stripTags(findRe(html, "<h2 class=\"director\">(.*?)</h2>"))
     results = findRe(html, '<div class="left_column">(.*?)</div>')
     results = re.compile("<li>(.*?)</li>").findall(results)
@@ -61,8 +62,8 @@ def getData(id):
         data["stills"] = [result]
         data["trailers"] = []
     else:
-        data["stills"] = [findRe(html, "\"thumbnailURL\", \"(.*?)\"")]
-        data["trailers"] = [findRe(html, "\"videoURL\", \"(.*?)\"")]
+        data["stills"] = filter(lambda x: x, [findRe(html, "\"thumbnailURL\", \"(.*?)\"")])
+        data["trailers"] = filter(lambda x: x, [findRe(html, "\"videoURL\", \"(.*?)\"")])
 
     data['imdbId'] = imdb.getMovieId(data['title'], data['director'], data['year'])
     return data
