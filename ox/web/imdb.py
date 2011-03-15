@@ -315,7 +315,6 @@ def getMovieId(title, director='', year='', timeout=-1):
     >>> getMovieId(u"Histoire(s) du cinéma: Le contrôle de l'univers", 'Jean-Luc Godard')
     u'0179214'
     '''
-    #print (title, director)
     imdbId = {
         (u'Le jour se l\xe8ve', u'Marcel Carn\xe9'): '0031514',
         (u'Wings', u'Larisa Shepitko'): '0061196',
@@ -327,7 +326,27 @@ def getMovieId(title, director='', year='', timeout=-1):
         (u'Humain, trop humain', u'Louis Malle'): '0071635',
         (u'Place de la R\xe9publique', u'Louis Malle'): '0071999',
         (u'God\u2019s Country', u'Louis Malle'): '0091125',
+        (u'Flunky, Work Hard', u'Mikio Naruse'): '0022036',
+        (u'The Courtesans of Bombay', u'Richard Robbins') : '0163591',
+        (u'Je tu il elle', u'Chantal Akerman') : '0071690',
+        (u'Hotel Monterey', u'Chantal Akerman') : '0068725',
+        (u'No Blood Relation', u'Mikio Naruse') : '023261',
+        (u'Apart from You', u'Mikio Naruse') : '0024214',
+        (u'Every-Night Dreams', u'Mikio Naruse') : '0024793',
+        (u'Street Without End', u'Mikio Naruse') : '0025338',
+        (u'Sisters of the Gion', u'Kenji Mizoguchi') : '0027672',
+        (u'Osaka Elegy', u'Kenji Mizoguchi') : '0028021',
+        (u'Blaise Pascal', u'Roberto Rossellini') : '0066839',
+        (u'Japanese Girls at the Harbor', u'Hiroshi Shimizu') : '0160535',
+        (u'The Private Life of Don Juan', u'Alexander Korda') : '0025681',
+        (u'Last Holiday', u'Henry Cass') : '0042665',
+        (u'A Colt Is My Passport', u'Takashi  Nomura') : '0330536',
+        (u'Androcles and the Lion', u'Chester Erskine') : '0044355',
+        (u'Major Barbara', u'Gabriel Pascal') : '0033868',
+        (u'Come On Children', u'Allan King') : '0269104',
 
+        (u'Jimi Plays Monterey & Shake! Otis at Monterey', u'D. A. Pennebaker and Chris Hegedus') : '',
+        (u'Martha Graham: Dance on Film', u'Nathan Kroll') : '',
     }.get((title, director), None)
     if imdbId:
         return imdbId
@@ -354,6 +373,7 @@ def getMovieId(title, director='', year='', timeout=-1):
     if results:
         return results[0]
 
+    #print (title, director), ": '',"
     #print google_query
     results = google.find(google_query)
     if results:
