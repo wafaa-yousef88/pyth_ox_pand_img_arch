@@ -49,11 +49,11 @@ class DictField(models.TextField):
         assert isinstance(value, dict)
         return value
 
-    def get_db_prep_save(self, value):
+    def get_db_prep_save(self, value, connection):
         """Convert our JSON object to a string before we save"""
         assert isinstance(value, dict)
         value = json.dumps(value, default=to_json)
-        return super(DictField, self).get_db_prep_save(value)
+        return super(DictField, self).get_db_prep_save(value, connection)
 
 class TupleField(models.TextField):
     """TupleField is a textfield that contains JSON-serialized tuples."""
@@ -73,11 +73,11 @@ class TupleField(models.TextField):
         assert isinstance(value, list)
         return tuple(value)
 
-    def get_db_prep_save(self, value):
+    def get_db_prep_save(self, value, connection):
         """Convert our JSON object to a string before we save"""
         assert isinstance(value, tuple)
         value = json.dumps(value, default=to_json)
-        return super(TupleField, self).get_db_prep_save(value)
+        return super(TupleField, self).get_db_prep_save(value, connection)
 
 try:
     from south.modelsinspector import add_introspection_rules
