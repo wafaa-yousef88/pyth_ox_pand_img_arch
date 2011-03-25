@@ -28,7 +28,7 @@ def render_to_json_response(dictionary, content_type="text/json", status=200):
         content_type = "text/javascript"
         indent = 2
     if settings.JSON_DEBUG:
-        print json.dumps(dictionary, indent=2)
+        print json.dumps(dictionary, indent=2, default=_to_json)
     if 'status' in dictionary and 'code' in dictionary['status']:
 			status = dictionary['status']['code']
 
