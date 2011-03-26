@@ -62,7 +62,8 @@ def oshash(filename):
 
 def avinfo(filename):
     if os.path.getsize(filename):
-        p = subprocess.Popen(['ffmpeg2theora', '--info', filename], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        p = subprocess.Popen(['ffmpeg2theora', '--info', filename],
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         info, error = p.communicate()
         try:
             info = json.loads(info)
@@ -71,6 +72,11 @@ def avinfo(filename):
             reg = re.compile('"metadata": {.*?},', re.DOTALL)
             info = re.sub(reg, '', info)
             info = json.loads(info)
+        if 'video' in info:
+            for v in info['video']:
+                if not 'display_aspect_ratio' in v:
+                    v['display_aspect_ratio'] = '%d:%d' % (v['width'], v['height'])
+                    v['pixel_aspect_ratio'] = '1:1'
         return info
 
     return {'path': filename, 'size': 0}
