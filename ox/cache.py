@@ -2,6 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 # GPL 2008
 import gzip
+import zlib
 import hashlib
 import os
 import StringIO
@@ -19,6 +20,16 @@ from net import DEFAULT_HEADERS, getEncoding
 
 cache_timeout = 30*24*60*60 # default is 30 days
 
+COMPRESS_TYPES = (
+    'text/html',
+    'text/plain',
+    'text/xml',
+    'application/xhtml+xml',
+    'application/x-javascript',
+    'application/javascript',
+    'application/ecmascript',
+    'application/rss+xml'
+)
 
 def status(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout):
     '''
@@ -118,7 +129,16 @@ def _connectDb():
     conn.text_factory = str
     return conn
 
-def _createDb(c):
+def _getSetting(c, key, default=None):
+    c.execute('SELECT value FROM setting WHERE key = ?', (key, ))
+    for row in c:
+        return row[0]
+    return default
+
+def _setSetting(c, key, value):
+    c.execute(u'INSERT OR REPLACE INTO setting values (?, ?)', (key, str(value)))
+
+def _createDb(conn, c):
     # Create table and indexes 
     c.execute('''CREATE TABLE IF NOT EXISTS cache (url_hash varchar(42) unique, domain text, url text,
                       post_data text, headers text, created int, data blob, only_headers int)''')
@@ -126,6 +146,11 @@ def _createDb(c):
     c.execute('''CREATE INDEX IF NOT EXISTS cache_url ON cache (url)''')
     c.execute('''CREATE INDEX IF NOT EXISTS cache_url_hash ON cache (url_hash)''')
 
+    c.execute('''CREATE TABLE IF NOT EXISTS setting (key varchar(1024) unique, value text)''')
+    if int(_getSetting(c, 'version', 0)) < 1:
+        _setSetting(c, 'version', 1)
+        c.execute('''ALTER TABLE cache ADD compressed INT DEFAULT 0''')
+        conn.commit()
 
 def _readUrlCache(url, data, headers=DEFAULT_HEADERS, timeout=-1, value="data"):
     r = None
@@ -139,9 +164,9 @@ def _readUrlCache(url, data, headers=DEFAULT_HEADERS, timeout=-1, value="data"):
 
     conn = _connectDb()
     c = conn.cursor()
-    _createDb(c)
+    _createDb(conn, c)
 
-    sql = 'SELECT %s FROM cache WHERE url_hash=?' % value
+    sql = 'SELECT %s, compressed FROM cache WHERE url_hash=?' % value
     if timeout > 0:
         now = time.mktime(time.localtime())
         t = (url_hash, now-timeout)
@@ -154,7 +179,10 @@ def _readUrlCache(url, data, headers=DEFAULT_HEADERS, timeout=-1, value="data"):
     for row in c:
         r = row[0]
         if value == 'data':
-            r = str(r)
+            if row[1] == 1:
+                r = zlib.decompress(r)
+            else:
+                r = str(r)
         break
 
     c.close()
@@ -173,7 +201,7 @@ def _saveUrlCache(url, post_data, data, headers):
     c = conn.cursor()
 
     # Create table if not exists
-    _createDb(c)
+    _createDb(conn, c)
 
     # Insert a row of data
     if not post_data: post_data=""
@@ -182,8 +210,15 @@ def _saveUrlCache(url, post_data, data, headers):
         only_headers = 1
         data = ""
     created = time.mktime(time.localtime())
-    t = (url_hash, domain, url, post_data, json.dumps(headers), created, sqlite3.Binary(data), only_headers)
-    c.execute(u"""INSERT OR REPLACE INTO cache values (?, ?, ?, ?, ?, ?, ?, ?)""", t)
+    content_type = headers.get('content-type', '').split(';')[0].strip()
+    if content_type in COMPRESS_TYPES:
+        compressed = 1
+        data = zlib.compress(data)
+    else:
+        compressed = 0
+    data = sqlite3.Binary(data)
+    t = (url_hash, domain, url, post_data, json.dumps(headers), created, sqlite3.Binary(data), only_headers, compressed)
+    c.execute(u"""INSERT OR REPLACE INTO cache values (?, ?, ?, ?, ?, ?, ?, ?, ?)""", t)
 
     # Save (commit) the changes and clean up
     conn.commit()
@@ -198,7 +233,7 @@ def migrate_to_db():
 
     conn = _connectDb()
     c = conn.cursor()
-    _createDb(c)
+    _createDb(conn, c)
 
     files = glob.glob(_getCacheBase() + "/*/*/*/*/*")
     _files = filter(lambda x: not x.endswith(".headers"), files)
@@ -222,3 +257,29 @@ def migrate_to_db():
     c.close()
     conn.close()
 
+def compress_db():
+    conn = _connectDb()
+    c = conn.cursor()
+    _createDb(conn, c)
+    c.execute(u"""SELECT url_hash FROM cache WHERE compressed = 0""")
+    ids = [row[0] for row in c]
+    for url_hash in ids:
+        c.execute(u"""SELECT headers, data FROM cache WHERE url_hash = ?""", (url_hash, ))
+        headers = {}
+        for row in c:
+            headers = json.loads(row[0])
+            data = row[1]
+        
+        content_type = headers.get('content-type', '').split(';')[0].strip()
+        if content_type in COMPRESS_TYPES:
+            data = zlib.compress(data)
+            t = (sqlite3.Binary(data), url_hash)
+            print url_hash, 'update'
+            c.execute('UPDATE cache SET compressed = 1, data = ? WHERE url_hash = ?', t)
+
+    conn.commit()
+    print "optimizing database"
+    c.execute('VACUUM')
+    conn.commit()
+    c.close()
+    conn.close()
