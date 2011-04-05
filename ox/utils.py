@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 try:
-    from django.utils.datetime_safe import datetime
+    from django.utils import datetime
 except ImportError:
     from datetime import datetime
 
