@@ -11,7 +11,7 @@ import subprocess
 
 from ox.utils import json
 
-__all__ = ['sha1sum', 'oshash', 'avinfo']
+__all__ = ['sha1sum', 'oshash', 'avinfo', 'makedirs']
 
 def sha1sum(filename):
     sha1 = hashlib.sha1()
@@ -80,3 +80,11 @@ def avinfo(filename):
         return info
 
     return {'path': filename, 'size': 0}
+
+def makedirs(path):
+    if not os.path.exists(path):
+        try:
+            os.makedirs(path)
+        except OSError, e:
+            if e.errno != 17:
+                raise
