@@ -7,21 +7,24 @@ from django.http import HttpResponse, Http404
 from django.conf import settings
 
 
+
 def HttpFileResponse(path, content_type=None, filename=None):
     if not os.path.exists(path):
         raise Http404
     if not content_type:
         content_type = mimetypes.guess_type(path)[0]
-    if settings.XACCELREDIRECT:
+    if getattr(settings, 'XACCELREDIRECT', False):
         response = HttpResponse()
         response['Content-Length'] = os.stat(path).st_size
-        if path.startswith(settings.STATIC_ROOT):
-            path = settings.STATIC_URL + path[len(settings.STATIC_ROOT)+1:]
-        if path.startswith(settings.MEDIA_ROOT):
-            path = settings.MEDIA_URL + path[len(settings.MEDIA_ROOT)+1:]
+        
+        for PREFIX in ('STATIC', 'MEDIA'):
+            root = getattr(settings, PREFIX+'_ROOT', '')
+            url = getattr(settings, PREFIX+'_URL', '')
+            if root and path.startswith(root):
+                path = url + path[len(root)+1:]
         response['X-Accel-Redirect'] = path
         response['Content-Type'] = content_type
-    elif settings.XSENDFILE:
+    elif getattr(settings, 'XSENDFILE', False):
         response = HttpResponse()
         response['X-Sendfile'] = path
         response['Content-Type'] = content_type
