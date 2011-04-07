@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+import re
 from urllib import urlencode
 
 from ox.utils import json
@@ -52,7 +53,7 @@ def getWikiData(wikipediaUrl):
 def getMovieData(wikipediaUrl):
     if not wikipediaUrl.startswith('http'): wikipediaUrl = getUrl(wikipediaUrl)
     data = getWikiData(wikipediaUrl)
-    filmbox_data = findRe(data, '''\{\{Infobox.Film(.*?)\n\}\}''')
+    filmbox_data = findRe(data, '''\{\{[Ii]nfobox.[Ff]ilm(.*?)\n\}\}''')
     filmbox = {}
     _box = filmbox_data.strip().split('\n|')
     if len(_box) == 1:
@@ -64,18 +65,23 @@ def getMovieData(wikipediaUrl):
             if key[0] == '|':
                 key = key[1:]
             value = d[1].strip()
-            filmbox[key] = value
-    if 'imdb title' in data:
-        filmbox['imdb_id'] = findRe(data, 'imdb title\|.*?(\d+)')
-    elif 'imdb episode' in data:
-        filmbox['imdb_id'] = findRe(data, 'imdb episode\|.*?(\d+)')
-    if 'Amg movie' in data:
-        filmbox['amg_id'] = findRe(data, 'Amg movie\|.*?(\d+)')
-    if 'amg_id' in filmbox and filmbox['amg_id'].startswith('1:'):
+            filmbox[key.strip()] = value
+
+    if 'Allmovie movie' in data:
+        filmbox['amg_id'] = findRe(data, 'Allmovie movie\|.*?(\d+)')
+    elif 'amg_id' in filmbox and filmbox['amg_id'].startswith('1:'):
         filmbox['amg_id'] = filmbox['amg_id'][2:]
 
-    if 'otten-tomatoes' in data:
-        filmbox['rottentomatoes_id'] = findRe(data, '\{\{Rotten-tomatoes\|id=(.*?)\}\}')
+    r = re.compile('{{IMDb title\|(\d{7})', re.IGNORECASE).findall(data)
+    if r:
+        filmbox['imdb_id'] = r[0]
+    r = re.compile('{{mojo title\|(.*?)\|', re.IGNORECASE).findall(data)
+    if r:
+        filmbox['mojo_id'] = r[0]
+
+    r = re.compile('{{rotten-tomatoes\|(.*?)\|', re.IGNORECASE).findall(data)
+    if r:
+        filmbox['rottentomatoes_id'] = r[0]
     if 'google video' in data:
         filmbox['google_video_id'] = findRe(data, 'google video\|.*?(\d*?)\|')
     if 'DEFAULTSORT' in data:
