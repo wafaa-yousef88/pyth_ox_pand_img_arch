@@ -5,6 +5,7 @@ import urllib
 import re
 import os
 import time
+import unicodedata
 
 import ox
 from ox import findRe, stripTags
@@ -233,6 +234,10 @@ class Imdb(SiteParser):
         #http://www.imdb.com/help/show_leaf?titlelanguagedisplay
         self.baseUrl = "http://akas.imdb.com/title/tt%s/" % id
         super(Imdb, self).__init__(timeout)
+       
+        url = self.baseUrl + 'combined' 
+        if '<title>IMDb: Page not found</title>' in self.readUrlUnicode(url, -1):
+            return
 
         def is_international_title(t):
             if 'working title' in t[1].lower(): return False
@@ -298,6 +303,51 @@ class ImdbCombined(Imdb):
         self.regex = _regex
         super(ImdbCombined, self).__init__(id, timeout)
 
+def getMovieIdByTitle(title, timeout=-1):
+    '''
+    This only works for exact title matches from the data dump
+    Usually in the format
+        Title (Year)
+        "Series Title" (Year) {(#Season.Episode)}
+        "Series Title" (Year) {Episode Title (#Season.Episode)}
+
+    If there is more than one film with that title for the year
+        Title (Year/I)
+
+    >>> getMovieIdByTitle(u'"Father Knows Best" (1954) {(#5.34)}')
+    u'1602860'
+
+    >>> getMovieIdByTitle(u'The Matrix (1999)')
+    u'0133093'
+
+    >>> getMovieIdByTitle(u'Little Egypt (1951)')
+    u'0043748'
+
+    >>> getMovieIdByTitle(u'Little Egypt (1897/I)')
+    u'0214882'
+    
+    >>> getMovieIdByTitle(u'Little Egypt')
+    None 
+
+    >>> getMovieIdByTitle(u'"Dexter" (2006) {Father Knows Best (#1.9)}')
+    u'0866567'
+    '''
+    params = {'s':'tt','q': title}
+    if isinstance(title, unicode):
+        try:
+            params['q'] = unicodedata.normalize('NFKC', params['q']).encode('latin-1')
+        except:
+            params['q'] = params['q'].encode('utf-8')
+    params = urllib.urlencode(params)
+    url = "http://akas.imdb.com/find?" + params
+    data = readUrlUnicode(url, timeout=timeout)
+    #if search results in redirect, get id of current page
+    r = '<meta property="og:url" content="http://www.imdb.com/title/tt(\d{7})/" />'
+    results = re.compile(r).findall(data)    
+    if results:
+        return results[0]
+    return None
+ 
 def getMovieId(title, director='', year='', timeout=-1):
     '''
     >>> getMovieId('The Matrix')
@@ -356,7 +406,11 @@ def getMovieId(title, director='', year='', timeout=-1):
     if year:
         params['q'] = u'"%s (%s)" %s' % (title, year, director)
     google_query = "site:imdb.com %s" % params['q']
-    params['q'] = params['q'].encode('utf-8')
+    if isinstance(params['q'], unicode):
+        try:
+            params['q'] = unicodedata.normalize('NFKC', params['q']).encode('latin-1')
+        except:
+            params['q'] = params['q'].encode('utf-8')
     params = urllib.urlencode(params)
     url = "http://akas.imdb.com/find?" + params
     #print url
