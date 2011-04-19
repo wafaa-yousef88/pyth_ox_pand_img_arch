@@ -74,7 +74,7 @@ def avinfo(filename):
             info = json.loads(info)
         if 'video' in info:
             for v in info['video']:
-                if not 'display_aspect_ratio' in v:
+                if not 'display_aspect_ratio' in v and 'width' in v:
                     v['display_aspect_ratio'] = '%d:%d' % (v['width'], v['height'])
                     v['pixel_aspect_ratio'] = '1:1'
         return info
