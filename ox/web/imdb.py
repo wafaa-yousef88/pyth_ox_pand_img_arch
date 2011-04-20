@@ -240,8 +240,7 @@ class Imdb(SiteParser):
             return
         if "<p>We're sorry, something went wrong.</p>" in self.readUrlUnicode(url, timeout=-1):
             time.sleep(1)
-            self.readUrlUnicode(url, timeout=0)
-            super(Imdb, self).__init__(timeout)
+            super(Imdb, self).__init__(0)
 
         def is_international_title(t):
             if 'working title' in t[1].lower(): return False
