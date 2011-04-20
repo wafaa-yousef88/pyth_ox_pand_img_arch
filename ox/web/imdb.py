@@ -236,8 +236,12 @@ class Imdb(SiteParser):
         super(Imdb, self).__init__(timeout)
        
         url = self.baseUrl + 'combined' 
-        if '<title>IMDb: Page not found</title>' in self.readUrlUnicode(url, -1):
+        if '<title>IMDb: Page not found</title>' in self.readUrlUnicode(url, timeout=-1):
             return
+        if "<p>We're sorry, something went wrong.</p>" in self.readUrlUnicode(url, timeout=-1):
+            time.sleep(1)
+            self.readUrlUnicode(url, timeout=0)
+            super(Imdb, self).__init__(timeout)
 
         def is_international_title(t):
             if 'working title' in t[1].lower(): return False
