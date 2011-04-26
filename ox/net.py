@@ -60,8 +60,8 @@ def readUrl(url, data=None, headers=DEFAULT_HEADERS, returnHeaders=False):
         return dict(f.headers), data
     return data
 
-def readUrlUnicode(url):
-    data = readUrl(url)
+def readUrlUnicode(url, data=None, headers=DEFAULT_HEADERS):
+    data = readUrl(url, data, headers)
     encoding = getEncoding(data)
     if not encoding:
         encoding = 'latin-1'
