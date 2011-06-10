@@ -151,16 +151,6 @@ def trimString(string, num):
         string = string[:num - 13] + '...' + string[-10:]
     return string
 
-def truncateWords(s, num):
-    "Truncates a string after a certain number of words."
-    length = int(num)
-    words = s.split()
-    if len(words) > length:
-        words = words[:length]
-        if not words[-1].endswith('...'):
-            words.append('...')
-    return ' '.join(words)
-
 def getValidFilename(s):
     """
     Returns the given string converted to a string that can be used for a clean
