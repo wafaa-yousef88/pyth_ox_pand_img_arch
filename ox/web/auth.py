@@ -5,7 +5,6 @@ import os
 
 from ox.utils import json
 
-
 def get(key):
     user_auth = os.environ.get('oxAUTH', os.path.expanduser('~/.ox/auth.json'))
     auth = {}
@@ -17,7 +16,7 @@ def get(key):
     if key in auth:
         return auth[key]
     print "please add key %s to json file '%s'" % (key, user_auth)
-    return ""
+    raise Exception,"no key %s found" % key
 
 def update(key, value):
     user_auth = os.environ.get('oxAUTH', os.path.expanduser('~/.ox/auth.json'))
