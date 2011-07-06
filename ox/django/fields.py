@@ -81,7 +81,7 @@ class TupleField(models.TextField):
 
 try:
     from south.modelsinspector import add_introspection_rules
-    add_introspection_rules([], ["^oxdjango\.fields\.DictField"])
-    add_introspection_rules([], ["^oxdjango\.fields\.TupleField"])
+    add_introspection_rules([], ["^ox.django\.fields\.DictField"])
+    add_introspection_rules([], ["^ox.django\.fields\.TupleField"])
 except:
     pass
