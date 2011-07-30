@@ -15,6 +15,10 @@ USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7) '
 USER_AGENT += 'AppleWebKit/534.48.3 (KHTML, like Gecko) Version/5.1 Safari/534.48.3'
 
 def getMovieData(title, director):
+    if isinstance(title, unicode):
+        title = title.encode('utf-8')
+    if isinstance(director, unicode):
+        director = director.encode('utf-8')
     data = {}
     # itunes section (preferred source for link)
     url = 'http://ax.search.itunes.apple.com/WebObjects/MZSearch.woa/wa/advancedSearch'
