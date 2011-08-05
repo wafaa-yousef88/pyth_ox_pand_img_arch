@@ -242,6 +242,12 @@ class Imdb(SiteParser):
             time.sleep(1)
             super(Imdb, self).__init__(0)
 
+        #only list one country per alternative title
+        if 'alternative_titles' in self:
+            self['alternative_titles'] = [[t[0],
+                                           t[1].split(' / ')[0].split('(')[0].strip()]
+                                          for t in self['alternative_titles']]
+
         def is_international_title(t):
             if 'working title' in t[1].lower(): return False
             if 'complete title' in t[1].lower(): return False
@@ -256,6 +262,7 @@ class Imdb(SiteParser):
 
         if 'title' in self and self['title'].startswith('"') and self['title'].endswith('"'):
             self['title'] = self['title'][1:-1]
+
         if 'runtime' in self and self['runtime']:
             if 'min' in self['runtime']: base=60
             else: base=1
