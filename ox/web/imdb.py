@@ -202,7 +202,7 @@ class Imdb(SiteParser):
         },
         'trivia': {
             'page': 'trivia',
-            're': '<div class="sodatext">(.*?)<br>',
+            're': '<div class="sodatext">(.*?)<br',
             'type': 'list',
         },
         'votes': {
