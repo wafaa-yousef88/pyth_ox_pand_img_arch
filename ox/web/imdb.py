@@ -243,10 +243,6 @@ class Imdb(SiteParser):
             super(Imdb, self).__init__(0)
 
         #only list one country per alternative title
-        if 'alternative_titles' in self:
-            self['alternative_titles'] = [[t[0],
-                                           t[1].split(' / ')[0].split('(')[0].strip()]
-                                          for t in self['alternative_titles']]
 
         def is_international_title(t):
             if 'working title' in t[1].lower(): return False
@@ -262,6 +258,11 @@ class Imdb(SiteParser):
 
         if 'title' in self and self['title'].startswith('"') and self['title'].endswith('"'):
             self['title'] = self['title'][1:-1]
+
+        if 'alternative_titles' in self:
+            self['alternative_titles'] = [[t[0],
+                                           t[1].split(' / ')[0].split('(')[0].strip()]
+                                          for t in self['alternative_titles']]
 
         if 'runtime' in self and self['runtime']:
             if 'min' in self['runtime']: base=60
@@ -288,7 +289,7 @@ class Imdb(SiteParser):
         if 'series' in self:
             if 'episode_title' in self:
                 self['series_title'] = self['title']
-                self['title'] = "%s: %s" % (self['series_title'], self['episode_title'])
+                self['title'] = "%s (S01) %s" % (self['series_title'], self['episode_title'])
             if 'episode_title' in self and 'season' in self and 'episode' in self:
                 self['title'] = "%s (S%02dE%02d) %s" % (
                         self['series_title'], self['season'], self['episode'], self['episode_title'])
