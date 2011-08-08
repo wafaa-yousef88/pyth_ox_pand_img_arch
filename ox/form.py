@@ -19,11 +19,20 @@ class MultiPartForm(object):
 
     def add_field(self, name, value):
         """Add a simple field to the form data."""
+        if isinstance(name, unicode):
+            name = name.encode('utf-8')
+        if isinstance(value, unicode):
+            value = value.encode('utf-8')
         self.form_fields.append((name, value))
         return
 
     def add_file(self, fieldname, filename, fileHandle, mimetype=None):
         """Add a file to be uploaded."""
+        if isinstance(fieldname, unicode):
+            fieldname = fieldname.encode('utf-8')
+        if isinstance(filename, unicode):
+            filename = filename.encode('utf-8')
+
         if hasattr(fileHandle, 'read'):
             body = fileHandle.read()
         else:
