@@ -45,7 +45,7 @@ class Imdb(SiteParser):
             'page': 'business',
             're': [
                 '<h5>Budget</h5>(.*?)<br',
-                lambda data: findRe(data.replace(',', ''), '\d+')
+                lambda data: findRe(ox.decodeHtml(data).replace(',', ''), '\d+')
             ],
             'type': 'int'
         },
