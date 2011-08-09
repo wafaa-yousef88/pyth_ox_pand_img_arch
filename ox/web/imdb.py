@@ -41,6 +41,14 @@ class Imdb(SiteParser):
             'type': 'list'
         
         },
+        'budget': {
+            'page': 'business',
+            're': [
+                '<h5>Budget</h5>(.*?)<br',
+                lambda data: findRe(data.replace(',', ''), '\d+')
+            ],
+            'type': 'int'
+        },
         'cast': {
             'page': 'combined',
             're': [
@@ -112,6 +120,14 @@ class Imdb(SiteParser):
             'page': 'combined',
             're': '<a href="/Sections/Genres/.*?/">(.*?)</a>',
             'type': 'list'
+        },
+        'gross': {
+            'page': 'business',
+            're': [
+                '<h5>Gross</h5>(.*?)\(',
+                lambda data: findRe(data.replace(',', ''), '\d+')
+            ],
+            'type': 'int'
         },
         'keywords': {
             'page': 'keywords',
@@ -210,6 +226,14 @@ class Imdb(SiteParser):
             're': '<a href="ratings" class="tn15more">([\d,]*?) votes</a>',
             'type': 'string'
         },
+        'worldwide_gross': {
+            'page': 'business',
+            're': [
+                '\$([\d,]+?) \(Worldwide\)',
+                lambda data: int(data.replace(',', '')),
+            ],
+            'type': 'list'
+        },
         'writers': {
             'page': 'combined',
             're': [
@@ -304,6 +328,15 @@ class Imdb(SiteParser):
             for key in ('series_title', 'episode_title', 'season', 'episode'):
                 if key in self:
                     del self[key]
+
+        if 'worldwide_gross' in self:
+            if not 'gross' in self:
+                self['gross'] = 0
+            self['gross'] += max(self['worldwide_gross'])
+            del self['worldwide_gross']
+
+        if 'budget' in self and 'gross' in self:
+            self['profit'] = self['gross'] - self['budget']
 
 class ImdbCombined(Imdb):
     def __init__(self, id, timeout=-1):
