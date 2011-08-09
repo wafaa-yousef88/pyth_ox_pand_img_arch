@@ -226,14 +226,6 @@ class Imdb(SiteParser):
             're': '<a href="ratings" class="tn15more">([\d,]*?) votes</a>',
             'type': 'string'
         },
-        'worldwide_gross': {
-            'page': 'business',
-            're': [
-                '\$([\d,]+?) \(Worldwide\)',
-                lambda data: int(data.replace(',', '')),
-            ],
-            'type': 'list'
-        },
         'writers': {
             'page': 'combined',
             're': [
@@ -328,12 +320,6 @@ class Imdb(SiteParser):
             for key in ('series_title', 'episode_title', 'season', 'episode'):
                 if key in self:
                     del self[key]
-
-        if 'worldwide_gross' in self:
-            if not 'gross' in self:
-                self['gross'] = 0
-            self['gross'] += max(self['worldwide_gross'])
-            del self['worldwide_gross']
 
         if 'budget' in self and 'gross' in self:
             self['profit'] = self['gross'] - self['budget']
