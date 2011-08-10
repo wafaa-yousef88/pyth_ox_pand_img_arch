@@ -263,8 +263,9 @@ class Imdb(SiteParser):
         def is_international_title(t):
             if 'working title' in t[1].lower(): return False
             if 'complete title' in t[1].lower(): return False
-            if t[1].lower() =='usa': return True
+            if t[1].lower() == 'usa': return True
             if 'international' in t[1].lower(): return True
+            if 'english title' in t[1].lower(): return True
             return False
         ititle = filter(is_international_title, self.get('alternative_titles', []))
         if ititle:
