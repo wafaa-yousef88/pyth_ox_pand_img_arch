@@ -273,8 +273,9 @@ class Imdb(SiteParser):
 
         self['title'] = self.get('english_title', self['original_title'])
 
-        if 'title' in self and self['title'].startswith('"') and self['title'].endswith('"'):
-            self['title'] = self['title'][1:-1]
+        for t in ('title', 'english_title', 'original_title'):
+            if t in self and self[t].startswith('"') and self[t].endswith('"'):
+                self[t] = self[t][1:-1]
 
         if 'alternative_titles' in self:
             self['alternative_titles'] = [[t[0],
