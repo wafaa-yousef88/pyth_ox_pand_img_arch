@@ -300,7 +300,18 @@ class Imdb(SiteParser):
             if len(self['connections']) == 2 and isinstance(self['connections'][0], basestring):
                 self['connections'] = [self['connections']]
             for rel, data in self['connections']:
-                cc[unicode(rel)] = re.compile('<a href="/title/tt(\d{7})/">').findall(data)
+                #cc[unicode(rel)] = re.compile('<a href="/title/tt(\d{7})/">(.*?)</a>').findall(data)
+                def get_conn(c):
+                    title = c[1]
+                    if title.startswith('"') and title.endswith('"'):
+                        title = title[1:-1]
+                    return {
+                        'id': c[0],
+                        'title': title
+                    }
+                cc[unicode(rel)] = map(get_conn, re.compile('<a href="/title/tt(\d{7})/">(.*?)</a>').findall(data))
+
+
             self['connections'] = cc
 
         for key in ('countries', 'genres'):
