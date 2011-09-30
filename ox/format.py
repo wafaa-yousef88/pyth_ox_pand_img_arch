@@ -4,6 +4,42 @@ import math
 import re
 import string
 
+def to26(q):
+    """
+    Converts an integer to base 32
+    We exclude 4 of the 26 letters: I L O U.
+    http://www.crockford.com/wrmg/base32.html
+
+    >>> for i in range(0, 1000): assert from26(to26(i)) == i
+    
+    >>> to26(0)
+    'A'
+
+    >>> to26(347485647)
+    'ABCDEF'
+    """
+    if q < 0: raise ValueError, "must supply a positive integer"
+    base26 = string.letters[26:]
+    converted = []
+    while q != 0:
+        q, r = divmod(q, 26)
+        l = base26[r]
+        converted.insert(0, l)
+    return "".join(converted) or 'A'
+
+def from26(q):
+    """
+    Converts an base 26 string to an integer
+    >>> from32('A')
+    0
+    """
+    base26 = string.letters[26:]
+    q = q.replace('-','')
+    r = 0
+    for i in q:
+        r = r * 26 + base26.index(i.upper())
+    return r
+
 def to32(q):
     """
     Converts an integer to base 32
