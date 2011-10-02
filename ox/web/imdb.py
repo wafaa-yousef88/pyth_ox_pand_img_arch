@@ -284,6 +284,9 @@ class Imdb(SiteParser):
                 self[t] = self[t][1:-1]
 
         if 'alternative_titles' in self:
+            if len(self['alternative_titles']) == 2 and \
+               isinstance(self['alternative_titles'][0], basestring):
+               self['alternative_titles'] = [self['alternative_titles']]
             self['alternative_titles'] = [[t[0],
                                            t[1].split(' / ')[0].split('(')[0].strip()]
                                           for t in self['alternative_titles']]
