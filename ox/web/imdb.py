@@ -338,6 +338,8 @@ class Imdb(SiteParser):
             for key in ['directors', 'year']:
                 if key in series:
                     self[key] =series[key]
+            if 'original_title' in self:
+                del self['original_title']
         else:
             for key in ('series_title', 'episode_title', 'season', 'episode'):
                 if key in self:
