@@ -125,10 +125,11 @@ def tokenize(source):
                 cursor += 1
         elif char in OPERATOR:
             type = 'operator'
-            string = char + source[cursor]
-            while cursor < length and string in OPERATOR:
-                cursor += 1
-                string += source[cursor]
+            if cursor < length:
+                string = char + source[cursor]
+                while cursor < length and string in OPERATOR:
+                    cursor += 1
+                    string += source[cursor]
         elif char in STRING:
             type = 'string'
             while cursor < length and source[cursor] != source[start]:
