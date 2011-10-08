@@ -13,8 +13,8 @@ def get_bzr_version():
         f = open(info)
         rev = int(f.read().split()[0])
         f.close()
-    if rev:
-        return u'%s' % rev
+        if rev:
+            return u'%s' % rev
     return u'unknown'
 
 setup(
