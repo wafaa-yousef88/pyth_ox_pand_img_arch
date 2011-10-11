@@ -33,7 +33,7 @@ ASIAN_NAMES = [
 ]
 PREFIXES = [
     'al', 'da', 'de', 'del', 'dem', 'den', 'der', 'di', 'dos', 'du',
-    'e', 'el', 'la', 'the', 'van', 'vom', 'von', 'y', 'zu'
+    'e', 'el', 'la', 'san', 'the', 'van', 'vom', 'von', 'y', 'zu'
 ]
 MIDFIXES = ['und']
 SUFFIXES = ['ii', 'iii', 'jr', 'jr.', 'ph.d.', 'phd', 'sr', 'sr.']
@@ -61,6 +61,9 @@ def get_sort_name(name):
 
     >>> get_sort_name('Bing Wang')
     'Wang Bing'
+
+    >>> get_sort_name('Frank Capra III')
+    'Capra III, Frank'
 
     >>> get_sort_name('The Queen of England')
     'Queen of England, The'
