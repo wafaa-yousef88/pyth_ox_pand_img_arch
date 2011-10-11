@@ -108,11 +108,15 @@ def get_sort_title(title):
     >>> get_sort_title('Die Hard')
     'Hard, Die'
 
+    >>> get_sort_title("L'atalante")
+    "atalante, L'"
+
     """
     for article in ARTICLES:
-        if title.lower().startswith(article + ' '):
+        spaces = 0 if article.endswith("'") else 1
+        if title.lower().startswith(article + ' ' * spaces):
             length = len(article)
-            return title[length + 1:] + ', ' + title[:length]
+            return title[length + spaces:] + ', ' + title[:length]
     return title
 
 def findRe(string, regexp):
