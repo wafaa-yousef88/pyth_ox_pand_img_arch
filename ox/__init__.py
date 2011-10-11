@@ -14,6 +14,5 @@ from image import *
 from js import *
 from location import *
 from normalize import *
-from sort import *
 from text import *
 from torrent import *
