@@ -18,21 +18,21 @@ ARTICLES = list(set([
 # see http://en.wikipedia.org/wiki/List_of_common_Chinese_surnames
 # and http://en.wikipedia.org/wiki/List_of_Korean_family_names
 ASIAN_NAMES = [
-    'Chan', 'Chang', 'Chao',
-    'Chen', 'Cheong', 'Cheung',
-    'Chong', 'Choo',
-    'Chu', 'Chun',
-    'Hou', 'Hsieh', 'Hsu', 'Hu', 'Huang',
-    'Kuo',
-    'Li', 'Liang', 'Lin', 'Liu',
-    '_Park',
-    'Sun', 'Sung',
-    'Tsao',
-    'Wang', 'Wong',
-    'Yang', 'Yeong', 'Yeung'
+    'chan', 'chang', 'chao',
+    'chen', 'cheong', 'cheung',
+    'chong', 'choo',
+    'chu', 'chun',
+    'hou', 'hsieh', 'hsu', 'hu', 'huang',
+    'kuo',
+    'li', 'liang', 'lin', 'liu',
+    '_park',
+    'sun', 'sung',
+    'tsao',
+    'wang', 'Wong',
+    'yang', 'yeong', 'yeung'
 ]
 PREFIXES = [
-    'al', 'da', 'de', 'del', 'dem', 'den', 'der', 'di', 'du',
+    'al', 'da', 'de', 'del', 'dem', 'den', 'der', 'di', 'dos', 'du',
     'e', 'el', 'la', 'the', 'van', 'vom', 'von', 'y', 'zu'
 ]
 MIDFIXES = ['und']
@@ -62,12 +62,20 @@ def get_sort_name(name):
     >>> get_sort_name('Bing Wang')
     'Wang Bing'
 
+    >>> get_sort_name('The Queen of England')
+    'Queen of England, The'
+
+    >>> get_sort_name('Sham 69')
+    'Sham 69'
+
     >>> get_sort_name('Scorsese, Martin')
     'Scorsese, Martin'
 
     """
-    if ', ' in name:
+    if not ' ' in name or ', ' in name:
         return name
+    if name.lower().startswith('the '):
+        return get_sort_title(name)
     def add_name():
         if len(first_names):
             last_names.insert(0, first_names.pop())
@@ -75,6 +83,8 @@ def get_sort_name(name):
         return len(first_names) and first_names[-1].lower() in names
     first_names = name.split(' ')
     last_names = []
+    if re.search('^[0-9]+$', first_names[-1]):
+        add_name()
     if find_name(SUFFIXES):
         add_name()
     add_name()
@@ -83,8 +93,11 @@ def get_sort_name(name):
         add_name()
     while find_name(PREFIXES):
         add_name()
-    separator = ' ' if last_names[0] in ASIAN_NAMES else ', '
-    return separator.join([' '.join(last_names), ' '.join(first_names)])
+    name = ' '.join(last_names)
+    if len(first_names):
+        separator = ' ' if last_names[0].lower() in ASIAN_NAMES else ', '
+        name += separator + ' '.join(first_names)
+    return name
 
 def get_sort_title(title):
     """
