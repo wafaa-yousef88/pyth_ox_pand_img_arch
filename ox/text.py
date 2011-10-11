@@ -4,6 +4,78 @@
 import math
 import re
 
+ARTICLES = list(set([
+    # def sg, def pl, indef sg, indef pl (each m/f/n)
+    'der', 'die', 'das', 'ein', 'eine', # de
+    'the', 'a', 'an', # en
+    'el', 'la', 'lo', 'los', 'las', 'un', 'una', 'unos', 'unas', # es
+    'le', "l'", 'la', 'les', 'un', 'une', 'des', # fr
+    'il', 'lo', "l'" 'la', 'i', 'gli', 'le', # it
+    'de', 'het', 'een', # nl
+     'o', 'a', 'os', '_as', 'um', 'uma', '_uns', 'umas' # pt
+     # some _disabled because of collisions
+]))
+PREFIXES = [
+    'al', 'da', 'de', 'del', 'dem', 'den', 'der', 'di', 'du',
+    'e', 'el', 'la', 'the', 'van', 'vom', 'von', 'y', 'zu'
+]
+MIDFIXES = ['und']
+SUFFIXES = ['jr', 'jr.', 'sr', 'sr.']
+
+def get_sort_name(name):
+    """
+
+    >>> get_sort_name('Alfred Hitchcock')
+    'Hitchcock, Alfred'
+
+    >>> get_sort_name('Jean-Luc Godard')
+    'Godard, Jean-Luc'
+
+    >>> get_sort_name('Rainer Werner Fassbinder')
+    'Fassbinder, Rainer Werner'
+
+    >>> get_sort_name('Brian De Palma')
+    'De Palma, Brian'
+
+    >>> get_sort_name('Johan van der Keuken')
+    'van der Keuken, Johan'
+
+    >>> get_sort_name('Edward D. Wood Jr.')
+    'Wood Jr., Edward D.'
+
+    """
+    def add_name():
+        if len(first_names):
+            last_names.insert(0, first_names.pop())
+    def find_name(names):
+        return len(first_names) and first_names[-1].lower() in names
+    first_names = name.split(' ')
+    last_names = []
+    if find_name(SUFFIXES):
+        add_name()
+    add_name()
+    if find_name(MIDFIXES):
+        add_name()
+        add_name()
+    while find_name(PREFIXES):
+        add_name()
+    return ', '.join([' '.join(last_names), ' '.join(first_names)])
+
+def get_sort_title(title):
+    """
+
+    >>> get_sort_title('Themroc')
+    'Themroc'
+
+    >>> get_sort_title('Die Hard')
+    'Hard, Die'
+
+    """
+    for article in ARTICLES:
+        if title.lower().startswith(article + ' '):
+            length = len(article)
+            return title[length + 1:] + ', ' + title[:length]
+    return title
 
 def findRe(string, regexp):
     result = re.compile(regexp, re.DOTALL).findall(string)

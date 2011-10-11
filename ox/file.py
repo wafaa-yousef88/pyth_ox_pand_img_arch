@@ -88,3 +88,45 @@ def makedirs(path):
         except OSError, e:
             if e.errno != 17:
                 raise
+
+def copy_file(source, target, verbose=False):
+    if verbose:
+        print 'copying', source, 'to', target
+    write_file(target, read_file(source))
+
+def read_file(file, verbose=False):
+    if verbose:
+        print 'reading', file
+    f = open(file)
+    data = f.read()
+    f.close()
+    return data
+
+def read_json(file, verbose=False):
+    return json.loads(read_file(file, verbose=verbose))
+
+def write_file(file, data, verbose=False):
+    if verbose:
+        print 'writing', file
+    write_path(file)
+    f = open(file, 'w')
+    f.write(data)
+    f.close()
+    return len(data)
+
+def write_json(file, data, indent=0, sort_keys=False, verbose=False):
+    data = json.dumps(data, indent=indent, sort_keys=sort_keys)
+    write_file(file, data, verbose=verbose)
+
+def write_link(source, target, verbose=False):
+    if verbose:
+        print 'linking', source, 'to', target
+    write_path(target)
+    if os.path.exists(target):
+        os.unlink(target)
+    os.symlink(source, target)
+
+def write_path(file):
+    path = os.path.split(file)[0]
+    if path and not os.path.exists(path):
+        os.makedirs(path)
