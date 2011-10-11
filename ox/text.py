@@ -15,6 +15,22 @@ ARTICLES = list(set([
      'o', 'a', 'os', '_as', 'um', 'uma', '_uns', 'umas' # pt
      # some _disabled because of collisions
 ]))
+# see http://en.wikipedia.org/wiki/List_of_common_Chinese_surnames
+# and http://en.wikipedia.org/wiki/List_of_Korean_family_names
+ASIAN_NAMES = [
+    'Chan', 'Chang', 'Chao',
+    'Chen', 'Cheong', 'Cheung',
+    'Chong', 'Choo',
+    'Chu', 'Chun',
+    'Hou', 'Hsieh', 'Hsu', 'Hu', 'Huang',
+    'Kuo',
+    'Li', 'Liang', 'Lin', 'Liu',
+    '_Park',
+    'Sun', 'Sung',
+    'Tsao',
+    'Wang', 'Wong',
+    'Yang', 'Yeong', 'Yeung'
+]
 PREFIXES = [
     'al', 'da', 'de', 'del', 'dem', 'den', 'der', 'di', 'du',
     'e', 'el', 'la', 'the', 'van', 'vom', 'von', 'y', 'zu'
@@ -43,7 +59,15 @@ def get_sort_name(name):
     >>> get_sort_name('Edward D. Wood Jr.')
     'Wood Jr., Edward D.'
 
+    >>> get_sort_name('Bing Wang')
+    'Wang Bing'
+
+    >>> get_sort_name('Scorsese, Martin')
+    'Scorsese, Martin'
+
     """
+    if ', ' in name:
+        return name
     def add_name():
         if len(first_names):
             last_names.insert(0, first_names.pop())
@@ -59,7 +83,8 @@ def get_sort_name(name):
         add_name()
     while find_name(PREFIXES):
         add_name()
-    return ', '.join([' '.join(last_names), ' '.join(first_names)])
+    separator = ' ' if last_names[0] in ASIAN_NAMES else ', '
+    return separator.join([' '.join(last_names), ' '.join(first_names)])
 
 def get_sort_title(title):
     """
