@@ -36,7 +36,7 @@ PREFIXES = [
     'e', 'el', 'la', 'the', 'van', 'vom', 'von', 'y', 'zu'
 ]
 MIDFIXES = ['und']
-SUFFIXES = ['jr', 'jr.', 'sr', 'sr.']
+SUFFIXES = ['jr', 'jr.', 'ph.d.', 'phd', 'sr', 'sr.']
 
 def get_sort_name(name):
     """
