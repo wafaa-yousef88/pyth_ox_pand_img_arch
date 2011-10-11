@@ -37,26 +37,6 @@ _noarticles = (
     'i was',
 )
 
-ARTICLES = list(set([
-    # def sg, def pl, indef sg, indef pl. all m/f/n
-    'der', 'die', 'das', 'ein', 'eine', # de
-    'the', 'a', 'an', # en
-    'el', 'la', 'lo', 'los', 'las', 'un', 'una', 'unos', 'unas', # es
-    'le', "l'", 'la', 'les', 'un', 'une', 'des', # fr
-    'il', 'lo', "l'" 'la', 'i', 'gli', 'le', # it
-    'de', 'het', 'een', # nl
-     'o', 'a', 'os', '_as', 'um', 'uma', '_uns', 'umas' # pt
-]))
-NAME_PREFIXES = [
-    'al', 'da', 'de', 'del', 'dem', 'den', 'der', 'di', 'du',
-    'e', 'el', 'la', 'the', 'van', 'vom', 'von', 'y', 'zu'
-]
-NAME_MIDFIXES = ['und']
-NAME_SUFFIXES = ['jr', 'jr.', 'sr', 'sr.']
-
-def get_sort_title():
-    
-
 def canonicalTitle(title):
     """Return the title in the canonic format 'Movie Title, The'.
     
