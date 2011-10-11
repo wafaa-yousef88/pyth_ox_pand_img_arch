@@ -10,7 +10,7 @@ ARTICLES = list(set([
     'the', 'a', 'an', # en
     'el', 'la', 'lo', 'los', 'las', 'un', 'una', 'unos', 'unas', # es
     'le', "l'", 'la', 'les', 'un', 'une', 'des', # fr
-    'il', 'lo', "l'" 'la', 'i', 'gli', 'le', # it
+    'il', 'lo', "l'" 'la', '_i', 'gli', 'le', # it
     'de', 'het', 'een', # nl
      'o', 'a', 'os', '_as', 'um', 'uma', '_uns', 'umas' # pt
      # some _disabled because of collisions
