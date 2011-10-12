@@ -7,10 +7,8 @@ from js import minify
 from utils import json
 
 
-def load(filename):
-    with open(filename) as f:
-        data = loads(f.read())
-    return data
+def load(f):
+    return loads(f.read())
 
 def loads(source):
     return json.loads(minify(source))
