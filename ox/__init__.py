@@ -4,6 +4,8 @@
 __version__ = '2.0.1'
 
 import cache
+import js
+import jsonc
 import net
 
 from file import *
@@ -11,7 +13,6 @@ from form import *
 from format import *
 from html import *
 from image import *
-from js import *
 from location import *
 from normalize import *
 from text import *

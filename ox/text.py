@@ -32,7 +32,7 @@ ASIAN_NAMES = [
     'yang', 'yeong', 'yeung'
 ]
 PREFIXES = [
-    'al', 'da', 'de', 'del', 'dem', 'den', 'der', 'di', 'dos', 'du',
+    'al', 'bin', 'da', 'de', 'del', 'dem', 'den', 'der', 'di', 'dos', 'du',
     'e', 'el', 'la', 'san', 'the', 'van', 'vom', 'von', 'y', 'zu'
 ]
 MIDFIXES = ['und']

@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 
+from ox.utils import json
+
 def minify(source, comment=''):
     # see https://github.com/douglascrockford/JSMin/blob/master/README
     def get_next_non_whitespace_token():
@@ -40,6 +42,9 @@ def minify(source, comment=''):
             # remove comments and leave all other tokens untouched
             minified += token['value']
     return minified
+
+def parse_JSONC(source):
+    return json.loads(minify(source))
 
 def tokenize(source):
     # see https://github.com/mozilla/narcissus/blob/master/lib/jslex.js
