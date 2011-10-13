@@ -4,11 +4,12 @@
 from __future__ import division
 
 import os
+import hashlib 
 
 from normalize import normalizeName
 from text import get_sort_name, findRe
 
-__all__ = ['parse_movie_path', 'create_movie_path']
+__all__ = ['parse_movie_path', 'create_movie_path', 'get_oxid']
 
 def parse_movie_path(path):
     """
@@ -47,6 +48,7 @@ def parse_movie_path(path):
         director = "%s." % director[:-1]
     director = director.split('; ')
     director = [normalizeName(d).strip() for d in director]
+    director = filter(lambda d: d not in ('Unknown Director', 'Various Directors'), director)
 
     #extension/language
     fileparts = parts[-1].split('.')
@@ -125,3 +127,17 @@ def create_movie_path(title, director, year,
     filename = '.'.join(filename)
     path = os.path.join(director[0], director, '%s (%s)' % (title, year), filename)
     return path
+
+def get_oxid(title, director=[], year='',
+             season='', episode='', episode_title='', episode_director=[], episode_year=''):
+    def get_hash(string):
+        return hashlib.sha1(string.encode('utf-8')).hexdigest().upper()
+    director = ', '.join(director)
+    episode_director = ', '.join(episode_director)
+    if not episode:
+        oxid = get_hash(director)[:8] + get_hash('\n'.join([title, str(year)]))[:8]
+    else:
+        oxid = get_hash('\n'.join([director, title, str(year), str(season)]))[:8] + \
+               get_hash('\n'.join([str(episode), episode_director, episode_title, str(episode_year)]))[:8]
+    return u'0x' + oxid
+
