@@ -61,6 +61,7 @@ class API(object):
             request.add_header('Content-length', len(body))
             request.add_data(body)
             result = self._opener.open(request).read().strip()
+            result = result.decode('utf-8')
             return json.loads(result)
         except urllib2.HTTPError, e:
             if self.DEBUG:
@@ -72,6 +73,7 @@ class API(object):
 
             result = e.read()
             try:
+                result = result.decode('utf-8')
                 result = json.loads(result)
             except:
                 result = {'status':{}}
