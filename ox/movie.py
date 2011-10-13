@@ -27,13 +27,19 @@ def parse_movie_path(path):
         "L/Labarthe, André S_/Cinéastes de notre temps (1964-)/Cinéastes de notre temps.Episode.Jean Renoir le patron, première partie_ La Recherche du relatif.avi"
         "S/Scott, Ridley/Blade Runner (1982)/Blade Runner.Directors's Cut.avi"
 
+        or
+        
+        T/Title (Year)/Title.avi
     """
     episodeTitle = episodeYear = None
     episodeDirector = []
     parts = path.split('/')
 
     #title/year
-    title = parts[2]
+    if len(parts) == 4:
+        title = parts[2]
+    else:
+        title = parts[1]
     year = findRe(title, '(\(\d{4}\))')
     if not year:
         year = findRe(title, '(\(\d{4}-\d*\))')
@@ -42,13 +48,17 @@ def parse_movie_path(path):
         year = year[1:-1]
         if '-' in year:
             year = findRe(year, '\d{4}')
+
     #director
-    director = parts[1]
-    if director.endswith('_'):
-        director = "%s." % director[:-1]
-    director = director.split('; ')
-    director = [normalizeName(d).strip() for d in director]
-    director = filter(lambda d: d not in ('Unknown Director', 'Various Directors'), director)
+    if len(parts) == 4:
+        director = parts[1]
+        if director.endswith('_'):
+            director = "%s." % director[:-1]
+        director = director.split('; ')
+        director = [normalizeName(d).strip() for d in director]
+        director = filter(lambda d: d not in ('Unknown Director', 'Various Directors'), director)
+    else:
+        director = []
 
     #extension/language
     fileparts = parts[-1].split('.')
