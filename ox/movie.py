@@ -31,7 +31,7 @@ def parse_movie_path(path):
         
         T/Title (Year)/Title.avi
     """
-    episodeTitle = episodeYear = None
+    episodeTitle = episodeYear = seriesTitle = None
     episodeDirector = []
     parts = path.split('/')
 
@@ -87,6 +87,13 @@ def parse_movie_path(path):
         episodeTitle = fileparts[episodeTitle]
         if episodeTitle == extension or episodeTitle.startswith('Part'):
             episodeTitle = None
+    if season:
+        seriesTitle = title
+        title = u'%s (S%02d)' % (seriesTitle, season)
+        if episode:
+            title = u'%s (S%02dE%02d)' % (seriesTitle, season, episode)
+        if episodeTitle:
+            title = u'%s %s' % (title, episodeTitle)
 
     #part
     part = findRe(parts[-1], '\.Part (\d+)\.')
@@ -105,6 +112,7 @@ def parse_movie_path(path):
         'language': language,
         'part': part,
         'season': season,
+        'seriesTitle': seriesTitle,
         'title': title,
         'year': year,
     }
