@@ -14,6 +14,7 @@ from format import *
 from html import *
 from image import *
 from location import *
+from movie import *
 from normalize import *
 from text import *
 from torrent import *
