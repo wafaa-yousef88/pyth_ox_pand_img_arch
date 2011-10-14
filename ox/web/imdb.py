@@ -266,6 +266,7 @@ class Imdb(SiteParser):
         #only list one country per alternative title
 
         def is_international_title(t):
+            if 'recut version' in t[1].lower(): return False
             if 'working title' in t[1].lower(): return False
             if 'complete title' in t[1].lower(): return False
             if t[1].lower() == 'usa': return True
