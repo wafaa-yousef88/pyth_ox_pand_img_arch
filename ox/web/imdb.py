@@ -32,7 +32,7 @@ class Imdb(SiteParser):
     u'The Matrix'
     '''
     regex =  {
-        'alternative_titles': {
+        'alternativeTitles': {
             'page': 'releaseinfo',
             're': [
                 'name="akas".*?<table.*?>(.*?)</table>',
@@ -41,7 +41,7 @@ class Imdb(SiteParser):
             'type': 'list'
         
         },
-        'aspectratio': {
+        'aspectRatio': {
             'page': 'combined',
             're': 'Aspect Ratio:</h5><div class="info-content">([\d\.]+)',
             'type': 'float',
@@ -62,7 +62,7 @@ class Imdb(SiteParser):
              ],
             'type': 'list'
         },
-        'cinematographers': {
+        'cinematographer': {
             'page': 'combined',
             're': [
                 lambda data: data.split('Series Crew')[0],
@@ -76,7 +76,7 @@ class Imdb(SiteParser):
             're': '<h5>(.*?)</h5>(.*?)\n\n',
             'type': 'list'
         },
-        'countries': {
+        'country': {
             'page': 'combined',
             're': [
                 '<div class="info"><h5>Country:</h5>.*?<div class="info">',
@@ -85,7 +85,7 @@ class Imdb(SiteParser):
             ],
             'type': 'list'
         },
-        'creators': {
+        'creator': {
             'page': 'combined',
             're': [
                 '<h5>Creators:</h5>.*?<div class="info-content">(.*?)</div>',
@@ -93,7 +93,7 @@ class Imdb(SiteParser):
             ],
             'type': 'list'
         },
-        'directors': {
+        'director': {
             'page': 'combined',
             're': [
                 lambda data: data.split('Series Crew')[0],
@@ -102,7 +102,7 @@ class Imdb(SiteParser):
             ],
             'type': 'list'
         },
-        'editors': {
+        'editor': {
             'page': 'combined',
             're': [
                 lambda data: data.split('Series Crew')[0],
@@ -111,17 +111,17 @@ class Imdb(SiteParser):
             ],
             'type': 'list'
         },
-        'episode_title': {
+        'episodeTitle': {
             'page': 'combined',
             're': '<div id="tn15title">.*?<em>(.*?)</em>',
             'type': 'string'
         },
-        'filming_locations': {
+        'filmingLocations': {
             'page': 'locations',
             're': '<a href="/search/title\?locations=.*?">(.*?)</a>',
             'type': 'list'
         },
-        'genres': {
+        'genre': {
             'page': 'combined',
             're': '<a href="/Sections/Genres/.*?/">(.*?)</a>',
             'type': 'list'
@@ -139,7 +139,7 @@ class Imdb(SiteParser):
             're': '<a href="/keyword/.*?/">(.*?)</a>',
             'type': 'list'
         },
-        'languages': {
+        'language': {
             'page': 'combined',
             're': [
                 '<div class="info"><h5>Language:</h5>.*?<div class="info">',
@@ -148,22 +148,22 @@ class Imdb(SiteParser):
             ],
             'type': 'list'
         },
-        'plot': {
+        'summary': {
             'page': 'plotsummary',
             're': '</div>.*?<p class="plotpar">(.*?)<i>',
             'type': 'string'
         },
-        'poster_id': {
+        'posterId': {
             'page': 'combined',
             're': '/primary-photo/media/rm(.*?)/tt',
             'type': 'string'
         },
-        'poster_ids': {
+        'posterIds': {
             'page': 'posters',
             're': '/unknown-thumbnail/media/rm(.*?)/tt',
             'type': 'list'
         },
-        'producers': {
+        'producer': {
             'page': 'combined',
             're': [
                 lambda data: data.split('Series Crew')[0],
@@ -177,7 +177,7 @@ class Imdb(SiteParser):
             're': '<div class="starbar-meta">.*?<b>([\d,.]+?)/10</b>',
             'type': 'float'
         },
-        'release date': {
+        'releaseDate': {
             'page': 'releaseinfo',
             're': '<a href="/date/(\d{2})-(\d{2})/">.*?</a> <a href="/year/(\d{4})/">',
             'type': 'date'
@@ -216,7 +216,7 @@ class Imdb(SiteParser):
             're': '<h5>TV Series:</h5>.*?<a href="/title/tt(\d{7})',
             'type': 'string'
         },
-        'original_title': {
+        'originalTitle': {
             'page': 'combined',
             're': '<h1>(.*?) <span>',
             'type': 'string'
@@ -231,7 +231,7 @@ class Imdb(SiteParser):
             're': '<a href="ratings" class="tn15more">([\d,]*?) votes</a>',
             'type': 'string'
         },
-        'writers': {
+        'writer': {
             'page': 'combined',
             're': [
                 lambda data: data.split('Series Crew')[0],
@@ -274,23 +274,23 @@ class Imdb(SiteParser):
             #fails if orignial is english... Japan (English title)
             #if 'english title' in t[1].lower(): return True
             return False
-        ititle = filter(is_international_title, self.get('alternative_titles', []))
+        ititle = filter(is_international_title, self.get('alternativeTitles', []))
         if ititle:
-            self['english_title'] = ititle[0][0]
+            self['englishTitle'] = ititle[0][0]
 
-        self['title'] = self.get('english_title', self['original_title'])
+        self['title'] = self.get('englishTitle', self['originalTitle'])
 
-        for t in ('title', 'english_title', 'original_title'):
+        for t in ('title', 'englishTitle', 'originalTitle'):
             if t in self and self[t].startswith('"') and self[t].endswith('"'):
                 self[t] = self[t][1:-1]
 
-        if 'alternative_titles' in self:
-            if len(self['alternative_titles']) == 2 and \
-               isinstance(self['alternative_titles'][0], basestring):
-               self['alternative_titles'] = [self['alternative_titles']]
-            self['alternative_titles'] = [[t[0],
+        if 'alternativeTitles' in self:
+            if len(self['alternativeTitles']) == 2 and \
+               isinstance(self['alternativeTitles'][0], basestring):
+               self['alternativeTitles'] = [self['alternativeTitles']]
+            self['alternativeTitles'] = [[t[0],
                                            t[1].split(' / ')[0].split('(')[0].strip()]
-                                          for t in self['alternative_titles']]
+                                          for t in self['alternativeTitles']]
 
         if 'runtime' in self and self['runtime']:
             if 'min' in self['runtime']: base=60
@@ -299,6 +299,13 @@ class Imdb(SiteParser):
         if 'runtime' in self and not self['runtime']:
             del self['runtime']
         if 'votes' in self: self['votes'] = self['votes'].replace(',', '')
+
+        if 'cast' in self:
+            if isinstance(self['cast'][0], basestring):
+                self['cast'] = [self['cast']]
+            self['actor'] = [c[0] for c in self['cast']]
+            self['cast'] = map(lambda x: {'actor': x[0], 'character': x[1]}, self['cast'])
+
         if 'connections' in self:
             cc={}
             if len(self['connections']) == 2 and isinstance(self['connections'][0], basestring):
@@ -318,36 +325,40 @@ class Imdb(SiteParser):
 
             self['connections'] = cc
 
-        for key in ('countries', 'genres'):
+        for key in ('country', 'genre'):
             if key in self:
                 self[key] = filter(lambda x: x.lower() != 'home', self[key])
 
-        if 'creators' in self:
-            self['directors'] = self['creators']
-            del self['creators']
+        if 'creator' in self:
+            self['episodeDirector'] = self['director']
+            self['director'] = self['creator']
         if 'series' in self:
-            if 'episode_title' in self:
-                self['series_title'] = self['title']
-                self['title'] = "%s (S01) %s" % (self['series_title'], self['episode_title'])
-            if 'episode_title' in self and 'season' in self and 'episode' in self:
+            if 'episodeTitle' in self:
+                self['seriesTitle'] = self['title']
+                self['title'] = "%s (S01) %s" % (self['seriesTitle'], self['episodeTitle'])
+            if 'episodeTitle' in self and 'season' in self and 'episode' in self:
                 self['title'] = "%s (S%02dE%02d) %s" % (
-                        self['series_title'], self['season'], self['episode'], self['episode_title'])
-            for key in ('directors', 'year'):
+                        self['seriesTitle'], self['season'], self['episode'], self['episodeTitle'])
+            for key in ('Director', 'Year'):
                 if key in self:
-                    self['episode_%s'%key] = self[key]
+                    self['episode%s'%key] = self[key.lowe()]
             series = Imdb(self['series'])
-            for key in ['directors', 'year']:
+            for key in ['director', 'year']:
                 if key in series:
-                    self[key] =series[key]
-            if 'original_title' in self:
-                del self['original_title']
+                    self[key] = series[key]
+            if 'originalTitle' in self:
+                del self['originalTitle']
         else:
-            for key in ('series_title', 'episode_title', 'season', 'episode'):
+            for key in ('seriesTitle', 'episodeTitle', 'season', 'episode'):
                 if key in self:
                     del self[key]
 
         if 'budget' in self and 'gross' in self:
             self['profit'] = self['gross'] - self['budget']
+
+        if 'releaseDate' in self:
+            if isinstance(self['releaseDate'], list):
+                self['releaseDate'] = min(self['releaseDate'])
 
 class ImdbCombined(Imdb):
     def __init__(self, id, timeout=-1):
