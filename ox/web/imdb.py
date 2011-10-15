@@ -88,7 +88,7 @@ class Imdb(SiteParser):
         'creator': {
             'page': 'combined',
             're': [
-                '<h5>Creators:</h5>.*?<div class="info-content">(.*?)</div>',
+                '<h5>Creator.?:</h5>.*?<div class="info-content">(.*?)</div>',
                 '<a href="/name/.*?>(.*?)</a>'
             ],
             'type': 'list'
@@ -329,10 +329,6 @@ class Imdb(SiteParser):
             if key in self:
                 self[key] = filter(lambda x: x.lower() != 'home', self[key])
 
-        if 'creator' in self:
-            if 'director' in self:
-                self['episodeDirector'] = self['director']
-            self['director'] = self['creator']
         if 'series' in self:
             if 'episodeTitle' in self:
                 self['seriesTitle'] = self['title']
@@ -344,7 +340,8 @@ class Imdb(SiteParser):
                 if key in self:
                     self['episode%s'%key] = self[key.lowe()]
             series = Imdb(self['series'])
-            for key in ['director', 'year']:
+
+            for key in ['creator', 'year']:
                 if key in series:
                     self[key] = series[key]
             if 'originalTitle' in self:
@@ -353,6 +350,10 @@ class Imdb(SiteParser):
             for key in ('seriesTitle', 'episodeTitle', 'season', 'episode'):
                 if key in self:
                     del self[key]
+        if 'creator' in self:
+            if 'director' in self:
+                self['episodeDirector'] = self['director']
+            self['director'] = self['creator']
 
         if 'budget' in self and 'gross' in self:
             self['profit'] = self['gross'] - self['budget']
