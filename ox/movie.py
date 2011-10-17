@@ -61,7 +61,7 @@ def parse_movie_path(path):
         director = []
 
     #extension/language
-    fileparts = parts[-1].split('.')
+    fileparts = [x.replace('||', '. ') for x in parts[-1].replace('. ', '||').split('.')]
     extension = fileparts[-1]
 
     if len(fileparts[-2]) == 2:
