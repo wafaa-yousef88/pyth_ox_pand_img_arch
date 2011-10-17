@@ -337,11 +337,11 @@ class Imdb(SiteParser):
                 self['title'] = "%s (S%02dE%02d) %s" % (
                         self['seriesTitle'], self['season'], self['episode'], self['episodeTitle'])
             for key in ('Director', 'Year'):
-                if key in self:
-                    self['episode%s'%key] = self[key.lowe()]
+                if key.lower() in self:
+                    self['episode%s'%key] = self[key.lower()]
             series = Imdb(self['series'])
 
-            for key in ['creator', 'year']:
+            for key in ['creator', 'year', 'country']:
                 if key in series:
                     self[key] = series[key]
             if 'originalTitle' in self:
