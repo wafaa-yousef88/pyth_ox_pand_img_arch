@@ -377,6 +377,8 @@ class Imdb(SiteParser):
         if 'releaseDate' in self:
             if isinstance(self['releaseDate'], list):
                 self['releaseDate'] = min(self['releaseDate'])
+        if 'summary' in self:
+            self['summary'] = self['summary'].split('</p')[0].strip()
 
 class ImdbCombined(Imdb):
     def __init__(self, id, timeout=-1):
