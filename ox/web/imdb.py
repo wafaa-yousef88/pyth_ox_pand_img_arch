@@ -355,6 +355,8 @@ class Imdb(SiteParser):
 
             if not 'creator' in series and 'director' in series:
                 series['creator'] = series['director']
+                if len(series['creator']) > 10:
+                    series['creator'] = series['director'][:1]
 
             for key in ['creator', 'year', 'country']:
                 if key in series:
