@@ -137,6 +137,8 @@ def decodeHtml(html):
     """
     >>> decodeHtml('me &amp; you and &#36;&#38;%')
     u'me & you and $&%'
+    >>> decodeHtml('&#x80;')
+    u'€'
     """
     if type(html) != unicode:
         html = unicode(html)[:]
@@ -146,7 +148,9 @@ def decodeHtml(html):
         uchr = lambda value: value > 255 and unichr(value) or chr(value)
     def entitydecode(match, uchr=uchr):
         entity = match.group(1)
-        if entity.startswith('#x'):
+        if entity == '#x80':
+            return u'€'
+        elif entity.startswith('#x'):
             return uchr(int(entity[2:], 16))
         elif entity.startswith('#'):
             return uchr(int(entity[1:]))

@@ -88,7 +88,7 @@ class Imdb(SiteParser):
         'creator': {
             'page': 'combined',
             're': [
-                '<h5>Creators:</h5>.*?<div class="info-content">(.*?)</div>',
+                '<h5>Creator.?:</h5>.*?<div class="info-content">(.*?)</div>',
                 '<a href="/name/.*?>(.*?)</a>'
             ],
             'type': 'list'
@@ -98,6 +98,14 @@ class Imdb(SiteParser):
             're': [
                 lambda data: data.split('Series Crew')[0],
                 'Directed by</a>(.*?)</table>',
+                '<a href="/name/.*?>(.*?)</a>'
+            ],
+            'type': 'list'
+        },
+        '_director': {
+            'page': 'combined',
+            're': [
+                '<h5>Director:</h5>.*?<div class="info-content">(.*?)</div>',
                 '<a href="/name/.*?>(.*?)</a>'
             ],
             'type': 'list'
@@ -266,11 +274,12 @@ class Imdb(SiteParser):
         #only list one country per alternative title
 
         def is_international_title(t):
+            if 'script title' in t[1].lower(): return False
             if 'recut version' in t[1].lower(): return False
             if 'working title' in t[1].lower(): return False
             if 'complete title' in t[1].lower(): return False
             if t[1].lower() == 'usa': return True
-            if 'international' in t[1].lower(): return True
+            if 'international (english title)' in t[1].lower(): return True
             #fails if orignial is english... Japan (English title)
             #if 'english title' in t[1].lower(): return True
             return False
@@ -328,10 +337,10 @@ class Imdb(SiteParser):
         for key in ('country', 'genre'):
             if key in self:
                 self[key] = filter(lambda x: x.lower() != 'home', self[key])
+        #0092999
+        if '_director' in self:
+            self['creator'] = self.pop('_director')
 
-        if 'creator' in self:
-            self['episodeDirector'] = self['director']
-            self['director'] = self['creator']
         if 'series' in self:
             if 'episodeTitle' in self:
                 self['seriesTitle'] = self['title']
@@ -340,18 +349,29 @@ class Imdb(SiteParser):
                 self['title'] = "%s (S%02dE%02d) %s" % (
                         self['seriesTitle'], self['season'], self['episode'], self['episodeTitle'])
             for key in ('Director', 'Year'):
-                if key in self:
-                    self['episode%s'%key] = self[key.lowe()]
+                if key.lower() in self:
+                    self['episode%s'%key] = self[key.lower()]
             series = Imdb(self['series'])
-            for key in ['director', 'year']:
+
+            if not 'creator' in series and 'director' in series:
+                series['creator'] = series['director']
+                if len(series['creator']) > 10:
+                    series['creator'] = series['director'][:1]
+
+            for key in ['creator', 'year', 'country']:
                 if key in series:
                     self[key] = series[key]
+
             if 'originalTitle' in self:
                 del self['originalTitle']
         else:
             for key in ('seriesTitle', 'episodeTitle', 'season', 'episode'):
                 if key in self:
                     del self[key]
+        if 'creator' in self:
+            if 'director' in self:
+                self['episodeDirector'] = self['director']
+            self['director'] = self['creator']
 
         if 'budget' in self and 'gross' in self:
             self['profit'] = self['gross'] - self['budget']
@@ -359,6 +379,8 @@ class Imdb(SiteParser):
         if 'releaseDate' in self:
             if isinstance(self['releaseDate'], list):
                 self['releaseDate'] = min(self['releaseDate'])
+        if 'summary' in self:
+            self['summary'] = self['summary'].split('</p')[0].strip()
 
 class ImdbCombined(Imdb):
     def __init__(self, id, timeout=-1):
@@ -510,8 +532,8 @@ def getMoviePoster(imdbId):
     'http://ia.media-imdb.com/images/M/MV5BMjA3NzMyMzU1MV5BMl5BanBnXkFtZTcwNjc1ODUwMg@@._V1._SX594_SY755_.jpg'
     '''
     info = ImdbCombined(imdbId)
-    if 'poster_id' in info:
-        url = "http://www.imdb.com/rg/action-box-title/primary-photo/media/rm%s/tt%s" % (info['poster_id'], imdbId)
+    if 'posterId' in info:
+        url = "http://www.imdb.com/rg/action-box-title/primary-photo/media/rm%s/tt%s" % (info['posterId'], imdbId)
         data = readUrl(url)
         poster = findRe(data, 'img id="primary-img".*?src="(.*?)"')
         return poster

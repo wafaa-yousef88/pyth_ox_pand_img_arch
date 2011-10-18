@@ -61,7 +61,7 @@ def parse_movie_path(path):
         director = []
 
     #extension/language
-    fileparts = parts[-1].split('.')
+    fileparts = [x.replace('||', '. ') for x in parts[-1].replace('. ', '||').split('.')]
     extension = fileparts[-1]
 
     if len(fileparts[-2]) == 2:
@@ -152,7 +152,7 @@ def get_oxid(title, director=[], year='',
         return hashlib.sha1(string.encode('utf-8')).hexdigest().upper()
     director = ', '.join(director)
     episode_director = ', '.join(episode_director)
-    if not episode:
+    if not episode and not episode_title:
         oxid = get_hash(director)[:8] + get_hash('\n'.join([title, str(year)]))[:8]
     else:
         oxid = get_hash('\n'.join([director, title, str(year), str(season)]))[:8] + \
