@@ -530,8 +530,8 @@ def getMoviePoster(imdbId):
     'http://ia.media-imdb.com/images/M/MV5BMjA3NzMyMzU1MV5BMl5BanBnXkFtZTcwNjc1ODUwMg@@._V1._SX594_SY755_.jpg'
     '''
     info = ImdbCombined(imdbId)
-    if 'poster_id' in info:
-        url = "http://www.imdb.com/rg/action-box-title/primary-photo/media/rm%s/tt%s" % (info['poster_id'], imdbId)
+    if 'posterId' in info:
+        url = "http://www.imdb.com/rg/action-box-title/primary-photo/media/rm%s/tt%s" % (info['posterId'], imdbId)
         data = readUrl(url)
         poster = findRe(data, 'img id="primary-img".*?src="(.*?)"')
         return poster
