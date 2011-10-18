@@ -102,6 +102,14 @@ class Imdb(SiteParser):
             ],
             'type': 'list'
         },
+        '_director': {
+            'page': 'combined',
+            're': [
+                '<h5>Director:</h5>.*?<div class="info-content">(.*?)</div>',
+                '<a href="/name/.*?>(.*?)</a>'
+            ],
+            'type': 'list'
+        },
         'editor': {
             'page': 'combined',
             're': [
@@ -329,6 +337,9 @@ class Imdb(SiteParser):
         for key in ('country', 'genre'):
             if key in self:
                 self[key] = filter(lambda x: x.lower() != 'home', self[key])
+        #0092999
+        if '_director' in self:
+            self['creator'] = self.pop('_director')
 
         if 'series' in self:
             if 'episodeTitle' in self:
