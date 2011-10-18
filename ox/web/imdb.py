@@ -279,7 +279,7 @@ class Imdb(SiteParser):
             if 'working title' in t[1].lower(): return False
             if 'complete title' in t[1].lower(): return False
             if t[1].lower() == 'usa': return True
-            if 'international' in t[1].lower(): return True
+            #if 'international' in t[1].lower(): return True
             #fails if orignial is english... Japan (English title)
             #if 'english title' in t[1].lower(): return True
             return False
