@@ -11,7 +11,6 @@ import ox
 from ox import findRe, stripTags
 from ox.normalize import normalizeTitle, normalizeImdbId
 import ox.cache
-from ox.cache import readUrl
 
 from siteparser import SiteParser
 import google
@@ -278,6 +277,7 @@ class Imdb(SiteParser):
             if 'recut version' in t[1].lower(): return False
             if 'working title' in t[1].lower(): return False
             if 'complete title' in t[1].lower(): return False
+            if 'usa (imdb display title)' in t[1].lower(): return True
             if t[1].lower() == 'usa': return True
             if 'international (english title)' in t[1].lower(): return True
             #fails if orignial is english... Japan (English title)
