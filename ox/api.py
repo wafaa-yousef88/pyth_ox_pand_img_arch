@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 # GPL 2011
+from __future__ import with_statement
 
 import cookielib
 import urllib2

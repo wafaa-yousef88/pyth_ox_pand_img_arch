@@ -8,12 +8,14 @@ from django.http import HttpResponse, Http404
 from django.conf import settings
 
 
-
 def HttpFileResponse(path, content_type=None, filename=None):
     if not os.path.exists(path):
         raise Http404
     if not content_type:
         content_type = mimetypes.guess_type(path)[0]
+    if not content_type:
+        content_type = 'application/octet-stream'
+    
     if getattr(settings, 'XACCELREDIRECT', False):
         response = HttpResponse()
         response['Content-Length'] = os.stat(path).st_size
