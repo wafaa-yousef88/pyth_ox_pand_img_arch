@@ -82,7 +82,7 @@ def parse_movie_path(path):
     else:
         episode = None
 
-    if episode:
+    if episode and 'Episode %d'%episode in fileparts:
         episodeTitle = fileparts.index('Episode %d' % episode) + 1
         episodeTitle = fileparts[episodeTitle]
         if episodeTitle == extension or episodeTitle.startswith('Part'):
