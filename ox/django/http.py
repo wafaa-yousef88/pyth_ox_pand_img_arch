@@ -24,11 +24,13 @@ def HttpFileResponse(path, content_type=None, filename=None):
             if root and path.startswith(root):
                 path = url + path[len(root)+1:]
         response['X-Accel-Redirect'] = path
-        response['Content-Type'] = content_type
+        if content_type:
+            response['Content-Type'] = content_type
     elif getattr(settings, 'XSENDFILE', False):
         response = HttpResponse()
         response['X-Sendfile'] = path
-        response['Content-Type'] = content_type
+        if content_type:
+            response['Content-Type'] = content_type
         response['Content-Length'] = os.stat(path).st_size
     else:
         response = HttpResponse(open(path), content_type=content_type)
