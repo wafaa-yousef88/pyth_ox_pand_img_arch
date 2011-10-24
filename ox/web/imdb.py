@@ -348,19 +348,28 @@ class Imdb(SiteParser):
             if 'episodeTitle' in self and 'season' in self and 'episode' in self:
                 self['title'] = "%s (S%02dE%02d) %s" % (
                         self['seriesTitle'], self['season'], self['episode'], self['episodeTitle'])
-            for key in ('Director', 'Year'):
-                if key.lower() in self:
-                    self['episode%s'%key] = self[key.lower()]
-            series = Imdb(self['series'])
+            if 'director' in self:
+                self['episodeDirector'] = self['director']
 
+            series = Imdb(self['series'])
             if not 'creator' in series and 'director' in series:
                 series['creator'] = series['director']
                 if len(series['creator']) > 10:
                     series['creator'] = series['director'][:1]
 
-            for key in ['creator', 'year', 'country']:
+            for key in ['creator', 'country']:
                 if key in series:
                     self[key] = series[key]
+
+            if 'year' in series:
+                self['seriesYear'] = series['year']
+                if not 'year' in self:
+                    self['year'] = series['year']
+
+            if 'year' in self:
+                self['episodeYear'] = self['year']
+            if 'creator' in self:
+                self['seriesDirector'] = self['creator']
 
             if 'originalTitle' in self:
                 del self['originalTitle']
