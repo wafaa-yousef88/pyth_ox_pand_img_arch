@@ -40,7 +40,7 @@ class Imdb(SiteParser):
             'type': 'list'
         
         },
-        'aspectRatio': {
+        'aspectratio': {
             'page': 'combined',
             're': 'Aspect Ratio:</h5><div class="info-content">([\d\.]+)',
             'type': 'float',
