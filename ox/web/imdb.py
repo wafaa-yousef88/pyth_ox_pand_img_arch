@@ -184,7 +184,7 @@ class Imdb(SiteParser):
             're': '<div class="starbar-meta">.*?<b>([\d,.]+?)/10</b>',
             'type': 'float'
         },
-        'releaseDate': {
+        'releasedate': {
             'page': 'releaseinfo',
             're': '<a href="/date/(\d{2})-(\d{2})/">.*?</a> <a href="/year/(\d{4})/">',
             'type': 'date'
@@ -385,9 +385,9 @@ class Imdb(SiteParser):
         if 'budget' in self and 'gross' in self:
             self['profit'] = self['gross'] - self['budget']
 
-        if 'releaseDate' in self:
-            if isinstance(self['releaseDate'], list):
-                self['releaseDate'] = min(self['releaseDate'])
+        if 'releasedate' in self:
+            if isinstance(self['releasedate'], list):
+                self['releasedate'] = min(self['releasedate'])
         if 'summary' in self:
             self['summary'] = self['summary'].split('</p')[0].strip()
 
