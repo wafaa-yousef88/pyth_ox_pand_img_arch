@@ -217,7 +217,7 @@ def _saveUrlCache(url, post_data, data, headers):
     else:
         compressed = 0
     data = sqlite3.Binary(data)
-    t = (url_hash, domain, url, post_data, json.dumps(headers), created, sqlite3.Binary(data), only_headers, compressed)
+    t = (url_hash, domain, url, post_data, json.dumps(headers), created, data, only_headers, compressed)
     c.execute(u"""INSERT OR REPLACE INTO cache values (?, ?, ?, ?, ?, ?, ?, ?, ?)""", t)
 
     # Save (commit) the changes and clean up
