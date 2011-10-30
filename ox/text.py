@@ -375,3 +375,9 @@ def smartSplit(text):
         else:
             yield bit
 
+def words(text):
+    """
+        returns words in text, removing punctuation
+    """
+    text = text.split()
+    return map(lambda x: re.sub("(([.!?:-_]|'s)$)", '', x), text)
