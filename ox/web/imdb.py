@@ -53,7 +53,7 @@ class Imdb(SiteParser):
         'budget': {
             'page': 'business',
             're': [
-                '<h5>Budget</h5>(.*?)<br',
+                '<h5>Budget</h5>\s*?\$(.*?)<br',
                 lambda data: findRe(ox.decodeHtml(data).replace(',', ''), '\d+')
             ],
             'type': 'int'
@@ -141,7 +141,7 @@ class Imdb(SiteParser):
         'gross': {
             'page': 'business',
             're': [
-                '<h5>Gross</h5>(.*?)\(',
+                '<h5>Gross</h5>\s*?\$(.*?)<br',
                 lambda data: findRe(data.replace(',', ''), '\d+')
             ],
             'type': 'int'
