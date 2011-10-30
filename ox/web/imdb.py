@@ -15,12 +15,17 @@ import ox.cache
 from siteparser import SiteParser
 import google
 
+
 def readUrl(url, data=None, headers=ox.cache.DEFAULT_HEADERS, timeout=ox.cache.cache_timeout, valid=None):
     headers = headers.copy()
     return ox.cache.readUrl(url, data, headers, timeout)
 
 def readUrlUnicode(url, timeout=ox.cache.cache_timeout):
    return ox.cache.readUrlUnicode(url, _readUrl=readUrl, timeout=timeout)
+
+
+def getUrl(id):
+    return "http://www.imdb.com/title/tt%s/" % id
 
 class Imdb(SiteParser):
     '''
