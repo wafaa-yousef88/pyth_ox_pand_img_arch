@@ -146,7 +146,7 @@ class Imdb(SiteParser):
             ],
             'type': 'int'
         },
-        'keywords': {
+        'keyword': {
             'page': 'keywords',
             're': '<a href="/keyword/.*?/">(.*?)</a>',
             'type': 'list'
