@@ -15,7 +15,7 @@ def getId(url):
 def getUrl(id):
     return "http://www.criterion.com/films/%s" % id
 
-def getData(id):
+def getData(id, timeout=ox.cache.cache_timeout):
     '''
     >>> getData('1333')['imdbId']
     u'0060304'
@@ -30,9 +30,9 @@ def getData(id):
         "url": getUrl(id)
     }
     try:
-        html = readUrlUnicode(data["url"])
+        html = readUrlUnicode(data["url"], timeout=timeout)
     except:
-        html = ox.cache.readUrl(data["url"])
+        html = ox.cache.readUrl(data["url"], timeout=timeout)
     data["number"] = findRe(html, "<li>Spine #(\d+)")
 
     data["title"] = findRe(html, "<meta property=['\"]og:title['\"] content=['\"](.*?)['\"]")
