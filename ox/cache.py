@@ -260,7 +260,6 @@ class FileCache(Cache):
 
         domain = ".".join(urlparse.urlparse(url)[1].split('.')[-2:])
         prefix, i, f = self.files(domain, url_hash)
-        
         if os.path.exists(i):
             with open(i) as _i:
                 info = json.load(_i)
@@ -298,6 +297,7 @@ class FileCache(Cache):
             'only_headers': data == -1,
             'created': created,
             'headers': headers,
+            'url': url,
         }
         if post_data:
             info['post_data'] = post_data
