@@ -531,7 +531,7 @@ def getMovieId(title, director='', year='', timeout=-1):
 
     #print (title, director), ": '',"
     #print google_query
-    results = google.find(google_query)
+    results = google.find(google_query, timeout=timeout)
     if results:
         return findRe(results[0][1], 'title/tt(\d{7})')
     #or nothing

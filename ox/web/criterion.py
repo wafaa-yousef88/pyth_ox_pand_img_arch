@@ -56,7 +56,10 @@ def getData(id, timeout=ox.cache.cache_timeout):
         html_ = readUrlUnicode(result)
         result = findRe(html_, '<a href="http://www.criterion.com/films/%s.*?">(.*?)</a>' % id)
         result = findRe(result, "src=\"(.*?)\"")
-        data["posters"] = [result.replace("_w100", "")]
+        if result:
+            data["posters"] = [result.replace("_w100", "")]
+        else:
+            data["posters"] = []
     result = findRe(html, "<img alt=\"Film Still\" height=\"252\" src=\"(.*?)\"")
     if result:
         data["stills"] = [result]
@@ -65,7 +68,10 @@ def getData(id, timeout=ox.cache.cache_timeout):
         data["stills"] = filter(lambda x: x, [findRe(html, "\"thumbnailURL\", \"(.*?)\"")])
         data["trailers"] = filter(lambda x: x, [findRe(html, "\"videoURL\", \"(.*?)\"")])
 
-    data['imdbId'] = imdb.getMovieId(data['title'], data['director'], data['year'])
+    if timeout == ox.cache.cache_timeout:
+        timeout = -1
+    data['imdbId'] = imdb.getMovieId(data['title'],
+        data['director'], data['year'], timeout=timeout)
     return data
 
 def getIds():
