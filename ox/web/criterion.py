@@ -15,7 +15,7 @@ def getId(url):
 def getUrl(id):
     return "http://www.criterion.com/films/%s" % id
 
-def getData(id, timeout=ox.cache.cache_timeout):
+def getData(id, timeout=ox.cache.cache_timeout, imdb=False):
     '''
     >>> getData('1333')['imdbId']
     u'0060304'
@@ -70,8 +70,9 @@ def getData(id, timeout=ox.cache.cache_timeout):
 
     if timeout == ox.cache.cache_timeout:
         timeout = -1
-    data['imdbId'] = imdb.getMovieId(data['title'],
-        data['director'], data['year'], timeout=timeout)
+    if imdb:
+        data['imdbId'] = imdb.getMovieId(data['title'],
+            data['director'], data['year'], timeout=timeout)
     return data
 
 def getIds():
