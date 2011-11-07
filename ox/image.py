@@ -37,7 +37,7 @@ def getHSL(rgb):
     return tuple(hsl)
 
 def getImageHeat(image_file):
-    image = Image.open(image_file).resize((16, 16), Image.ANTIALIAS)
+    image = Image.open(image_file).convert('RGB').resize((16, 16), Image.ANTIALIAS)
     pixel = image.load()
     image_heat = 0
     for y in range(image.size[1]):
