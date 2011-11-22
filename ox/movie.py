@@ -99,7 +99,7 @@ def parse_movie_path(path):
     if season:
         seriesTitle = title
         title = u'%s (S%02d)' % (seriesTitle, season)
-        if episode:
+        if isinstance(episode, int):
             title = u'%s (S%02dE%02d)' % (seriesTitle, season, episode)
         if episodeTitle:
             title = u'%s %s' % (title, episodeTitle)
