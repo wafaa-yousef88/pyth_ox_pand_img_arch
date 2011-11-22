@@ -228,6 +228,11 @@ class Imdb(SiteParser):
             're': '<h5>TV Series:</h5>.*?<a href="/title/tt(\d{7})',
             'type': 'string'
         },
+        'isSeries': {
+            'page': 'combined',
+            're': '<span class="tv-extra">(TV series)</span>',
+            'type': 'string'
+        },
         'originalTitle': {
             'page': 'combined',
             're': '<h1>(.*?) <span>',
@@ -344,10 +349,12 @@ class Imdb(SiteParser):
                 self[key] = filter(lambda x: x.lower() != 'home', self[key])
         #0092999
         if '_director' in self:
-            if 'series' in self:
+            if 'series' in self or 'isSeries' in self:
                 self['creator'] = self.pop('_director')
             else:
                 del self['_director']
+        if 'isSeries' in self:
+            del self['isSeries']
 
         if 'series' in self:
             if 'episodeTitle' in self:
