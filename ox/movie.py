@@ -87,6 +87,15 @@ def parse_movie_path(path):
         episodeTitle = fileparts[episodeTitle]
         if episodeTitle == extension or episodeTitle.startswith('Part'):
             episodeTitle = None
+
+    if not season and 'Episode' in fileparts:
+        episodeTitle = fileparts.index('Episode') + 1
+        episodeTitle = fileparts[episodeTitle]
+        if episodeTitle == extension or episodeTitle.startswith('Part'):
+            episodeTitle = None
+        else:
+            season = 1
+
     if season:
         seriesTitle = title
         title = u'%s (S%02d)' % (seriesTitle, season)
@@ -95,11 +104,6 @@ def parse_movie_path(path):
         if episodeTitle:
             title = u'%s %s' % (title, episodeTitle)
 
-    if 'Episode' in fileparts:
-        episodeTitle = fileparts.index('Episode') + 1
-        episodeTitle = fileparts[episodeTitle]
-        if episodeTitle == extension or episodeTitle.startswith('Part'):
-            episodeTitle = None
     #part
     part = findRe(parts[-1], '\.Part (\d+)\.')
     if part:
