@@ -95,6 +95,11 @@ def parse_movie_path(path):
         if episodeTitle:
             title = u'%s %s' % (title, episodeTitle)
 
+    if 'Episode' in fileparts:
+        episodeTitle = fileparts.index('Episode') + 1
+        episodeTitle = fileparts[episodeTitle]
+        if episodeTitle == extension or episodeTitle.startswith('Part'):
+            episodeTitle = None
     #part
     part = findRe(parts[-1], '\.Part (\d+)\.')
     if part:
