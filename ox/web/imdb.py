@@ -344,7 +344,10 @@ class Imdb(SiteParser):
                 self[key] = filter(lambda x: x.lower() != 'home', self[key])
         #0092999
         if '_director' in self:
-            self['creator'] = self.pop('_director')
+            if 'series' in self:
+                self['creator'] = self.pop('_director')
+            else:
+                del self['_director']
 
         if 'series' in self:
             if 'episodeTitle' in self:
