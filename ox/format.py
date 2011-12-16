@@ -4,11 +4,51 @@ import math
 import re
 import string
 
+
+def toAZ(num):
+    """
+    Converts an integer to bijective base 26 string using A-Z
+
+    >>> for i in range(0, 1000): assert fromAZ(toAZ(i)) == i
+    
+    >>> toAZ(0)
+    'A'
+
+    >>> toAZ(1234567890)
+    'CYWOQVK'
+    """
+    if num < 0: raise ValueError, "must supply a positive integer"
+    digits = string.letters[26:]
+    az = ''
+    num += 1
+    while num != 0:
+        num, r = divmod(num, 26)
+        u, r = divmod(r - 1, 26)
+        num += u
+        az = digits[r] + az
+    return az
+
+def fromAZ(num):
+    """
+    Converts a bijective base 26 string to an integer
+
+    >>> fromAZ('A')
+    0
+    >>> fromAZ('AA')
+    26
+    >>> fromAZ('AAA')
+    702
+    """
+    num = num.replace('-','')
+    digits = string.letters[26:]
+    r = 0
+    for exp, char in enumerate(reversed(num)):
+        r = r + (pow(26, exp) * (digits.index(char) + 1))
+    return r - 1
+
 def to26(q):
     """
-    Converts an integer to base 32
-    We exclude 4 of the 26 letters: I L O U.
-    http://www.crockford.com/wrmg/base32.html
+    Converts an integer to base 26
 
     >>> for i in range(0, 1000): assert from26(to26(i)) == i
     
@@ -16,7 +56,7 @@ def to26(q):
     'A'
 
     >>> to26(347485647)
-    'ABCDEF'
+    'BDGKMAP'
     """
     if q < 0: raise ValueError, "must supply a positive integer"
     base26 = string.letters[26:]
