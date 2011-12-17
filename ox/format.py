@@ -9,18 +9,20 @@ def toAZ(num):
     """
     Converts an integer to bijective base 26 string using A-Z
 
-    >>> for i in range(0, 1000): assert fromAZ(toAZ(i)) == i
+    >>> for i in range(1, 1000): assert fromAZ(toAZ(i)) == i
     
-    >>> toAZ(0)
+    >>> toAZ(1)
     'A'
+
+    >>> toAZ(4461)
+    'FOO'
 
     >>> toAZ(1234567890)
     'CYWOQVK'
     """
-    if num < 0: raise ValueError, "must supply a positive integer"
+    if num < 1: raise ValueError, "must supply a positive integer"
     digits = string.letters[26:]
     az = ''
-    num += 1
     while num != 0:
         num, r = divmod(num, 26)
         u, r = divmod(r - 1, 26)
@@ -33,18 +35,20 @@ def fromAZ(num):
     Converts a bijective base 26 string to an integer
 
     >>> fromAZ('A')
-    0
+    1
     >>> fromAZ('AA')
-    26
+    27
     >>> fromAZ('AAA')
-    702
+    703
+    >>> fromAZ('FOO')
+    4461
     """
     num = num.replace('-','')
     digits = string.letters[26:]
     r = 0
     for exp, char in enumerate(reversed(num)):
         r = r + (pow(26, exp) * (digits.index(char) + 1))
-    return r - 1
+    return r
 
 def to26(q):
     """
