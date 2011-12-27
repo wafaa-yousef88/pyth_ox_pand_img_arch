@@ -1,37 +1,19 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from urllib import quote, unquote
-import httplib
-import xml.etree.ElementTree as ET
+from urllib import quote, unquote_plus
 import re
-from urlparse import parse_qs
+from xml.dom.minidom import parseString
 
 import feedparser
-from ox.cache import readUrl, readUrlUnicode, cache_timeout
-from ox import findString, findRe
+from ox.cache import readUrl, cache_timeout
 
-def getVideoKey(youtubeId, timeout=cache_timeout):
-    for el_type in ['&el=embedded', '&el=detailpage', '&el=vevo', '']:
-        video_info_url = 'http://www.youtube.com/get_video_info?&video_id=%s%s&ps=default&eurl=&gl=US&hl=en' % (youtubeId, el_type)
-        try:
-            data = readUrl(video_info_url, timeout=timeout)
-            video_info = parse_qs(data)
-            if 'token' in video_info:
-                return video_info['token'][0]
-        except (urllib2.URLError, httplib.HTTPException, socket.error), err:
-            return
-    return False
  
 def getVideoUrl(youtubeId, format='mp4', timeout=cache_timeout):
     """
         youtubeId - if of video
         format - video format, options: webm, 1080p, 720p, mp4, high
     """
-    youtubeKey = getVideoKey(youtubeId, timeout=timeout)
-
     fmt = None
-    if format == 'webm':
-        fmt=45
     if format == '1080p':
         fmt=37
     if format == '720p':
@@ -40,83 +22,94 @@ def getVideoUrl(youtubeId, format='mp4', timeout=cache_timeout):
         fmt=18
     elif format == 'high':
         fmt=35
-    url_template = "http://www.youtube.com/get_video?video_id=%s&t=%s=&eurl=&el=&ps=&asv="
-    url = url_template % (youtubeId, youtubeKey)
-    if fmt:
-        url += "&fmt=%d"%fmt
+    elif format == 'webm':
+        streams = videos(youtubeId, 'webm')
+        return streams[max(streams.keys())]['url']
 
-    return url
+    streams = videos(youtubeId)
+    if str(fmt) in streams:
+        return streams[str(fmt)]['url']
 
-def getMovieInfo(youtubeId, video_url_base=None):
-    url = "http://gdata.youtube.com/feeds/api/videos/%s" % youtubeId
-    data = readUrl(url)
-    fd = feedparser.parse(data)
-    return getInfoFromAtom(fd.entries[0], video_url_base)
-
-def getInfoFromAtom(entry, video_url_base=None):
-    info = dict()
-    info['title'] = entry['title']
-    info['description'] = entry['description']
-    info['author'] = entry['author']
-    #info['published'] = entry['published_parsed']
-    if 'media_keywords' in entry:
-        info['keywords'] = entry['media_keywords'].split(', ')
-    info['url'] = entry['links'][0]['href']
-    info['id'] = findRe(info['url'], r'\?v=(.*?)&') 
-    info['thumbnail'] = "http://img.youtube.com/vi/%s/0.jpg" % info['id']
-    if video_url_base:
-        info['flv'] = "%s/%s.%s" % (video_url_base, info['id'], 'flv')
-        info['mp4'] = "%s/%s.%s" % (video_url_base, info['id'], 'mp4')
-    else:
-        info['flv'] = getVideoUrl(info['id'], 'flv')
-        info['flv_high'] = getVideoUrl(info['id'], 'high')
-        info['webm'] = getVideoUrl(info['id'], 'webm')
-        info['mp4'] = getVideoUrl(info['id'], 'mp4')
-        info['720p'] = getVideoUrl(info['id'], '720p')
-        info['1080p'] = getVideoUrl(info['id'], '1080p')
-    info['embed_flash'] = '<object width="425" height="355"><param name="movie" value="http://www.youtube.com/v/%s&hl=en"></param><param name="wmode" value="transparent"></param><embed src="http://www.youtube.com/v/%s&hl=en" type="application/x-shockwave-flash" wmode="transparent" width="425" height="355"></embed></object>' % (info['id'], info['id'])
-    info['embed'] = '<iframe class="youtube-player" width="425" height="355" src="http://www.youtube.com/embed/%s" frameborder="0"></iframe>' % info['id']
-
-    return info
-
-def find(query, max_results=10, offset=1, orderBy='relevance', video_url_base=None):
+def find(query, max_results=10, offset=1, orderBy='relevance'):
     query = quote(query)
     url = "http://gdata.youtube.com/feeds/api/videos?vq=%s&orderby=%s&start-index=%s&max-results=%s" % (query, orderBy, offset, max_results)
-    data = readUrlUnicode(url)
+    data = readUrl(url)
     fd = feedparser.parse(data)
     videos = []
-    for entry in fd.entries:
-        v = getInfoFromAtom(entry, video_url_base)
-        videos.append(v)
+    for item in fd.entries:
+        id = item['id'].split('/')[-1]
+        title = item['title']
+        description = item['description']
+        videos.append((title, id, description))
         if len(videos) >= max_results:
             return videos
     return videos
 
-'''
-def find(query, max_results=10, offset=1, orderBy='relevance', video_url_base=None):
-  url = "http://youtube.com/results?search_query=%s&search=Search" % quote(query)
-  data = readUrlUnicode(url)
-  regx = re.compile(' <a href="/watch.v=(.*?)" title="(.*?)" ')
-  regx = re.compile('<a href="/watch\?v=(\w*?)" ><img src="(.*?)"  class="vimg120" title="(.*?)" alt="video">')
-  id_title = regx.findall(data)
-  data_flat = data.replace('\n', ' ')
-  videos = {}
-  for video in id_title:
-    vid = video[0]
-    if vid not in videos:
-      v = dict()
-      v['id'] = vid
-      v['link'] = "http//youtube.com/watch.v=%s" % v['id']
-      v['title'] = video[2].strip()
-      if video_url_base:
-        v['video_link'] = "%s/%s" % (video_url_base, v['id'])
-      else:
-        v['video_url'] = getVideoUrl(v['id'])
-      v['description'] = findRe(data, 'BeginvidDesc%s">(.*?)</span>' % v['id']).strip().replace('<b>', ' ').replace('</b>', '')
-      v['thumbnail'] = video[1]
-    videos[vid] = v
-    if len(videos) >= max_results:
-        return videos.values()
-  return videos.values()
-'''
+def info(id):
+    info = {}
+    url = "http://gdata.youtube.com/feeds/api/videos/%s?v=2" % id
+    data = readUrl(url)
+    xml = parseString(data)
+    info['url'] = 'http://www.youtube.com/watch?v=%s' % id
+    info['title'] = xml.getElementsByTagName('title')[0].firstChild.data
+    info['description'] = xml.getElementsByTagName('media:description')[0].firstChild.data
+    info['date'] = xml.getElementsByTagName('published')[0].firstChild.data.split('T')[0]
+    info['author'] = "http://www.youtube.com/user/%s"%xml.getElementsByTagName('name')[0].firstChild.data
 
+    info['categories'] = []
+    for cat in xml.getElementsByTagName('media:category'):
+        info['categories'].append(cat.firstChild.data)
+
+    info['keywords'] = xml.getElementsByTagName('media:keywords')[0].firstChild.data.split(', ')
+    url = "http://www.youtube.com/watch?v=%s" % id
+    data = readUrl(url)
+    match = re.compile('<h4>License:</h4>(.*?)</p>', re.DOTALL).findall(data)
+    if match:
+        info['license'] = match[0].strip()
+        info['license'] = re.sub('<.+?>', '', info['license']).strip()
+
+    url = "http://www.youtube.com/api/timedtext?hl=en&type=list&tlangs=1&v=%s&asrs=1"%id
+    data = readUrl(url)
+    xml = parseString(data)
+    languages = [t.getAttribute('lang_code') for t in xml.getElementsByTagName('track')]
+    if languages:
+        info['subtitles'] = {}
+        for language in languages:
+            url = "http://www.youtube.com/api/timedtext?hl=en&v=%s&type=track&lang=%s&name&kind"%(id, language)
+            data = readUrl(url)
+            xml = parseString(data)
+            subs = []
+            for t in xml.getElementsByTagName('text'):
+                start = float(t.getAttribute('start'))
+                duration = t.getAttribute('dur')
+                if not duration:
+                    duration = '2'
+                end = start + float(duration)
+                text = t.firstChild.data
+                subs.append({
+                    'start': start,
+                    'end': end,
+                    'value': text,
+                })
+            info['subtitles'][language] = subs
+    return info
+
+def videos(id, format=''):
+    stream_type = {
+        'flv': 'video/x-flv',
+        'webm': 'video/webm',
+        'mp4': 'video/mp4'
+    }.get(format)
+    url = "http://www.youtube.com/watch?v=%s" % id
+    data = readUrl(url)
+    match = re.compile('"url_encoded_fmt_stream_map": "(.*?)"').findall(data)
+    streams = {}
+    for x in match[0].split(','):
+        stream = {}
+        for s in x.split('\\u0026'):
+            key, value = s.split('=')
+            value = unquote_plus(value)
+            stream[key] = value
+        if not stream_type or stream['type'].startswith(stream_type):
+            streams[stream['itag']] = stream
+    return streams
