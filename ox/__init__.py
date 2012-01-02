@@ -7,6 +7,7 @@ import cache
 import js
 import jsonc
 import net
+import srt
 
 from api import *
 from file import *
