@@ -80,3 +80,21 @@ def load(filename, offset=0):
         srt.append(_s)
         i += 1
     return srt
+
+def encode(data):
+    '''
+        encodes list of objects with in,out,value into srt
+        result is utf-8 encoded bytestring
+    '''
+    srt = u''
+    i = 1
+    for s in data:
+        srt += '%d\r\n%s --> %s\r\n%s\r\n\r\n' % (
+            i,
+            ox.formatDuration(s['in']*1000, years=False).replace('.', ','),
+            ox.formatDuration(s['out']*1000, years=False).replace('.', ','),
+            s['value'].replace('\n', '\r\n').strip()
+        )
+        i += 1
+    return srt.encode('utf-8')
+
