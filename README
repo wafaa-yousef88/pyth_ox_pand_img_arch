@@ -24,6 +24,8 @@ Usage:
  info['year']
  1999
 
+For information on ox.django see https://wiki.0x2620.org/wiki/ox.django
+
 Install:
   python setup.py install
 
