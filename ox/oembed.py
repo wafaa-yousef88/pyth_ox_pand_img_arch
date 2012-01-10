@@ -1,0 +1,31 @@
+# -*- coding: utf-8 -*-
+# ci:si:et:sw=4:sts=4:ts=4
+import re
+from text import findRe
+import cache
+from utils import json, ET
+
+def get_embed_code(url, maxwidth=None, maxheight=None):
+    embed = {}
+    header = cache.getHeaders(url)
+    if header.get('content-type', '').startswith('text/html'):
+        html = cache.readUrl(url)
+        json_oembed = filter(lambda l: 'json+oembed' in l, re.compile('<link.*?>').findall(html))
+        xml_oembed = filter(lambda l: 'xml+oembed' in l, re.compile('<link.*?>').findall(html))
+        if json_oembed:
+            oembed_url = findRe(json_oembed[0], 'href="(.*?)"')
+            if maxwidth:
+                oembed_url += '&maxwidth=%d' % maxwidth
+            if maxheight:
+                oembed_url += '&maxheight=%d' % maxheight
+            embed = json.loads(cache.readUrl(oembed_url))
+        elif xml_oembed:
+            oembed_url = findRe(json_oembed[0], 'href="(.*?)"')
+            if maxwidth:
+                oembed_url += '&maxwidth=%d' % maxwidth
+            if maxheight:
+                oembed_url += '&maxheight=%d' % maxheight
+            data = cache.readUrl(oembed_url)
+            for e in ET.fromstring(data):
+                embed[e.tag] = e.text
+    return embed

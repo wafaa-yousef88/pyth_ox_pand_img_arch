@@ -13,3 +13,7 @@ except ImportError:
     except ImportError:
         from django.utils import simplejson as json
 
+try:
+    import xml.etree.ElementTree as ET
+except:
+    import elementtree.ElementTree as ET

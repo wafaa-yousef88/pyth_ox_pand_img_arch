@@ -8,6 +8,7 @@ import js
 import jsonc
 import net
 import srt
+import utils
 
 from api import *
 from file import *
@@ -18,5 +19,6 @@ from image import *
 from location import *
 from movie import *
 from normalize import *
+from oembed import *
 from text import *
 from torrent import *

@@ -72,9 +72,18 @@ def getMovieData(wikipediaUrl):
     elif 'amg_id' in filmbox and filmbox['amg_id'].startswith('1:'):
         filmbox['amg_id'] = filmbox['amg_id'][2:]
 
-    r = re.compile('{{IMDb title\|(\d{7})', re.IGNORECASE).findall(data)
+    r = re.compile('{{IMDb title\|id=(\d{7})', re.IGNORECASE).findall(data)
     if r:
         filmbox['imdb_id'] = r[0]
+    else:
+        r = re.compile('{{IMDb title\|(\d{7})', re.IGNORECASE).findall(data)
+        if r:
+            filmbox['imdb_id'] = r[0]
+
+    r = re.compile('{{Internet Archive.*?\|id=(.*?)\|', re.IGNORECASE).findall(data)
+    if r:
+        filmbox['archiveorg_id'] = r[0]
+
     r = re.compile('{{mojo title\|(.*?)\|', re.IGNORECASE).findall(data)
     if r:
         filmbox['mojo_id'] = r[0]
