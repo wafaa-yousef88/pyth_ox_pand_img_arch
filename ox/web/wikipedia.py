@@ -51,7 +51,8 @@ def getWikiData(wikipediaUrl):
     return data
 
 def getMovieData(wikipediaUrl):
-    if not wikipediaUrl.startswith('http'): wikipediaUrl = getUrl(wikipediaUrl)
+    if not wikipediaUrl.startswith('http'):
+        wikipediaUrl = getUrl(wikipediaUrl)
     data = getWikiData(wikipediaUrl)
     filmbox_data = findRe(data, '''\{\{[Ii]nfobox.[Ff]ilm(.*?)\n\}\}''')
     filmbox = {}
@@ -80,7 +81,7 @@ def getMovieData(wikipediaUrl):
         if r:
             filmbox['imdb_id'] = r[0]
 
-    r = re.compile('{{Internet Archive.*?\|id=(.*?)\|', re.IGNORECASE).findall(data)
+    r = re.compile('{{Internet Archive.*?\|id=(.*?)[\|}]', re.IGNORECASE).findall(data)
     if r:
         filmbox['archiveorg_id'] = r[0]
 
