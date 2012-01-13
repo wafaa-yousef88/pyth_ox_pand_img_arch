@@ -66,12 +66,12 @@ def getMovieData(wikipediaUrl):
             if key[0] == '|':
                 key = key[1:]
             value = d[1].strip()
+            if '<br>' in value:
+                value = value.split('<br>')
             filmbox[key.strip()] = value
 
     if 'Allmovie movie' in data:
         filmbox['amg_id'] = findRe(data, 'Allmovie movie\|.*?(\d+)')
-    elif 'amg_id' in filmbox and filmbox['amg_id'].startswith('1:'):
-        filmbox['amg_id'] = filmbox['amg_id'][2:]
 
     r = re.compile('{{IMDb title\|id=(\d{7})', re.IGNORECASE).findall(data)
     if r:
@@ -87,11 +87,11 @@ def getMovieData(wikipediaUrl):
 
     r = re.compile('{{mojo title\|(.*?)\|', re.IGNORECASE).findall(data)
     if r:
-        filmbox['mojo_id'] = r[0]
+        filmbox['mojo_id'] = r[0].replace('id=', '')
 
     r = re.compile('{{rotten-tomatoes\|(.*?)\|', re.IGNORECASE).findall(data)
     if r:
-        filmbox['rottentomatoes_id'] = r[0]
+        filmbox['rottentomatoes_id'] = r[0].replace('id=', '')
     if 'google video' in data:
         filmbox['google_video_id'] = findRe(data, 'google video\|.*?(\d*?)\|')
     if 'DEFAULTSORT' in data:
