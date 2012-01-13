@@ -70,6 +70,8 @@ def getMovieData(wikipediaUrl):
                 value = value.split('<br>')
             filmbox[key.strip()] = value
 
+    if 'amg_id' in filmbox and not filmbox['amg_id'].isdigit():
+        del filmbox['amg_id']
     if 'Allmovie movie' in data:
         filmbox['amg_id'] = findRe(data, 'Allmovie movie\|.*?(\d+)')
 
@@ -85,15 +87,15 @@ def getMovieData(wikipediaUrl):
     if r:
         filmbox['archiveorg_id'] = r[0]
 
-    r = re.compile('{{mojo title\|(.*?)\|', re.IGNORECASE).findall(data)
+    r = re.compile('{{mojo title\|(.*?)[\|}]', re.IGNORECASE).findall(data)
     if r:
         filmbox['mojo_id'] = r[0].replace('id=', '')
 
-    r = re.compile('{{rotten-tomatoes\|(.*?)\|', re.IGNORECASE).findall(data)
+    r = re.compile('{{rotten-tomatoes\|(.*?)[\|}]', re.IGNORECASE).findall(data)
     if r:
         filmbox['rottentomatoes_id'] = r[0].replace('id=', '')
     if 'google video' in data:
-        filmbox['google_video_id'] = findRe(data, 'google video\|.*?(\d*?)\|')
+        filmbox['google_video_id'] = findRe(data, 'google video\|.*?(\d*?)[\|}]')
     if 'DEFAULTSORT' in data:
         filmbox['title_sort'] = findRe(data, '''\{\{DEFAULTSORT:(.*?)\}\}''')
     return filmbox
