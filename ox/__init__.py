@@ -15,7 +15,11 @@ from file import *
 from form import *
 from format import *
 from html import *
-from image import *
+#image depends on PIL, not easy enough to instal on osx
+try:
+    from image import *
+except:
+    pass
 from location import *
 from movie import *
 from normalize import *
