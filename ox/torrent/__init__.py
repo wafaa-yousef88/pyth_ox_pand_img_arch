@@ -72,5 +72,5 @@ def getFiles(data):
 
 def getTorrentSize(torrentFile):
     "Returns Size of files in torrent file in bytes"
-    return getTorrentInfo(torrentFile)['size']
+    return getTorrentInfoFromFile(torrentFile)['size']
 
