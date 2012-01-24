@@ -25,11 +25,15 @@ def HttpFileResponse(path, content_type=None, filename=None):
             url = getattr(settings, PREFIX+'_URL', '')
             if root and path.startswith(root):
                 path = url + path[len(root)+1:]
+        if isinstance(path, unicode):
+            path = path.encode('utf-8')
         response['X-Accel-Redirect'] = path
         if content_type:
             response['Content-Type'] = content_type
     elif getattr(settings, 'XSENDFILE', False):
         response = HttpResponse()
+        if isinstance(path, unicode):
+            path = path.encode('utf-8')
         response['X-Sendfile'] = path
         if content_type:
             response['Content-Type'] = content_type
@@ -37,6 +41,8 @@ def HttpFileResponse(path, content_type=None, filename=None):
     else:
         response = HttpResponse(open(path), content_type=content_type)
     if filename:
+        if isinstance(filename, unicode):
+            filename = filename.encode('utf-8')
        response['Content-Disposition'] = 'attachment; filename="%s"' % filename
     response['Expires'] = datetime.strftime(datetime.utcnow() + timedelta(days=1), "%a, %d-%b-%Y %H:%M:%S GMT")
     return response
