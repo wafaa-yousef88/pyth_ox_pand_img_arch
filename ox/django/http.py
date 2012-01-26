@@ -43,7 +43,7 @@ def HttpFileResponse(path, content_type=None, filename=None):
     if filename:
         if isinstance(filename, unicode):
             filename = filename.encode('utf-8')
-       response['Content-Disposition'] = 'attachment; filename="%s"' % filename
+        response['Content-Disposition'] = 'attachment; filename="%s"' % filename
     response['Expires'] = datetime.strftime(datetime.utcnow() + timedelta(days=1), "%a, %d-%b-%Y %H:%M:%S GMT")
     return response
 
