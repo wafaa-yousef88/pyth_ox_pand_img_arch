@@ -34,12 +34,17 @@ def _detectEncoding(fp):
     fp.seek(oldFP)
     if bomDetection:
         return bomDetection
-
     encoding = 'latin-1'
     #more character detecting magick using http://chardet.feedparser.org/
     fp.seek(0)
     rawdata = fp.read()
-    encoding = chardet.detect(rawdata)['encoding']
+    #if data can be decoded as utf-8 use that, try chardet otherwise
+    #chardet detects utf-8 as ISO-8859-2 most of the time
+    try:
+        data = unicode(rawdata, 'utf-8')
+        encoding = 'utf-8'
+    except:
+        encoding = chardet.detect(rawdata)['encoding']
     fp.seek(oldFP)
     return encoding
 
