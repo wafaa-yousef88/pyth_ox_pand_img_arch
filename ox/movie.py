@@ -38,8 +38,10 @@ def parse_movie_path(path):
     #title/year
     if len(parts) == 4:
         title = parts[2]
-    else:
+    elif len(parts) > 1:
         title = parts[1]
+    else:
+        title = parts[0]
     title = title.replace('_ ', ': ')
 
     year = findRe(title, '(\(\d{4}\))')
@@ -64,9 +66,9 @@ def parse_movie_path(path):
 
     #extension/language
     fileparts = [x.replace('||', '. ') for x in parts[-1].replace('. ', '||').split('.')]
-    extension = fileparts[-1]
+    extension = len(fileparts) > 1 and fileparts[-1] or ''
 
-    if len(fileparts[-2]) == 2:
+    if len(fileparts) > 1 and len(fileparts[-2]) == 2:
         language = fileparts[-2]
     else:
         language = ''
@@ -152,7 +154,8 @@ def create_movie_path(title, director, year,
         filename += ['Part %s' % part]
     if partTitle:
         filename += [partTitle]
-    filename += [extension]
+    if extension:
+        filename += [extension]
     filename = '.'.join(filename)
     path = os.path.join(director[0], director, '%s (%s)' % (title, year), filename)
     return path
