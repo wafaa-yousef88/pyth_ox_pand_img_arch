@@ -39,6 +39,12 @@ class SessionCookieJar(cookielib.LWPCookieJar):
         self._really_load(f, 'memory', ignore_discard, ignore_expires)
 
 def api_proxy(request):
+    '''
+        settings.OXAPI_URL =...
+        from ox.django.views import api_proxy
+        urlpatterns = patterns('',
+            url(r'^api/$', api_proxy)
+    '''
     url = settings.OXAPI_URL
     cj = SessionCookieJar()
     if 'cj' in request.session:
