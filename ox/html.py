@@ -34,7 +34,7 @@ def escape(html):
     '''
     if not isinstance(html, basestring):
           html = str(html)
-    return html.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
+    return html.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&apos;')
 
 def linebreaks(value):
     '''
@@ -173,4 +173,106 @@ def highlight(text, query, hlClass="hl"):
             text = re.sub("(%s)" % re.escape(i).replace('\ ', '.'), '<span class="%s">\\1</span>' % hlClass, text)
         text = text.replace('|', '<br />')
     return text
+
+def escape_html(value):
+    '''
+    >>> escape_html(u'<script> foo')
+    u'&lt;script&gt; foo'
+    >>> escape_html(u'&lt;script&gt; foo')
+    u'&lt;script&gt; foo'
+    '''
+    return escape(decodeHtml(value))
+
+def parse_html(html, tags=None, wikilinks=False):
+    '''
+    >>> parse_html('http://foo.com, bar')
+    '<a href="http://foo.com">http://foo.com</a>, bar'
+    >>> parse_html('http://foo.com/foobar?foo, bar')
+    '<a href="http://foo.com/foobar?foo">http://foo.com/foobar?foo</a>, bar'
+    >>> parse_html('(see: www.foo.com)')
+    '(see: <a href="http://www.foo.com">www.foo.com</a>)'
+    >>> parse_html('foo@bar.com')
+    '<a href="mailto:foo@bar.com">foo@bar.com</a>'
+    >>> parse_html('<a href="http://foo.com" onmouseover="alert()">foo</a>')
+    '<a href="http://foo.com">foo</a>'
+    >>> parse_html('<a href="javascript:alert()">foo</a>')
+    '&lt;a href="javascript:alert()"&gt;foo'
+    >>> parse_html('[http://foo.com foo]')
+    '<a href="http://foo.com">foo</a>'
+    >>> parse_html('<rtl>foo</rtl>')
+    '<div style="direction: rtl">foo</div>'
+    >>> parse_html('<script>alert()</script>')
+    '&lt;script&gt;alert()&lt;/script&gt;'
+    >>> parse_html('\'foo\' < \'bar\' && "foo" > "bar"')
+    '\'foo\' &lt; \'bar\' &amp;&amp; "foo" &gt; "bar"'
+    >>> parse_html('<b>foo')
+    '<b>foo</b>'
+    >>> parse_html('<b>foo</b></b>')
+    '<b>foo</b>'
+    '''
+    if not tags:
+        tags = [
+            # inline formatting
+            'b', 'code', 'i', 's', 'sub', 'sup', 'u',
+            # block formatting
+            'blockquote', 'h1', 'h2', 'h3', 'p', 'pre',
+            # lists
+            'li', 'ol', 'ul',
+            # tables
+            'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr',
+            # other
+            'a', 'br', 'img',
+            # special
+            'rtl', '[]'
+        ]
+    parse = {
+            'a': {
+            '<a [^<>]*?href="((https?:\/\/|\/).+?)".*?>': '<a href="{1}">',
+            '<\/a>': '</a>'
+        },
+        'img': {
+            '<img [^<>]*?src="((https?:\/\/|\/).+?)".*?>': '<img src="{1}">'
+        },
+        'rtl': {
+            '<rtl>': '<div style="direction: rtl">',
+            '<\/rtl>': '</div>'
+        },
+        '*': lambda tag: {'<(/?' + tag + ') ?/?>':'<{1}>'}
+    }
+    matches = []
+
+    #makes parse_html output the same value if run twice
+    html = decodeHtml(html)
+
+    if '[]' in tags:
+        html = re.sub(
+                re.compile('\[((https?:\/\/|\/).+?) (.+?)\]', re.IGNORECASE),
+                '<a href="\\1">\\3</a>', html);
+        tags = filter(lambda tag: tag != '[]', tags)
+
+    def replace_match(match, value, replace):
+        i = 1
+        for m in match.groups():
+            value = value.replace('{%d}'%i, m)
+            i += 1
+        matches.append(value)
+        return '\t%d\t' % len(matches)
+
+    for tag in tags:
+        p = parse.get(tag, parse['*'](tag))
+        for replace in p:
+            html = re.sub(
+                re.compile(replace, re.IGNORECASE),
+                lambda match: replace_match(match, p[replace][:], replace),
+                html
+            )
+    html = escape(html)
+    for i in range(0, len(matches)):
+        html = html.replace('\t%d\t'%(i+1), matches[i])
+    html = html.replace('\n\n', '<br/><br/>')
+    return  sanitize_fragment(html)
+
+def sanitize_fragment(html):
+    import html5lib
+    return html5lib.parseFragment(html).toxml().decode('utf-8')
 
