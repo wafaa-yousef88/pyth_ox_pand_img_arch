@@ -160,6 +160,8 @@ def decodeHtml(html):
             return match.group(0)
     return charrefpat.sub(entitydecode, html).replace(u'\xa0', ' ')
 
+decode_hmtl = decodeHtml
+
 def highlight(text, query, hlClass="hl"):
     """
     >>> highlight('me &amp; you and &#36;&#38;%', 'and')

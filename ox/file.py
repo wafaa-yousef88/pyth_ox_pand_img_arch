@@ -62,7 +62,11 @@ def oshash(filename):
 
 def avinfo(filename):
     if os.path.getsize(filename):
-        p = subprocess.Popen(['ffmpeg2theora', '--info', filename],
+        ffmpeg2theora = 'ffmpeg2theora'
+        local = os.path.expanduser('~/.ox/bin/ffmpeg2theora')
+        if os.path.exists(local):
+            ffmpeg2theora = local
+        p = subprocess.Popen([ffmpeg2theora, '--info', filename],
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         info, error = p.communicate()
         try:
