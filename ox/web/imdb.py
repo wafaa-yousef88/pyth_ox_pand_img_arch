@@ -135,7 +135,10 @@ class Imdb(SiteParser):
         },
         'genre': {
             'page': 'combined',
-            're': '<a href="/Sections/Genres/.*?/">(.*?)</a>',
+            're': [
+                '<h5>Genre:</h5>(.*?)<hr',
+                '<a href="/Sections/Genres/.*?/">(.*?)</a>'
+            ],
             'type': 'list'
         },
         'gross': {
