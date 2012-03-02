@@ -3,6 +3,7 @@
 from __future__ import with_statement, division
 import chardet
 import re
+import codecs
 
 import ox
 
@@ -101,5 +102,5 @@ def encode(data):
             s['value'].replace('\n', '\r\n').strip()
         )
         i += 1
-    return srt.encode('utf-8')
+    return codecs.BOM_UTF8 + srt.encode('utf-8')
 
