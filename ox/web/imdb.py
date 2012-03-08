@@ -23,7 +23,6 @@ def readUrl(url, data=None, headers=ox.cache.DEFAULT_HEADERS, timeout=ox.cache.c
 def readUrlUnicode(url, timeout=ox.cache.cache_timeout):
    return ox.cache.readUrlUnicode(url, _readUrl=readUrl, timeout=timeout)
 
-
 def getUrl(id):
     return "http://www.imdb.com/title/tt%s/" % id
 
@@ -567,6 +566,11 @@ def getMoviePoster(imdbId):
     elif 'series' in info:
         return getMoviePoster(info['series'])
     return ''
+
+def maxVotes():
+    data = ox.cache.readUrl('http://www.imdb.com/chart/top')
+    votes = int(ox.findRe(data,'<td align="right"><font face="Arial, Helvetica, sans-serif" size="-1">([\d,]+)</font></td></tr>').replace(',', ''))
+    return votes
 
 def guess(title, director='', timeout=-1):
     return getMovieId(title, director, timeout=timeout)
