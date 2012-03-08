@@ -568,8 +568,10 @@ def getMoviePoster(imdbId):
     return ''
 
 def maxVotes():
-    data = ox.cache.readUrl('http://www.imdb.com/chart/top')
-    votes = int(ox.findRe(data,'<td align="right"><font face="Arial, Helvetica, sans-serif" size="-1">([\d,]+)</font></td></tr>').replace(',', ''))
+    url = 'http://www.imdb.com/search/title?num_votes=500000,&sort=num_votes,desc'
+    data = ox.cache.readUrl(url)
+    votes = max([int(v.replace(',', ''))
+        for v in re.compile('<td class="sort_col">([\d,]+)</td>').findall(data)])
     return votes
 
 def guess(title, director='', timeout=-1):
