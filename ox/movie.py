@@ -43,6 +43,8 @@ def parse_movie_path(path):
     else:
         title = parts[0]
     title = title.replace('_ ', ': ')
+    if title.endswith('_'):
+        title = title[:-1] + '.'
 
     year = findRe(title, '(\(\d{4}\))')
     if not year:

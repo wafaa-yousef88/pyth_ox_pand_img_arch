@@ -4,7 +4,7 @@ import re
 import urllib
 
 import ox
-from ox import stripTags
+from ox import stripTags, decodeHtml
 
 DEFAULT_MAX_RESULTS = 10
 DEFAULT_TIMEOUT = 24*60*60
@@ -30,8 +30,11 @@ def find(query, max_results=DEFAULT_MAX_RESULTS, timeout=DEFAULT_TIMEOUT):
     url = 'http://google.com/search?q=%s' % quote_plus(query)
     data = readUrlUnicode(url, timeout=timeout)
     results = []
-    for a in re.compile('<a href="(\S+?)" class=l .*?>(.*?)</a>').findall(data):
-        results.append((stripTags(a[1]), a[0], ''))
+    data = re.sub('<span class="f">(.*?)</span>', '\\1', data)
+    for a in re.compile(
+        '<a href="(\S+?)" class=l .*?>(.*?)</a>.*?<span class="st">(.*?)<\/span>'
+    ).findall(data):
+        results.append((stripTags(decodeHtml(a[1])), a[0], stripTags(decodeHtml(a[2]))))
         if len(results) >= max_results:
             break
     return results
