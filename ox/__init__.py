@@ -14,7 +14,7 @@ from api import *
 from file import *
 from form import *
 from format import *
-from geo iport *
+from geo import *
 from html import *
 #image depends on PIL, not easy enough to instal on osx
 try:
