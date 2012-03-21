@@ -38,6 +38,102 @@ PREFIXES = [
 MIDFIXES = ['und']
 SUFFIXES = ['ii', 'iii', 'jr', 'jr.', 'ph.d.', 'phd', 'sr', 'sr.']
 
+UA_ALIASES = {
+    'browser': {
+        'Firefox': '(Fennec|Firebird|Iceweasel|Minefield|Namoroka|Phoenix|SeaMonkey|Shiretoko)'
+    },
+    'system': {
+        'BSD': '(FreeBSD|NetBSD|OpenBSD)',
+        'Linux': '(CrOS|MeeGo|webOS)',
+        'Unix': '(AIX|HP-UX|IRIX|SunOS)'
+    }
+}
+UA_NAMES = {
+    'browser': {
+        'chromeframe': 'Chrome Frame',
+        'MSIE': 'Internet Explorer'
+    },
+    'system': {
+        'CPU OS': 'iOS',
+        'iPhone OS': 'iOS',
+        'Macintosh': 'Mac OS X'
+    }
+}
+UA_REGEXPS = {
+    'browser': [
+        '(Camino)\/(\d+)',
+        '(chromeframe)\/(\d+)',
+        '(Chrome)\/(\d+)',
+        '(Epiphany)\/(\d+)',
+        '(Firefox)\/(\d+)',
+        '(Galeon)\/(\d+)',
+        '(Googlebot)\/(\d+)',
+        '(Konqueror)\/(\d+)',
+        '(MSIE) (\d+)',
+        '(Netscape)\d?\/(\d+)',
+        '(NokiaBrowser)\/(\d+)',
+        '(Opera) (\d+)',
+        '(Opera)\/.+Version\/(\d+)',
+        'Version\/(\d+).+(Safari)'
+    ],
+    'system': [
+        '(Android) (\d+)',
+        '(BeOS)',
+        '(BlackBerry) (\d+)',
+        '(Darwin)',
+        '(BSD) (FreeBSD|NetBSD|OpenBSD)',
+        '(CPU OS) (\d+)',
+        '(iPhone OS) (\d+)',
+        '(Linux).+(CentOS|CrOS|Debian|Fedora|Gentoo|Mandriva|MeeGo|Mint|Red Hat|SUSE|Ubuntu|webOS)',
+        '(CentOS|CrOS|Debian|Fedora|Gentoo|Mandriva|MeeGo|Mint|Red Hat|SUSE|Ubuntu|webOS).+(Linux)',
+        '(Linux)',
+        '(Mac OS X) (10.\d)',
+        '(Mac OS X)',
+        '(Macintosh)',
+        '(SymbianOS)\/(\d+)',
+        '(SymbOS)',
+        '(OS\/2)',
+        '(Unix) (AIX|HP-UX|IRIX|SunOS)',
+        '(Unix)',
+        '(Windows) (NT \d\.\d)',
+        '(Windows) (95|98|2000|2003|ME|NT|XP)', # Opera
+        '(Windows).+(Win 9x 4\.90)', # Firefox
+        '(Windows).+(Win9\d)', # Firefox
+        '(Windows).+(WinNT4.0)' # Firefox
+    ]
+}
+UA_VERSIONS = {
+    'browser': {},
+    'system': {
+        '10.2': '10.2 (Jaguar)',
+        '10.3': '10.3 (Panther)',
+        '10.4': '10.4 (Tiger)',
+        '10.5': '10.5 (Leopard)',
+        '10.6': '10.6 (Snow Leopard)',
+        '10.7': '10.7 (Lion)',
+        'CrOS': 'Chrome OS',
+        'NT 4.0': 'NT 4.0 (Windows NT)',
+        'NT 4.1': 'NT 4.1 (Windows 98)',
+        'Win 9x 4.90': 'NT 4.9 (Windows ME)',
+        'NT 5.0': 'NT 5.0 (Windows 2000)',
+        'NT 5.1': 'NT 5.1 (Windows XP)',
+        'NT 5.2': 'NT 5.2 (Windows 2003)',
+        'NT 6.0': 'NT 6.0 (Windows Vista)',
+        'NT 6.1': 'NT 6.1 (Windows 7)',
+        'NT 6.2': 'NT 6.2 (Windows 8)',
+        '95': 'NT 4.0 (Windows 95)',
+        'NT': 'NT 4.0 (Windows NT)',
+        '98': 'NT 4.1 (Windows 98)',
+        'ME': 'NT 4.9 (Windows ME)',
+        '2000': 'NT 5.0 (Windows 2000)',
+        '2003': 'NT 5.2 (Windows 2003)',
+        'XP': 'NT 5.1 (Windows XP)',
+        'Win95': 'NT 4.0 (Windows 95)',
+        'WinNT4.0': 'NT 4.0 (Windows NT)',
+        'Win98': 'NT 4.1 (Windows 98)'
+    }
+}
+
 def get_sort_name(name):
     """
 
@@ -152,6 +248,37 @@ def findString(string, string0='', string1 = ''):
     else:
         string1 = '$'
     return findRe(string, string0 + '(.*?)' + string1)
+
+def parse_useragent(useragent):
+    data = {}
+    for key in UA_REGEXPS:
+        for alias, regexp in UA_ALIASES[key].iteritems():
+            alias = alias if key == 'browser' else alias + ' \\1'
+            useragent = re.sub(regexp, alias, useragent)                    
+        for regexp in UA_REGEXPS[key]:
+            data[key] = {'name': '', 'version': '', 'string': ''}
+            match = re.compile(regexp).search(useragent)
+            if match:
+                matches = list(match.groups())
+                if len(matches) == 1:
+                    matches.append('')
+                swap = re.match('^\d', matches[0]) or matches[1] == 'Linux'
+                name = matches[1 if swap else 0]
+                version = matches[0 if swap else 1].replace('_', '.')
+                name = UA_NAMES[key][name] if name in UA_NAMES[key] else name
+                version = UA_VERSIONS[key][version] if version in UA_VERSIONS[key] else version
+                string = name
+                if version:
+                    string = string + ' ' + (
+                        '(' + version + ')' if name in ['BSD', 'Linux', 'Unix'] else version
+                    )
+                data[key] = {
+                    'name': name,
+                    'version': version,
+                    'string': string
+                }
+                break;
+    return data
 
 def removeSpecialCharacters(text):
     """
