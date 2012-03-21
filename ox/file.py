@@ -66,6 +66,11 @@ def avinfo(filename):
         local = os.path.expanduser('~/.ox/bin/ffmpeg2theora')
         if os.path.exists(local):
             ffmpeg2theora = local
+        p = subprocess.Popen([ffmpeg2theora], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        info, error = p.communicate()
+        version = info.split('\n')[0].split(' ')[-1]
+        if version < '0.27':
+            raise EnvironmentError('version of ffmpeg2theora needs to be 0.27 or later, found %s' % version)
         p = subprocess.Popen([ffmpeg2theora, '--info', filename],
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         info, error = p.communicate()
