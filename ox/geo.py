@@ -2,6 +2,8 @@
 # vi:si:et:sw=4:sts=4:ts=4
 # GPL 2008
 
+__all__ = ['get_country_name']
+
 '''
 var countries = {};
 Ox.COUNTRIES.forEach(function(country) {
