@@ -105,12 +105,15 @@ UA_REGEXPS = {
 UA_VERSIONS = {
     'browser': {},
     'system': {
+        '10.0': '10.0 (Cheetah)',
+        '10.1': '10.1 (Puma)',
         '10.2': '10.2 (Jaguar)',
         '10.3': '10.3 (Panther)',
         '10.4': '10.4 (Tiger)',
         '10.5': '10.5 (Leopard)',
         '10.6': '10.6 (Snow Leopard)',
         '10.7': '10.7 (Lion)',
+        '10.8': '10.8 (Mountain Lion)',
         'CrOS': 'Chrome OS',
         'NT 4.0': 'NT 4.0 (Windows NT)',
         'NT 4.1': 'NT 4.1 (Windows 98)',
