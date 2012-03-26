@@ -63,6 +63,7 @@ UA_REGEXPS = {
     'browser': [
         '(Camino)\/(\d+)',
         '(chromeframe)\/(\d+)',
+        '(Google Web Preview).+Chrome\/(\d+)',
         '(Chrome)\/(\d+)',
         '(Epiphany)\/(\d+)',
         '(Firefox)\/(\d+)',
@@ -281,6 +282,7 @@ def parse_useragent(useragent):
                     'string': string
                 }
                 break;
+    data['robot'] = data['browser']['name'] in ['Google Web Preview', 'Googlebot']
     return data
 
 def removeSpecialCharacters(text):
