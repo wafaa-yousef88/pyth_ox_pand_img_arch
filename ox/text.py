@@ -40,6 +40,7 @@ SUFFIXES = ['ii', 'iii', 'jr', 'jr.', 'ph.d.', 'phd', 'sr', 'sr.']
 
 UA_ALIASES = {
     'browser': {
+        'Chrome': '(CrMo)',
         'Firefox': '(Fennec|Firebird|Iceweasel|Minefield|Namoroka|Phoenix|SeaMonkey|Shiretoko)'
     },
     'system': {
@@ -61,6 +62,7 @@ UA_NAMES = {
 }
 UA_REGEXPS = {
     'browser': [
+        '(BingPreview)\/(\d+)',
         '(Camino)\/(\d+)',
         '(chromeframe)\/(\d+)',
         '(Google Web Preview).+Chrome\/(\d+)',
@@ -103,6 +105,7 @@ UA_REGEXPS = {
         '(Windows).+(WinNT4.0)' # Firefox
     ]
 }
+UA_ROBOTS = ['BingPreview', 'Google Web Preview', 'Googlebot']
 UA_VERSIONS = {
     'browser': {},
     'system': {
@@ -282,7 +285,7 @@ def parse_useragent(useragent):
                     'string': string
                 }
                 break;
-    data['robot'] = data['browser']['name'] in ['Google Web Preview', 'Googlebot']
+    data['robot'] = data['browser']['name'] in UA_ROBOTS
     return data
 
 def removeSpecialCharacters(text):
