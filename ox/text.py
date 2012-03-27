@@ -43,6 +43,7 @@ UA_ALIASES = {
         'Chrome': '(CrMo)',
         'Firefox': '(Fennec|Firebird|Iceweasel|Minefield|Namoroka|Phoenix|SeaMonkey|Shiretoko)'
     },
+    'robot': {},
     'system': {
         'BSD': '(FreeBSD|NetBSD|OpenBSD)',
         'Linux': '(CrOS|MeeGo|webOS)',
@@ -54,6 +55,7 @@ UA_NAMES = {
         'chromeframe': 'Chrome Frame',
         'MSIE': 'Internet Explorer'
     },
+    'robot': {},
     'system': {
         'CPU OS': 'iOS',
         'iPhone OS': 'iOS',
@@ -62,22 +64,25 @@ UA_NAMES = {
 }
 UA_REGEXPS = {
     'browser': [
-        '(BingPreview)\/(\d+)',
         '(Camino)\/(\d+)',
         '(chromeframe)\/(\d+)',
-        '(Google Web Preview).+Chrome\/(\d+)',
         '(Chrome)\/(\d+)',
         '(Epiphany)\/(\d+)',
         '(Firefox)\/(\d+)',
         '(Galeon)\/(\d+)',
-        '(Googlebot)\/(\d+)',
         '(Konqueror)\/(\d+)',
         '(MSIE) (\d+)',
         '(Netscape)\d?\/(\d+)',
         '(NokiaBrowser)\/(\d+)',
         '(Opera) (\d+)',
         '(Opera)\/.+Version\/(\d+)',
-        'Version\/(\d+).+(Safari)'
+        'Version\/(\d+).+(Safari)',
+        '(WebKit)\/(\d+)'
+    ],
+    'robot': [
+        '(BingPreview)\/(\d+)',
+        '(Google Web Preview).+Chrome\/(\d+)',
+        '(Googlebot)\/(\d+)'
     ],
     'system': [
         '(Android) (\d+)',
@@ -105,9 +110,9 @@ UA_REGEXPS = {
         '(Windows).+(WinNT4.0)' # Firefox
     ]
 }
-UA_ROBOTS = ['BingPreview', 'Google Web Preview', 'Googlebot']
 UA_VERSIONS = {
     'browser': {},
+    'robot': {},
     'system': {
         '10.0': '10.0 (Cheetah)',
         '10.1': '10.1 (Puma)',
@@ -285,7 +290,6 @@ def parse_useragent(useragent):
                     'string': string
                 }
                 break;
-    data['robot'] = data['browser']['name'] in UA_ROBOTS
     return data
 
 def removeSpecialCharacters(text):
