@@ -33,7 +33,7 @@ def escape(html):
     'html &quot;test&quot; &amp; &lt;brothers&gt;'
     '''
     if not isinstance(html, basestring):
-          html = str(html)
+        html = str(html)
     return html.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&apos;')
 
 def linebreaks(value):
@@ -139,6 +139,8 @@ def decodeHtml(html):
     u'me & you and $&%'
     >>> decodeHtml('&#x80;')
     u'€'
+    >>> decodeHtml('Anniversary of Daoud&apos;s Republic')
+    u'Anniversary of Daoud's Republic'
     """
     if type(html) != unicode:
         html = unicode(html)[:]
@@ -156,6 +158,8 @@ def decodeHtml(html):
             return uchr(int(entity[1:]))
         elif entity in name2codepoint:
             return uchr(name2codepoint[entity])
+        elif entity == 'apos':
+            return "'"
         else:
             return match.group(0)
     return charrefpat.sub(entitydecode, html).replace(u'\xa0', ' ')
@@ -211,6 +215,8 @@ def parse_html(html, tags=None, wikilinks=False):
     '<b>foo</b>'
     >>> parse_html('<b>foo</b></b>')
     '<b>foo</b>'
+    >>> parse_html('Anniversary of Daoud&apos;s Republic')
+    'Anniversary of Daoud&apos;s Republic'
     '''
     if not tags:
         tags = [
