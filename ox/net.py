@@ -4,6 +4,7 @@
 import os
 import gzip
 import StringIO
+import struct
 import urllib
 import urllib2
 
@@ -89,4 +90,51 @@ def saveUrl(url, filename, overwrite=False):
         f = open(filename, 'w')
         f.write(data)
         f.close()
+
+def oshash(url):
+    def get_size(url):
+        req = urllib2.Request(url, headers=DEFAULT_HEADERS.copy())
+        req.get_method = lambda : 'HEAD'
+        u = urllib2.urlopen(req)
+        if u.code != 200 or not 'Content-Length' in u.headers:
+            raise IOError
+        return int(u.headers['Content-Length'])
+
+    def get_range(url, start, end):
+        headers = DEFAULT_HEADERS.copy()
+        headers['Range'] = 'bytes=%s-%s' % (start, end)
+        req = urllib2.Request(url, headers=headers)
+        u = urllib2.urlopen(req)
+        return u.read() 
+
+    try:
+        longlongformat = 'q'  # long long
+        bytesize = struct.calcsize(longlongformat)
+
+        filesize = get_size(url)
+        hash = filesize
+        head = get_range(url, 0, min(filesize, 65536))
+        if filesize > 65536:
+            tail = get_range(url, filesize-65536, filesize)
+        if filesize < 65536:
+            for offset in range(0, filesize, bytesize):
+                buffer = head[offset:offset+bytesize]
+                (l_value,)= struct.unpack(longlongformat, buffer)
+                hash += l_value
+                hash = hash & 0xFFFFFFFFFFFFFFFF #cut off 64bit overflow
+        else:
+            for offset in range(0, 65536, bytesize):
+                buffer = head[offset:offset+bytesize]
+                (l_value,)= struct.unpack(longlongformat, buffer)
+                hash += l_value
+                hash = hash & 0xFFFFFFFFFFFFFFFF #cut of 64bit overflow
+            for offset in range(0, 65536, bytesize):
+                buffer = tail[offset:offset+bytesize]
+                (l_value,)= struct.unpack(longlongformat, buffer)
+                hash += l_value
+                hash = hash & 0xFFFFFFFFFFFFFFFF
+        returnedhash =  "%016x" % hash
+        return returnedhash
+    except(IOError):
+        return "IOError"
 
