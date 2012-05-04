@@ -11,5 +11,11 @@ def load(f):
     return loads(f.read())
 
 def loads(source):
-    return json.loads(minify(source))
-
+    try:
+        minified = minify(source)
+        return json.loads(minified)
+    except json.JSONDecodeError, e:
+        s = minified.split('\n')
+        context = s[e.lineno-1][max(0, e.colno-1):e.colno+30]
+        msg = e.msg + ' at ' + context
+        raise json.JSONDecodeError(msg, minified, e.pos)
