@@ -3,6 +3,7 @@
 # GPL 2008
 import math
 import re
+import unicodedata
 
 ARTICLES = list(set([
     # def sg, def pl, indef sg, indef pl (each m/f/n)
@@ -520,3 +521,13 @@ def words(text):
     """
     text = text.split()
     return map(lambda x: re.sub("(([.!?:-_]|'s)$)", '', x), text)
+
+def sort_string(string):
+    string = string.replace(u'Æ', 'AE').replace(u'Ø', 'O').replace(u'Þ', 'Th')
+
+    #pad numbered titles
+    string = re.sub('(\d+)', lambda x: '%010d' % int(x.group(0)), string)
+    return unicodedata.normalize('NFKD', string)
+
+def sorted_strings(strings):
+    return sorted(strings, cmp=lambda a, b: cmp(sort_string(a), sort_string(b)))
