@@ -261,7 +261,7 @@ class Imdb(SiteParser):
         },
         'year': {
             'page': 'combined',
-            're': '="og:title" content=".*?\((\d{4})\).*?"',
+            're': '="og:title" content=".*?\((\d{4}).*?"',
             'type': 'int'
         }
     }
