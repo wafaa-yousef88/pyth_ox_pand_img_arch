@@ -49,6 +49,23 @@ def parse_JSONC(source):
 def tokenize(source):
     # see https://github.com/mozilla/narcissus/blob/master/lib/jslex.js
     IDENTIFIER = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$_'
+    KEYWORD = [
+        'break',
+        'case', 'catch', 'class', 'const', 'continue',
+        'debugger', 'default', 'delete', 'do',
+        'else', 'enum', 'export', 'extends',
+        'finally', 'for', 'function',
+        'if', 'implements', 'import', 'in', 'instanceof', 'interface',
+        'let', 'module',
+        'new',
+        'package', 'private', 'protected', 'public',
+        'return',
+        'super', 'switch', 'static',
+        'this', 'throw', 'try', 'typeof',
+        'var', 'void',
+        'yield',
+        'while', 'with'
+    ]
     LINEBREAK = '\n\r'
     NUMBER = '01234567890'
     OPERATOR = [
@@ -87,7 +104,7 @@ def tokenize(source):
         else:
             token = tokens[i]
             is_regexp = (
-                token['type'] == 'keyword' and not token['value'] in ['false', 'null', 'true']
+                token['type'] == 'identifier' and token['value'] in KEYWORDS
             ) or (
                 token['type'] == 'operator' and not token['value'] in ['++', '--', ')', ']', '}']
             )
