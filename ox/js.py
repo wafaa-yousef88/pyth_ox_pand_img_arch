@@ -104,7 +104,7 @@ def tokenize(source):
         else:
             token = tokens[i]
             is_regexp = (
-                token['type'] == 'identifier' and token['value'] in KEYWORDS
+                token['type'] == 'identifier' and token['value'] in KEYWORD
             ) or (
                 token['type'] == 'operator' and not token['value'] in ['++', '--', ')', ']', '}']
             )
