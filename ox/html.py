@@ -6,7 +6,7 @@ import string
 from htmlentitydefs import name2codepoint
 
 
-# Configuration for urlize() function
+# Configuration for add_links() function
 LEADING_PUNCTUATION  = ['(', '<', '&lt;']
 TRAILING_PUNCTUATION = ['.', ',', ')', '>', '\n', '&gt;', "'", '"']
 
@@ -45,15 +45,17 @@ def linebreaks(value):
     paras = ['<p>%s</p>' % p.strip().replace('\n', '<br />') for p in paras]
     return '\n\n'.join(paras)
 
-def stripTags(value):
+def strip_tags(value):
     """
     Returns the given HTML with all tags stripped
     
-    >>> stripTags('some <h2>title</h2> <script>asdfasdf</script>')
+    >>> strip_tags('some <h2>title</h2> <script>asdfasdf</script>')
     'some title asdfasdf'
     """
     return re.sub(r'<[^>]*?>', '', value)
-    
+
+stripTags = strip_tags
+
 def stripSpacesBetweenTags(value):
     "Returns the given HTML with spaces between tags normalized to a single space"
     return re.sub(r'>\s+<', '> <', value)
@@ -66,7 +68,7 @@ def fixAmpersands(value):
     "Returns the given HTML with all unencoded ampersands encoded correctly"
     return unencoded_ampersands_re.sub('&amp;', value)
 
-def urlize(text, trim_url_limit=None, nofollow=False):
+def add_links(text, trim_url_limit=None, nofollow=False):
     """
     Converts any URLs in text into clickable links. Works on http://, https:// and
     www. links. Links can have trailing punctuation (periods, commas, close-parens)
@@ -97,7 +99,9 @@ def urlize(text, trim_url_limit=None, nofollow=False):
                 words[i] = lead + middle + trail
     return ''.join(words)
 
-def cleanHtml(text):
+urlize = add_links
+
+def clean_html(text):
     """
     Cleans the given HTML. Specifically, it does the following:
         * Converts <b> and <i> to <strong> and <em>.
@@ -133,13 +137,13 @@ def cleanHtml(text):
 # references, a hexadecimal numeric reference, or a named reference).
 charrefpat = re.compile(r'&(#(\d+|x[\da-fA-F]+)|[\w.:-]+);?')
 
-def decodeHtml(html):
+def decode_html(html):
     """
-    >>> decodeHtml('me &amp; you and &#36;&#38;%')
+    >>> decode_html('me &amp; you and &#36;&#38;%')
     u'me & you and $&%'
-    >>> decodeHtml('&#x80;')
+    >>> decode_html('&#x80;')
     u'€'
-    >>> decodeHtml('Anniversary of Daoud&apos;s Republic')
+    >>> decode_html('Anniversary of Daoud&apos;s Republic')
     u'Anniversary of Daoud's Republic'
     """
     if type(html) != unicode:
@@ -164,7 +168,7 @@ def decodeHtml(html):
             return match.group(0)
     return charrefpat.sub(entitydecode, html).replace(u'\xa0', ' ')
 
-decode_html = decodeHtml
+decodeHtml = decode_html
 
 def highlight(text, query, hlClass="hl"):
     """
@@ -280,7 +284,7 @@ def sanitize_html(html, tags=None, wikilinks=False):
     for i in range(0, len(matches)):
         html = html.replace('\t%d\t'%(i+1), matches[i])
     html = html.replace('\n\n', '<br/><br/>')
-    html = urlize(html)
+    html = add_links(html)
     return  sanitize_fragment(html)
 
 def sanitize_fragment(html):
