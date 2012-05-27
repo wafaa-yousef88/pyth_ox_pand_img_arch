@@ -164,7 +164,7 @@ def decodeHtml(html):
             return match.group(0)
     return charrefpat.sub(entitydecode, html).replace(u'\xa0', ' ')
 
-decode_hmtl = decodeHtml
+decode_html = decodeHtml
 
 def highlight(text, query, hlClass="hl"):
     """
@@ -187,35 +187,37 @@ def escape_html(value):
     >>> escape_html(u'&lt;script&gt; foo')
     u'&lt;script&gt; foo'
     '''
-    return escape(decodeHtml(value))
+    return escape(decode_html(value))
 
-def parse_html(html, tags=None, wikilinks=False):
+def sanitize_html(html, tags=None, wikilinks=False):
     '''
-    >>> parse_html('http://foo.com, bar')
+    >>> sanitize_html('http://foo.com, bar')
     '<a href="http://foo.com">http://foo.com</a>, bar'
-    >>> parse_html('http://foo.com/foobar?foo, bar')
+    >>> sanitize_html('http://foo.com/foobar?foo, bar')
     '<a href="http://foo.com/foobar?foo">http://foo.com/foobar?foo</a>, bar'
-    >>> parse_html('(see: www.foo.com)')
+    >>> sanitize_html('(see: www.foo.com)')
     '(see: <a href="http://www.foo.com">www.foo.com</a>)'
-    >>> parse_html('foo@bar.com')
+    >>> sanitize_html('foo@bar.com')
     '<a href="mailto:foo@bar.com">foo@bar.com</a>'
-    >>> parse_html('<a href="http://foo.com" onmouseover="alert()">foo</a>')
+    >>> sanitize_html(sanitize_html('foo@bar.com'))
+    '<a href="mailto:foo@bar.com">foo@bar.com</a>'
+    >>> sanitize_html('<a href="http://foo.com" onmouseover="alert()">foo</a>')
     '<a href="http://foo.com">foo</a>'
-    >>> parse_html('<a href="javascript:alert()">foo</a>')
+    >>> sanitize_html('<a href="javascript:alert()">foo</a>')
     '&lt;a href="javascript:alert()"&gt;foo'
-    >>> parse_html('[http://foo.com foo]')
+    >>> sanitize_html('[http://foo.com foo]')
     '<a href="http://foo.com">foo</a>'
-    >>> parse_html('<rtl>foo</rtl>')
+    >>> sanitize_html('<rtl>foo</rtl>')
     '<div style="direction: rtl">foo</div>'
-    >>> parse_html('<script>alert()</script>')
+    >>> sanitize_html('<script>alert()</script>')
     '&lt;script&gt;alert()&lt;/script&gt;'
-    >>> parse_html('\'foo\' < \'bar\' && "foo" > "bar"')
+    >>> sanitize_html('\'foo\' < \'bar\' && "foo" > "bar"')
     '\'foo\' &lt; \'bar\' &amp;&amp; "foo" &gt; "bar"'
-    >>> parse_html('<b>foo')
+    >>> sanitize_html('<b>foo')
     '<b>foo</b>'
-    >>> parse_html('<b>foo</b></b>')
+    >>> sanitize_html('<b>foo</b></b>')
     '<b>foo</b>'
-    >>> parse_html('Anniversary of Daoud&apos;s Republic')
+    >>> sanitize_html('Anniversary of Daoud&apos;s Republic')
     'Anniversary of Daoud&apos;s Republic'
     '''
     if not tags:
@@ -234,8 +236,8 @@ def parse_html(html, tags=None, wikilinks=False):
             'rtl', '[]'
         ]
     parse = {
-            'a': {
-            '<a [^<>]*?href="((https?:\/\/|\/).+?)".*?>': '<a href="{1}">',
+        'a': {
+            '<a [^<>]*?href="((https?:\/\/|\/|mailto:).+?)".*?>': '<a href="{1}">',
             '<\/a>': '</a>'
         },
         'img': {
@@ -250,7 +252,7 @@ def parse_html(html, tags=None, wikilinks=False):
     matches = []
 
     #makes parse_html output the same value if run twice
-    html = decodeHtml(html)
+    html = decode_html(html)
 
     if '[]' in tags:
         html = re.sub(
@@ -278,6 +280,7 @@ def parse_html(html, tags=None, wikilinks=False):
     for i in range(0, len(matches)):
         html = html.replace('\t%d\t'%(i+1), matches[i])
     html = html.replace('\n\n', '<br/><br/>')
+    html = urlize(html)
     return  sanitize_fragment(html)
 
 def sanitize_fragment(html):
