@@ -400,6 +400,11 @@ class Imdb(SiteParser):
                 self['episodeDirector'] = self['director']
             self['director'] = self['creator']
 
+        for key in ('actor', 'writer', 'producer', 'editor'):
+            if key in self:
+                self[key] = sorted(list(set(self[key])),
+                                   lambda a, b: self[key].index(a) - self[key].index(b))
+
         if 'budget' in self and 'gross' in self:
             self['profit'] = self['gross'] - self['budget']
 
