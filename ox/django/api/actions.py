@@ -50,6 +50,7 @@ def trim(docstring):
 
 class ApiActions(dict):
     properties = {}
+    versions = {}
     def __init__(self):
 
         def api(request):
@@ -79,34 +80,51 @@ class ApiActions(dict):
             data = json.loads(request.POST.get('data', '{}'))
             docs = data.get('docs', False)
             code = data.get('code', False)
-            _actions = self.keys()
+            version = getattr(request, 'version', None)
+            if version:
+                _actions = self.versions.get(version, {}).keys()
+                _actions = list(set(_actions + self.keys()))
+            else:
+                _actions = self.keys()
             _actions.sort()
             actions = {}
             for a in _actions:
                 actions[a] = self.properties[a]
                 if docs:
-                    actions[a]['doc'] = self.doc(a)
+                    actions[a]['doc'] = self.doc(a, version)
                 if code:
-                    actions[a]['code'] = self.code(a)
+                    actions[a]['code'] = self.code(a, version)
             response = json_response({'actions': actions})
             return render_to_json_response(response)
         self.register(api)
 
-    def doc(self, f):
-        return trim(self[f].__doc__)
+    def doc(self, name, version=None):
+        if version:
+            f = self.versions[version].get(name, self.get(name))
+        else:
+            f = self[name]
+        return trim(f.__doc__)
 
-    def code(self, name):
-        f = self[name]
+    def code(self, name, version=None):
+        if version:
+            f = self.versions[version].get(name, self.get(name))
+        else:
+            f = self[name]
         if name != 'api' and hasattr(f, 'func_closure') and f.func_closure:
             f = f.func_closure[0].cell_contents 
         info = f.func_code.co_filename[len(settings.PROJECT_ROOT)+1:]
         info = u'%s:%s' % (info, f.func_code.co_firstlineno)
         return info, trim(inspect.getsource(f))
 
-    def register(self, method, action=None, cache=True):
+    def register(self, method, action=None, cache=True, version=None):
         if not action:
             action = method.func_name
-        self[action] = method
+        if version:
+            if not version in self.versions:
+                self.versions[version] = {}
+            self.versions[version][action] = method
+        else:
+            self[action] = method
         self.properties[action] = {'cache': cache}
 
     def unregister(self, action):

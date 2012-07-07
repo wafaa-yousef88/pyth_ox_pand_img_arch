@@ -25,14 +25,17 @@ def api(request):
         context = RequestContext(request, {'api': api,
                                            'sitename': settings.SITENAME})
         return render_to_response('api.html', context)
-    function = request.POST['action']
-
-    f = actions.get(function)
+    action = request.POST['action']
+    version = getattr(request, 'version', None)
+    if version:
+        f = actions.versions.get(version, {}).get(action, actions.get(action))
+    else:
+        f = actions.get(action)
     if f:
         response = f(request)
     else:
         response = render_to_json_response(json_response(status=400,
-                                text='Unknown function %s' % function))
+                                text='Unknown action %s' % action))
     response['Access-Control-Allow-Origin'] = '*'
     return response
 

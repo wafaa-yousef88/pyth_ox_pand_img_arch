@@ -27,7 +27,7 @@ def render_to_json_response(dictionary, content_type="text/json", status=200):
     if settings.DEBUG:
         content_type = "text/javascript"
         indent = 2
-    if settings.JSON_DEBUG:
+    if getattr(settings, 'JSON_DEBUG', False):
         print json.dumps(dictionary, indent=2, default=_to_json)
 
     return HttpResponse(json.dumps(dictionary, indent=indent, default=_to_json),
