@@ -517,6 +517,9 @@ def getMovieId(title, director='', year='', timeout=-1):
 
         (u'Jimi Plays Monterey & Shake! Otis at Monterey', u'D. A. Pennebaker and Chris Hegedus') : '',
         (u'Martha Graham: Dance on Film', u'Nathan Kroll') : '',
+        (u'Carmen', u'Carlos Saura'): '0085297',
+        (u'The Story of a Cheat', u'Sacha Guitry'): '0028201',
+        (u'Weekend', 'Andrew Haigh'): '1714210',
     }.get((title, director), None)
     if imdbId:
         return imdbId
