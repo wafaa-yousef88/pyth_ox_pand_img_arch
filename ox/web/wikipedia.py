@@ -101,8 +101,13 @@ def getMovieData(wikipediaUrl):
     return filmbox
 
 def getImageUrl(name):
-    data = readUrlUnicode('http://en.wikipedia.org/wiki/Image:' + name)
+    url = 'http://en.wikipedia.org/wiki/Image:' + name.replace(' ', '%20')
+    data = readUrlUnicode(url)
     url = findRe(data, 'href="(http://upload.wikimedia.org/.*?)"')
+    if not url:
+        url = findRe(data, 'href="(//upload.wikimedia.org/.*?)"')
+        if url:
+            url = 'http:' + url
     return url
 
 def getPosterUrl(wikipediaUrl):
