@@ -69,7 +69,8 @@ def getMovieData(wikipediaUrl):
             if '<br>' in value:
                 value = value.split('<br>')
             filmbox[key.strip()] = value
-
+    if not filmbox:
+        return filmbox
     if 'amg_id' in filmbox and not filmbox['amg_id'].isdigit():
         del filmbox['amg_id']
     if 'Allmovie movie' in data:
