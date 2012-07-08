@@ -7,6 +7,12 @@ from lxml.html import document_fromstring
 from ox.cache import readUrl, readUrlUnicode
 from ox import findRe, stripTags
 
+def getUrl(id):
+    return 'http://www.metacritic.com/movie/%s' % id
+
+def getId(url):
+    return url.split('/')[-1]
+
 def getUrlByImdb(imdb):
     url = "http://www.imdb.com/title/tt%s/criticreviews" % imdb
     data = readUrl(url)
@@ -30,28 +36,29 @@ def getData(url):
         score = -1
     authors = [a.text
         for a in doc.xpath('//div[@class="review_content"]//div[@class="author"]//a')]
-    publications = [d.text
+    sources = [d.text
         for d in doc.xpath('//div[@class="review_content"]//div[@class="source"]/a')]
     reviews = [d.text
         for d in doc.xpath('//div[@class="review_content"]//div[@class="review_body"]')]
     scores = [int(d.text.strip())
         for d in doc.xpath('//div[@class="review_content"]//div[contains(@class, "critscore")]')]
-    links = [a.attrib['href']
+    urls = [a.attrib['href']
         for a in doc.xpath('//div[@class="review_content"]//a[contains(@class, "external")]')]
 
     metacritics = []
     for i in range(len(authors)):
         metacritics.append({
-            'score': scores[i],
-            'publication': publications[i],
             'critic': authors[i],
+            'url': urls[i],
+            'source': sources[i],
             'quote': stripTags(reviews[i]).strip(),
-            'link': links[i],
+            'score': scores[i],
         })
         
     return {
-    'score': score,
-    'critics': metacritics,
-    'url': url
+        'critics': metacritics,
+        'id': getId(url),
+        'score': score,
+        'url': url,
     }
 
