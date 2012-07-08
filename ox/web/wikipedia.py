@@ -56,9 +56,7 @@ def getMovieData(wikipediaUrl):
     data = getWikiData(wikipediaUrl)
     filmbox_data = findRe(data, '''\{\{[Ii]nfobox.[Ff]ilm(.*?)\n\}\}''')
     filmbox = {}
-    _box = filmbox_data.strip().split('\n|')
-    if len(_box) == 1:
-        _box = _box[0].split('|\n')
+    _box = filmbox_data.strip().split('|')
     for row in _box:
         d = row.split('=')
         if len(d) == 2:
@@ -69,12 +67,17 @@ def getMovieData(wikipediaUrl):
             if '<br>' in value:
                 value = value.split('<br>')
             filmbox[key.strip()] = value
-    if not filmbox:
+    if not filmbox_data:
         return filmbox
     if 'amg_id' in filmbox and not filmbox['amg_id'].isdigit():
         del filmbox['amg_id']
     if 'Allmovie movie' in data:
         filmbox['amg_id'] = findRe(data, 'Allmovie movie\|.*?(\d+)')
+    elif 'Allmovie title' in data:
+        filmbox['amg_id'] = findRe(data, 'Allmovie title\|.*?(\d+)')
+
+    if 'Official website' in data:
+        filmbox['website'] = findRe(data, 'Official website\|(.*?)}').strip()
 
     r = re.compile('{{IMDb title\|id=(\d{7})', re.IGNORECASE).findall(data)
     if r:

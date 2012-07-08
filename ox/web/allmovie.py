@@ -8,7 +8,7 @@ from ox.cache import readUrlUnicode
 
 
 def getId(url):
-    return url.split("/")[-2]
+    return url.split("/")[-1]
 
 def getData(id):
     '''
@@ -21,44 +21,52 @@ def getData(id):
     >>> getData('129689')['rating']
     u'4.5'
     '''
+    if id.startswith('http'):
+        id = getId(id)
     data = {
         "url": getUrl(id)
     }
     html = readUrlUnicode(data["url"])
     data['aka'] = parseList(html, 'AKA')
-    data['category'] = findRe(html, 'http://allmovie.com/explore/category/.*?">(.*?)</a>')
-    data['countries'] = parseList(html, 'Countries')
-    data['director'] = parseEntry(html, 'Director')
-    data['genres'] = parseList(html, 'Genres')
-    data['keywords'] = parseList(html, 'Keywords')
-    data['posters'] = [findRe(html, '<img src="(http://image\..*?)"')]
-    data['produced'] = parseList(html, 'Produced by')
+    data['category'] = findRe(html, '<dt>category</dt>.*?<dd>(.*?)</dd>')
+    data['countries'] = parseList(html, 'countries')
+    data['director'] = parseEntry(html, 'directed by')
+    data['genres'] = parseList(html, 'genres')
+    data['keywords'] = parseList(html, 'keywords')
+    data['posters'] = [findRe(html, '<img src="(http://cps-.*?)"')]
+    data['produced'] = parseList(html, 'produced by')
     data['rating'] = findRe(html, 'Stars" title="(.*?) Stars"')
-    data['released'] = parseEntry(html, 'Released by')
-    data['releasedate'] = parseEntry(html, 'Release')[0:10].replace(' ', '-')
-    data['runtime'] = findRe(html, '<td class="formed-sub" style="width: 86px;">(\d+) min.</td>')
-    data['set'] = parseEntry(html, 'Set In')
-    data['synopsis'] = parseText(html, 'Plot Synopsis')
-    data['themes'] = parseList(html, 'Themes')
-    data['types'] = parseList(html, 'Types')
-    data['year'] = findRe(html, '"http://allmovie.com/explore/year/(.*?)"')
-    html = readUrlUnicode("http://allmovie.com/work/%s/cast" % id)
-    data['cast'] = parseTable(html)
-    html = readUrlUnicode("http://allmovie.com/work/%s/credits" % id)
-    data['credits'] = parseTable(html)
+    data['released'] = parseEntry(html, 'released by')
+    data['releasedate'] = parseList(html, 'release date')
+    data['runtime'] = parseEntry(html, 'run time').replace('min.', '').strip()
+    data['set'] = parseEntry(html, 'set in')
+    data['synopsis'] = stripTags(findRe(html, '<div class="toggle-text" itemprop="description">(.*?)</div>')).strip()
+    data['themes'] = parseList(html, 'themes')
+    data['types'] = parseList(html, 'types')
+    data['year'] = findRe(html, '<span class="year">.*?(\d+)')
+    #data['stills'] = [re.sub('_derived.*?/', '', i) for i in re.compile('<a href="#" title="movie still".*?<img src="(.*?)"', re.DOTALL).findall(html)]
+    data['stills'] = re.compile('<a href="#" title="movie still".*?<img src="(.*?)"', re.DOTALL).findall(html)
+    #html = readUrlUnicode("http://allmovie.com/work/%s/cast" % id)
+    #data['cast'] = parseTable(html)
+    #html = readUrlUnicode("http://allmovie.com/work/%s/credits" % id)
+    #data['credits'] = parseTable(html)
     html = readUrlUnicode("http://allmovie.com/work/%s/review" % id)
-    data['review'] = parseText(html, 'Review')
+    data['review'] = stripTags(findRe(html, '<div class="toggle-text" itemprop="description">(.*?)</div>')).strip()
     return data
 
 def getUrl(id):
-    return "http://allmovie.com/work/%s/" % id
+    return "http://allmovie.com/work/%s" % id
 
 def parseEntry(html, title):
-    return stripTags(findRe(html, '<span>%s</span>(.*?)</table>' % title)).strip()
+    html = findRe(html, '<dt>%s</dt>.*?<dd>(.*?)</dd>' % title)
+    return stripTags(html).strip()
 
 def parseList(html, title):
-    html = findRe(html, '<span>%s</span>(.*?)</table>' % title)
-    return map(lambda x: stripTags(x), re.compile('<li>(.*?)</li>', re.DOTALL).findall(html))
+    html = findRe(html, '<dt>%s</dt>.*?<dd>(.*?)</dd>' % title.lower())
+    r = map(lambda x: stripTags(x), re.compile('<li>(.*?)</li>', re.DOTALL).findall(html))
+    if not r and html:
+        r = [stripTags(html)]
+    return r
 
 def parseTable(html):
     return map(
