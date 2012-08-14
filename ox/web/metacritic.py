@@ -4,8 +4,8 @@ import re
 from urllib import quote
 from lxml.html import document_fromstring
 
-from ox.cache import readUrl, readUrlUnicode
-from ox import findRe, stripTags
+from ox.cache import read_url
+from ox import findRe, strip_tags
 
 def getUrl(id):
     return 'http://www.metacritic.com/movie/%s' % id
@@ -15,18 +15,18 @@ def getId(url):
 
 def getUrlByImdb(imdb):
     url = "http://www.imdb.com/title/tt%s/criticreviews" % imdb
-    data = readUrl(url)
+    data = read_url(url)
     metacritic_url = findRe(data, '"(http://www.metacritic.com/movie/.*?)"')
     return metacritic_url or None
 
 def getMetacriticShowUrl(title):
     title = quote(title)
     url = "http://www.metacritic.com/search/process?ty=6&ts=%s&tfs=tvshow_title&x=0&y=0&sb=0&release_date_s=&release_date_e=&metascore_s=&metascore_e=" % title
-    data = readUrl(url)
+    data = read_url(url)
     return findRe(data, '(http://www.metacritic.com/tv/shows/.*?)\?')
 
 def getData(url):
-    data = readUrlUnicode(url)
+    data = read_url(url, unicode=True)
     doc = document_fromstring(data)
     score = filter(lambda s: s.attrib.get('property') == 'v:average',
                    doc.xpath('//span[@class="score_value"]'))
@@ -51,7 +51,7 @@ def getData(url):
             'critic': authors[i],
             'url': urls[i],
             'source': sources[i],
-            'quote': stripTags(reviews[i]).strip(),
+            'quote': strip_tags(reviews[i]).strip(),
             'score': scores[i],
         })
         

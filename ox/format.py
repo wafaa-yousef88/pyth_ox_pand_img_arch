@@ -217,15 +217,15 @@ def to36(q):
 def from36(q):
     return int(q, 36)
 
-def intValue(strValue, default=u''):
+def int_value(strValue, default=u''):
     """
-    >>> intValue('abc23')
+    >>> int_value('abc23')
     u'23'
 
-    >>> intValue(' abc23')
+    >>> int_value(' abc23')
     u'23'
 
-    >>> intValue('ab')
+    >>> int_value('ab')
     u''
     """
     try:
@@ -234,15 +234,15 @@ def intValue(strValue, default=u''):
         val = default
     return val
 
-def floatValue(strValue, default=u''):
+def float_value(strValue, default=u''):
     """
-    >>> floatValue('abc23.4')
+    >>> float_value('abc23.4')
     u'23.4'
 
-    >>> floatValue(' abc23.4')
+    >>> float_value(' abc23.4')
     u'23.4'
 
-    >>> floatValue('ab')
+    >>> float_value('ab')
     u''
     """
     try:
@@ -251,46 +251,46 @@ def floatValue(strValue, default=u''):
         val = default
     return val
 
-def formatNumber(number, longName, shortName):
+def format_number(number, longName, shortName):
     """
     Return the number in a human-readable format (23 KB, 23.4 MB, 23.42 GB)
     
-    >>> formatNumber(123, 'Byte', 'B')
+    >>> format_number(123, 'Byte', 'B')
     '123 Bytes'
 
-    >>> formatNumber(1234, 'Byte', 'B')
+    >>> format_number(1234, 'Byte', 'B')
     '1 KB'
 
-    >>> formatNumber(1234567, 'Byte', 'B')
+    >>> format_number(1234567, 'Byte', 'B')
     '1.2 MB'
 
-    >>> formatNumber(1234567890, 'Byte', 'B')
+    >>> format_number(1234567890, 'Byte', 'B')
     '1.15 GB'
 
-    >>> formatNumber(1234567890123456789, 'Byte', 'B')
+    >>> format_number(1234567890123456789, 'Byte', 'B')
     '1,096.5166 PB'
 
-    >>> formatNumber(-1234567890123456789, 'Byte', 'B')
+    >>> format_number(-1234567890123456789, 'Byte', 'B')
     '-1,096.5166 PB'
 
     """
     if abs(number) < 1024:
-        return '%s %s%s' % (formatThousands(number), longName, number != 1 and 's' or '')
+        return '%s %s%s' % (format_thousands(number), longName, number != 1 and 's' or '')
     prefix = ['K', 'M', 'G', 'T', 'P']
     for i in range(5):
         if abs(number) < math.pow(1024, i + 2) or i == 4:
             n = number / math.pow(1024, i + 1)
-            return '%s %s%s' % (formatThousands('%.*f' % (i, n)), prefix[i], shortName)
+            return '%s %s%s' % (format_thousands('%.*f' % (i, n)), prefix[i], shortName)
 
-def formatThousands(number, separator = ','):
+def format_thousands(number, separator = ','):
     """
     Return the number with separators (1,000,000)
     
-    >>> formatThousands(1)
+    >>> format_thousands(1)
     '1'
-    >>> formatThousands(1000)
+    >>> format_thousands(1000)
     '1,000'
-    >>> formatThousands(1000000)
+    >>> format_thousands(1000000)
     '1,000,000'
     """
     string = str(number).split('.')
@@ -302,16 +302,16 @@ def formatThousands(number, separator = ','):
     string[0] = ''.join(l)
     return '.'.join(string)
 
-def formatBits(number):
-    return formatNumber(number, 'bit', 'b')
+def format_bits(number):
+    return format_number(number, 'bit', 'b')
 
-def formatBytes(number):
-    return formatNumber(number, 'byte', 'B')
+def format_bytes(number):
+    return format_number(number, 'byte', 'B')
 
-def formatPixels(number):
-    return formatNumber(number, 'pixel', 'px')
+def format_pixels(number):
+    return format_number(number, 'pixel', 'px')
 
-def formatCurrency(amount, currency="$"):
+def format_currency(amount, currency="$"):
   if amount:
     temp = "%.2f" % amount
     profile=re.compile(r"(\d)(\d\d\d[.,])")
@@ -336,9 +336,9 @@ def plural(amount, unit, plural='s'):
         if plural == 's':
             unit = unit + plural
         else: unit = plural
-    return "%s %s" % (formatThousands(amount), unit)
+    return "%s %s" % (format_thousands(amount), unit)
 
-def formatDuration(ms, verbosity=0, years=True, hours=True, milliseconds=True):
+def format_duration(ms, verbosity=0, years=True, hours=True, milliseconds=True):
     '''
     verbosity
         0: D:HH:MM:SS
@@ -353,13 +353,13 @@ def formatDuration(ms, verbosity=0, years=True, hours=True, milliseconds=True):
     milliseconds
         True: always display milliseconds
         False: never display milliseconds
-    >>> formatDuration(1000 * 60 * 60 * 24 * 366)
+    >>> format_duration(1000 * 60 * 60 * 24 * 366)
     '1:001:00:00:00.000'
-    >>> formatDuration(1000 * 60 * 60 * 24 * 366, years=False)
+    >>> format_duration(1000 * 60 * 60 * 24 * 366, years=False)
     '366:00:00:00.000'
-    >>> formatDuration(1000 * 60 * 60 * 24 * 365 + 2003, verbosity=2)
+    >>> format_duration(1000 * 60 * 60 * 24 * 365 + 2003, verbosity=2)
     '1 year 2 seconds 3 milliseconds'
-    >>> formatDuration(1000 * 30, hours=False, milliseconds=False)
+    >>> format_duration(1000 * 30, hours=False, milliseconds=False)
     '00:30'
     '''
     if not ms and ms != 0:
@@ -403,7 +403,7 @@ def formatDuration(ms, verbosity=0, years=True, hours=True, milliseconds=True):
     return duration
 
 def ms2runtime(ms, shortenLong=False):
-    # deprecated - use formatDuration
+    # deprecated - use format_duration
     '''
     >>> ms2runtime(5000)
     '5 seconds'
@@ -415,11 +415,11 @@ def ms2runtime(ms, shortenLong=False):
     '13 hours 53 minutes'
     '''
     if shortenLong and ms > 1000 * 60 * 60 * 24 * 464:
-        return formatDuration(ms, verbosity=1, milliseconds=False)
-    return formatDuration(ms, verbosity=2, milliseconds=False)
+        return format_duration(ms, verbosity=1, milliseconds=False)
+    return format_duration(ms, verbosity=2, milliseconds=False)
 
 def ms2playtime(ms, hours=False):
-    # deprecated - use formatDuration
+    # deprecated - use format_duration
     '''
     >>> ms2playtime(5000)
     '00:05'
@@ -428,15 +428,15 @@ def ms2playtime(ms, hours=False):
     >>> ms2playtime(50000000)
     '13:53:20'
     '''
-    return formatDuration(ms, hours=False, years=False, milliseconds=False)
+    return format_duration(ms, hours=False, years=False, milliseconds=False)
 
 def ms2time(ms):
-    # deprecated - use formatDuration
+    # deprecated - use format_duration
     '''
     >>> ms2time(44592123)
     '12:23:12.123'
     '''
-    return formatDuration(ms, years=False)
+    return format_duration(ms, years=False)
 
 def time2ms(timeString):
     '''
@@ -451,7 +451,7 @@ def time2ms(timeString):
         ms = ms * 60 + float(_p)
     return int(ms * 1000)
 
-def shiftTime(offset, timeString):
+def shift_time(offset, timeString):
     newTime = time2ms(timeString) + offset
     return ms2time(newTime)
 

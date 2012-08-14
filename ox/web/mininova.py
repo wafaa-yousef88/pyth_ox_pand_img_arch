@@ -5,8 +5,8 @@ import re
 import socket
 from urllib import quote
 
-from ox.cache import readUrl, readUrlUnicode
-from ox import findRe, cache, stripTags, decodeHtml, getTorrentInfo, intValue, normalizeNewlines
+from ox.cache import read_url
+from ox import findRe, cache, strip_tags, decodeHtml, getTorrentInfo, int_value, normalizeNewlines
 from ox.normalize import normalizeImdbId
 import ox
 
@@ -31,7 +31,7 @@ def findMovie(query, max_results=10):
     '''search for torrents on mininova
     '''
     url = "http://www.mininova.org/search/%s/seeds" % quote(query)
-    data = readUrlUnicode(url)
+    data = read_url(url, unicode=True)
     return _parseResultsPage(data, max_results)
 
 def findMovieByImdb(imdbId):
@@ -39,7 +39,7 @@ def findMovieByImdb(imdbId):
     '''
     results = []
     imdbId = normalizeImdbId(imdbId)
-    data = readUrlUnicode("http://www.mininova.org/imdb/?imdb=%s" % imdbId)
+    data = read_url("http://www.mininova.org/imdb/?imdb=%s" % imdbId, unicode=True)
     return _parseResultsPage(data)
 
 def getId(mininovaId):
@@ -55,7 +55,7 @@ def getId(mininovaId):
 
 def exists(mininovaId):
     mininovaId = getId(mininovaId)
-    data = ox.net.readUrl("http://www.mininova.org/tor/%s" % mininovaId)
+    data = ox.net.read_url("http://www.mininova.org/tor/%s" % mininovaId)
     if not data or 'Torrent not found...' in data:
         return False
     if 'tracker</a> of this torrent requires registration.' in data:
@@ -74,22 +74,22 @@ def getData(mininovaId):
     torrent[u'torrent_link'] = "http://www.mininova.org/get/%s" % mininovaId
     torrent[u'details_link'] = "http://www.mininova.org/det/%s" % mininovaId
 
-    data = readUrlUnicode(torrent['comment_link']) + readUrlUnicode(torrent['details_link'])
+    data = read_url(torrent['comment_link'], unicode=True) + read_url(torrent['details_link'], unicode=True)
     if '<h1>Torrent not found...</h1>' in data:
         return None
 
     for d in re.compile('<p>.<strong>(.*?):</strong>(.*?)</p>', re.DOTALL).findall(data):
         key = d[0].lower().strip()
         key = _key_map.get(key, key)
-        value = decodeHtml(stripTags(d[1].strip()))
+        value = decodeHtml(strip_tags(d[1].strip()))
         torrent[key] = value
 
     torrent[u'title'] = findRe(data, '<title>(.*?):.*?</title>')
     torrent[u'imdbId'] = findRe(data, 'title/tt(\d{7})')
     torrent[u'description'] = findRe(data, '<div id="description">(.*?)</div>')
     if torrent['description']:
-        torrent['description'] = normalizeNewlines(decodeHtml(stripTags(torrent['description']))).strip()
-    t = readUrl(torrent[u'torrent_link'])
+        torrent['description'] = normalizeNewlines(decodeHtml(strip_tags(torrent['description']))).strip()
+    t = read_url(torrent[u'torrent_link'])
     torrent[u'torrent_info'] = getTorrentInfo(t)
     return torrent
 
@@ -109,13 +109,13 @@ class Mininova(Torrent):
         self['seeder'] = -1
         self['leecher'] = -1
         if len(ratio) == 2:
-            val = intValue(ratio[0].replace(',','').strip())
+            val = int_value(ratio[0].replace(',','').strip())
             if val:
                 self['seeder'] = int(val)
-            val = intValue(ratio[1].replace(',','').strip())
+            val = int_value(ratio[1].replace(',','').strip())
             if val:
                 self['leecher'] = int(val)
-        val = intValue(self.data['downloads'].replace(',','').strip())
+        val = int_value(self.data['downloads'].replace(',','').strip())
         if val:
             self['downloaded'] = int(val)
         else:

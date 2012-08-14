@@ -12,7 +12,7 @@ def getUrl(id):
 def getData(id):
     data = {}
     url = getUrl(id)
-    details = cache.readUrl('%s?output=json' % url)
+    details = cache.read_url('%s?output=json' % url)
     details = json.loads(details)
     for key in ('title', 'description', 'runtime'):
         data[key] = details['metadata'][key]

@@ -97,8 +97,8 @@ def encode(data):
     for s in data:
         srt += '%d\r\n%s --> %s\r\n%s\r\n\r\n' % (
             i,
-            ox.formatDuration(s['in']*1000, years=False).replace('.', ','),
-            ox.formatDuration(s['out']*1000, years=False).replace('.', ','),
+            ox.format_duration(s['in']*1000, years=False).replace('.', ','),
+            ox.format_duration(s['out']*1000, years=False).replace('.', ','),
             s['value'].replace('\n', '\r\n').strip()
         )
         i += 1

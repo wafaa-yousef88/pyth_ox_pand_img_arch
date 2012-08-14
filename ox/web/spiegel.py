@@ -5,7 +5,7 @@ import re
 import time
 
 import ox.cache
-from ox.html import decodeHtml, stripTags
+from ox.html import decodeHtml, strip_tags
 import ox.net
 
 
@@ -21,11 +21,11 @@ def getNews(year, month, day):
     for section in sections:
         url = 'http://www.spiegel.de/%s/0,1518,archiv-%d-%03d,00.html' % (section, year, day)
         if date == time.strftime('%d.%m.%Y', time.localtime()):
-            html = ox.net.readUrl(url)
+            html = ox.net.read_url(url)
         else:
-            html = ox.cache.readUrl(url)
+            html = ox.cache.read_url(url)
         for item in re.compile('<div class="spTeaserCenterpage(.*?)</p>', re.DOTALL).findall(html):
-            dateString = stripTags(re.compile('<div class="spDateTime">(.*?)</div>', re.DOTALL).findall(item)[0]).strip()
+            dateString = strip_tags(re.compile('<div class="spDateTime">(.*?)</div>', re.DOTALL).findall(item)[0]).strip()
             try:
                 description = formatString(re.compile('<p>(.*?)<', re.DOTALL).findall(item)[0])
             except:
@@ -104,12 +104,12 @@ def getIssue(year, week):
         return None
     url = 'http://service.spiegel.de/digas/servlet/epaper?Q=SP&JG=%d&AG=%d&SE=1&AN=INHALT' % (year, week)
     contents = []
-    data = ox.cache.readUrl(url)
+    data = ox.cache.read_url(url)
     items = re.compile('<a.?href="http://service.spiegel.de/digas/servlet/epaper\?Q=SP&JG=".?>(.*?)</a>').findall(data)
     for item in items:
         item = item[1]
         page = int(re.compile('&amp;SE=(.*?)"').findall(item)[0])
-        title = stripTags(item).strip()
+        title = strip_tags(item).strip()
         contents.append({'title': title, 'page': page})
     pageUrl = {}
     pages = page + 2
@@ -163,7 +163,7 @@ def archiveIssues():
                     f.close()
                 filename = '%s/Der Spiegel %d %02d.jpg' % (dirname, y, w)
                 if not os.path.exists(filename):
-                    data = ox.cache.readUrl(issue['coverUrl'])
+                    data = ox.cache.read_url(issue['coverUrl'])
                     f = open(filename, 'w')
                     f.write(data)
                     f.close()
@@ -172,7 +172,7 @@ def archiveIssues():
                     if url:
                         filename = '%s/Der Spiegel %d %02d %03d.jpg' % (dirname, y, w, page)
                         if not os.path.exists(filename):
-                            data = ox.cache.readUrl(url)
+                            data = ox.cache.read_url(url)
                             f = open(filename, 'w')
                             f.write(data)
                             f.close()
@@ -243,7 +243,7 @@ def archiveNews():
                         f.close()
                     filename = dirname + '/' + new['imageUrl'].split('/')[-1]
                     if not os.path.exists(filename):
-                        data = ox.cache.readUrl(new['imageUrl'])
+                        data = ox.cache.read_url(new['imageUrl'])
                         f = open(filename, 'w')
                         f.write(data)
                         f.close()

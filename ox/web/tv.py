@@ -3,8 +3,8 @@
 import re
 import time
 
-from ox import stripTags, findRe
-from ox.cache import readUrlUnicode
+from ox import strip_tags, findRe
+from ox.cache import read_url
 
 
 def getEpisodeData(url):
@@ -14,9 +14,9 @@ def getEpisodeData(url):
       example:
         getEpisodeData('http://www.tv.com/lost/do-no-harm/episode/399310/summary.html')
     '''
-    data = readUrlUnicode(url)
+    data = read_url(url, unicode=True)
     r = {}
-    r['description'] = stripTags(findRe(data, 'div id="main-col">.*?<div>(.*?)</div').split('\r')[0])
+    r['description'] = strip_tags(findRe(data, 'div id="main-col">.*?<div>(.*?)</div').split('\r')[0])
     r['show'] = findRe(data, '<h1>(.*?)</h1>')
     r['title'] =  findRe(data, '<title>.*?: (.*?) - TV.com  </title>')
     #episode score

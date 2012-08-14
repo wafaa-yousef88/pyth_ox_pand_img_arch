@@ -4,13 +4,13 @@ import re
 import urllib
 
 import ox
-from ox import stripTags, decodeHtml
+from ox import strip_tags, decodeHtml
 
 DEFAULT_MAX_RESULTS = 10
 DEFAULT_TIMEOUT = 24*60*60
 
-def readUrlUnicode(url, data=None, headers=ox.net.DEFAULT_HEADERS, timeout=DEFAULT_TIMEOUT):
-    return ox.cache.readUrlUnicode(url, data, headers, timeout)
+def read_url(url, data=None, headers=ox.net.DEFAULT_HEADERS, timeout=DEFAULT_TIMEOUT):
+    return ox.cache.read_url(url, data, headers, timeout, unicode=True)
 
 def quote_plus(s):
     if not isinstance(s, str):
@@ -28,13 +28,13 @@ def find(query, max_results=DEFAULT_MAX_RESULTS, timeout=DEFAULT_TIMEOUT):
     u'http://www.imdb.com/title/tt0133093/'
     """
     url = 'http://google.com/search?q=%s' % quote_plus(query)
-    data = readUrlUnicode(url, timeout=timeout)
+    data = read_url(url, timeout=timeout)
     results = []
     data = re.sub('<span class="f">(.*?)</span>', '\\1', data)
     for a in re.compile(
         '<a href="(\S+?)" class=l .*?>(.*?)</a>.*?<span class="st">(.*?)<\/span>'
     ).findall(data):
-        results.append((stripTags(decodeHtml(a[1])), a[0], stripTags(decodeHtml(a[2]))))
+        results.append((strip_tags(decodeHtml(a[1])), a[0], strip_tags(decodeHtml(a[2]))))
         if len(results) >= max_results:
             break
     return results

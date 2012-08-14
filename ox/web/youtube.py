@@ -5,7 +5,7 @@ import re
 from xml.dom.minidom import parseString
 
 import feedparser
-from ox.cache import readUrl, cache_timeout
+from ox.cache import read_url, cache_timeout
 
  
 def getVideoUrl(youtubeId, format='mp4', timeout=cache_timeout):
@@ -33,7 +33,7 @@ def getVideoUrl(youtubeId, format='mp4', timeout=cache_timeout):
 def find(query, max_results=10, offset=1, orderBy='relevance'):
     query = quote(query)
     url = "http://gdata.youtube.com/feeds/api/videos?vq=%s&orderby=%s&start-index=%s&max-results=%s" % (query, orderBy, offset, max_results)
-    data = readUrl(url)
+    data = read_url(url)
     fd = feedparser.parse(data)
     videos = []
     for item in fd.entries:
@@ -48,7 +48,7 @@ def find(query, max_results=10, offset=1, orderBy='relevance'):
 def info(id):
     info = {}
     url = "http://gdata.youtube.com/feeds/api/videos/%s?v=2" % id
-    data = readUrl(url)
+    data = read_url(url)
     xml = parseString(data)
     info['url'] = 'http://www.youtube.com/watch?v=%s' % id
     info['title'] = xml.getElementsByTagName('title')[0].firstChild.data
@@ -62,21 +62,21 @@ def info(id):
 
     info['keywords'] = xml.getElementsByTagName('media:keywords')[0].firstChild.data.split(', ')
     url = "http://www.youtube.com/watch?v=%s" % id
-    data = readUrl(url)
+    data = read_url(url)
     match = re.compile('<h4>License:</h4>(.*?)</p>', re.DOTALL).findall(data)
     if match:
         info['license'] = match[0].strip()
         info['license'] = re.sub('<.+?>', '', info['license']).strip()
 
     url = "http://www.youtube.com/api/timedtext?hl=en&type=list&tlangs=1&v=%s&asrs=1"%id
-    data = readUrl(url)
+    data = read_url(url)
     xml = parseString(data)
     languages = [t.getAttribute('lang_code') for t in xml.getElementsByTagName('track')]
     if languages:
         info['subtitles'] = {}
         for language in languages:
             url = "http://www.youtube.com/api/timedtext?hl=en&v=%s&type=track&lang=%s&name&kind"%(id, language)
-            data = readUrl(url)
+            data = read_url(url)
             xml = parseString(data)
             subs = []
             for t in xml.getElementsByTagName('text'):
@@ -101,7 +101,7 @@ def videos(id, format=''):
         'mp4': 'video/mp4'
     }.get(format)
     url = "http://www.youtube.com/watch?v=%s" % id
-    data = readUrl(url)
+    data = read_url(url)
     match = re.compile('"url_encoded_fmt_stream_map": "(.*?)"').findall(data)
     streams = {}
     for x in match[0].split(','):

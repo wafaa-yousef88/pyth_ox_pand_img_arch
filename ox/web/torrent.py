@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from ox import intValue
+from ox import int_value
 
 
 class Torrent(dict):
@@ -25,7 +25,7 @@ class Torrent(dict):
         for key in self._int_keys:
             value = self.data.get(key, -1)
             if not isinstance(value, int):
-                value = int(intValue(value))
+                value = int(int_value(value))
             self[key] = value
         self['infohash'] = self.data['torrent_info'].get('hash', '')
         self['size'] = self.data['torrent_info'].get('size', -1)

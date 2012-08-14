@@ -4,13 +4,13 @@ import re
 from StringIO import StringIO
 import xml.etree.ElementTree as ET
 
-from ox.cache import readUrl, readUrlUnicode
+from ox.cache import read_url
 from ox import findString, findRe
 
 
 def getData(id):
     url = 'http://www.vimeo.com/moogaloop/load/clip:%s' %id
-    xml = readUrl(url)
+    xml = read_url(url)
     tree = ET.parse(StringIO(xml))
     request_signature = tree.find('request_signature').text
     request_signature_expires = tree.find('request_signature_expires').text

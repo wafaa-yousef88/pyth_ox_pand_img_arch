@@ -4,7 +4,7 @@ import re
 from urllib import urlencode
 
 from ox.utils import json
-from ox.cache import readUrl, readUrlUnicode
+from ox.cache import read_url
 from ox import findRe, decodeHtml
 
 
@@ -47,7 +47,7 @@ def getUrlByAllmovieId(allmovieId):
 def getWikiData(wikipediaUrl):
     url = wikipediaUrl.replace('wikipedia.org/wiki/', 'wikipedia.org/w/index.php?title=')
     url = "%s&action=raw" % url
-    data = readUrl(url).decode('utf-8')
+    data = read_url(url).decode('utf-8')
     return data
 
 def getMovieData(wikipediaUrl):
@@ -106,7 +106,7 @@ def getMovieData(wikipediaUrl):
 
 def getImageUrl(name):
     url = 'http://en.wikipedia.org/wiki/Image:' + name.replace(' ', '%20')
-    data = readUrlUnicode(url)
+    data = read_url(url, unicode=True)
     url = findRe(data, 'href="(http://upload.wikimedia.org/.*?)"')
     if not url:
         url = findRe(data, 'href="(//upload.wikimedia.org/.*?)"')
@@ -133,9 +133,9 @@ def find(query, max_results=10):
     query = {'action': 'query', 'list':'search', 'format': 'json',
              'srlimit': max_results, 'srwhat': 'text', 'srsearch': query.encode('utf-8')}
     url = "http://en.wikipedia.org/w/api.php?" + urlencode(query)
-    data = readUrl(url)
+    data = read_url(url)
     if not data:
-        data  = readUrl(url, timeout=0)
+        data  = read_url(url, timeout=0)
     result = json.loads(data)
     results = []
     if result and 'query' in result:

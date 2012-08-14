@@ -8,7 +8,7 @@ import time
 import unicodedata
 
 import ox
-from ox import findRe, stripTags
+from ox import findRe, strip_tags
 from ox.normalize import normalizeTitle, normalizeImdbId
 import ox.cache
 
@@ -16,12 +16,9 @@ from siteparser import SiteParser
 import google
 
 
-def readUrl(url, data=None, headers=ox.cache.DEFAULT_HEADERS, timeout=ox.cache.cache_timeout, valid=None):
+def read_url(url, data=None, headers=ox.cache.DEFAULT_HEADERS, timeout=ox.cache.cache_timeout, valid=None, unicode=False):
     headers = headers.copy()
-    return ox.cache.readUrl(url, data, headers, timeout)
-
-def readUrlUnicode(url, timeout=ox.cache.cache_timeout):
-   return ox.cache.readUrlUnicode(url, _readUrl=readUrl, timeout=timeout)
+    return ox.cache.read_url(url, data, headers, timeout, unicode=unicode)
 
 def getUrl(id):
     return "http://www.imdb.com/title/tt%s/" % id
@@ -61,7 +58,7 @@ class Imdb(SiteParser):
             'page': 'combined',
             're': [
                 '<td class="nm">.*?>(.*?)</a>.*?<td class="char">(.*?)</td>',
-                lambda ll: [stripTags(l) for l in ll]
+                lambda ll: [strip_tags(l) for l in ll]
              ],
             'type': 'list'
         },
@@ -266,8 +263,8 @@ class Imdb(SiteParser):
         }
     }
 
-    def readUrlUnicode(self, url, timeout):
-        return readUrlUnicode(url, timeout)
+    def read_url(self, url, timeout):
+        return read_url(url, timeout, unicode=True)
 
     def __init__(self, id, timeout=-1):
         #use akas.imdb.com to always get original title:
@@ -276,7 +273,7 @@ class Imdb(SiteParser):
         super(Imdb, self).__init__(timeout)
        
         url = self.baseUrl + 'combined' 
-        page = self.readUrlUnicode(url, timeout=-1)
+        page = self.read_url(url, timeout=-1)
         if '<title>IMDb: Page not found</title>' in page \
             or 'The requested URL was not found on our server.' in page:
             return
@@ -460,7 +457,7 @@ def getMovieIdByTitle(title, timeout=-1):
             params['q'] = params['q'].encode('utf-8')
     params = urllib.urlencode(params)
     url = "http://akas.imdb.com/find?" + params
-    data = readUrlUnicode(url, timeout=timeout)
+    data = read_url(url, timeout=timeout, unicode=True)
     #if search results in redirect, get id of current page
     r = '<meta property="og:url" content="http://www.imdb.com/title/tt(\d{7})/" />'
     results = re.compile(r).findall(data)    
@@ -538,7 +535,7 @@ def getMovieId(title, director='', year='', timeout=-1):
     url = "http://akas.imdb.com/find?" + params
     #print url
 
-    data = readUrlUnicode(url, timeout=timeout)
+    data = read_url(url, timeout=timeout, unicode=True)
     #if search results in redirect, get id of current page
     r = '<meta property="og:url" content="http://www.imdb.com/title/tt(\d{7})/" />'
     results = re.compile(r).findall(data)    
@@ -569,7 +566,7 @@ def getMoviePoster(imdbId):
     info = ImdbCombined(imdbId)
     if 'posterId' in info:
         url = "http://www.imdb.com/rg/action-box-title/primary-photo/media/rm%s/tt%s" % (info['posterId'], imdbId)
-        data = readUrl(url)
+        data = read_url(url)
         poster = findRe(data, 'img id="primary-img".*?src="(.*?)"')
         return poster
     elif 'series' in info:
@@ -578,7 +575,7 @@ def getMoviePoster(imdbId):
 
 def maxVotes():
     url = 'http://www.imdb.com/search/title?num_votes=500000,&sort=num_votes,desc'
-    data = ox.cache.readUrl(url)
+    data = ox.cache.read_url(url)
     votes = max([int(v.replace(',', ''))
         for v in re.compile('<td class="sort_col">([\d,]+)</td>').findall(data)])
     return votes

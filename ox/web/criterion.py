@@ -3,8 +3,8 @@
 import re
 
 import ox.cache
-from ox.cache import readUrlUnicode
-from ox.html import stripTags
+from ox.cache import read_url
+from ox.html import strip_tags
 from ox.text import findRe, removeSpecialCharacters
 
 import imdb
@@ -30,19 +30,19 @@ def getData(id, timeout=ox.cache.cache_timeout, get_imdb=False):
         "url": getUrl(id)
     }
     try:
-        html = readUrlUnicode(data["url"], timeout=timeout)
+        html = read_url(data["url"], timeout=timeout, unicode=True)
     except:
-        html = ox.cache.readUrl(data["url"], timeout=timeout)
+        html = ox.cache.read_url(data["url"], timeout=timeout)
     data["number"] = findRe(html, "<li>Spine #(\d+)")
 
     data["title"] = findRe(html, "<meta property=['\"]og:title['\"] content=['\"](.*?)['\"]")
     data["title"] = data["title"].split(u' \u2014 The Television Version')[0]
-    data["director"] = stripTags(findRe(html, "<h2 class=\"director\">(.*?)</h2>"))
+    data["director"] = strip_tags(findRe(html, "<h2 class=\"director\">(.*?)</h2>"))
     results = findRe(html, '<div class="left_column">(.*?)</div>')
     results = re.compile("<li>(.*?)</li>").findall(results)
     data["country"] = results[0]
     data["year"] = results[1]
-    data["synopsis"] = stripTags(findRe(html, "<p><strong>SYNOPSIS:</strong> (.*?)</p>"))
+    data["synopsis"] = strip_tags(findRe(html, "<p><strong>SYNOPSIS:</strong> (.*?)</p>"))
 
     result = findRe(html, "<div class=\"purchase\">(.*?)</div>")
     if 'Blu-Ray' in result or 'Essential Art House DVD' in result:
@@ -53,7 +53,7 @@ def getData(id, timeout=ox.cache.cache_timeout, get_imdb=False):
     if not "/boxsets/" in result:
         data["posters"] = [result]
     else:
-        html_ = readUrlUnicode(result)
+        html_ = read_url(result, unicode=True)
         result = findRe(html_, '<a href="http://www.criterion.com/films/%s.*?">(.*?)</a>' % id)
         result = findRe(result, "src=\"(.*?)\"")
         if result:
@@ -77,7 +77,7 @@ def getData(id, timeout=ox.cache.cache_timeout, get_imdb=False):
 
 def getIds():
     ids = []
-    html = readUrlUnicode("http://www.criterion.com/library/expanded_view?m=dvd&p=1&pp=50&s=spine")
+    html = read_url("http://www.criterion.com/library/expanded_view?m=dvd&p=1&pp=50&s=spine", unicode=True)
     results = re.compile("\&amp;p=(\d+)\&").findall(html)
     pages = max(map(int, results))
     for page in range(1, pages):
@@ -88,13 +88,13 @@ def getIds():
 def getIdsByPage(page):
     ids = []
     url = "http://www.criterion.com/library/expanded_view?m=dvd&p=%s&pp=50&s=spine" % page
-    html = readUrlUnicode(url)
+    html = read_url(url, unicode=True)
     results = re.compile("films/(\d+)").findall(html)
     for result in results:
         ids.append(result)
     results = re.compile("boxsets/(.*?)\"").findall(html)
     for result in results:
-        html = readUrlUnicode("http://www.criterion.com/boxsets/" + result)
+        html = read_url("http://www.criterion.com/boxsets/" + result, unicode=True)
         results = re.compile("films/(\d+)").findall(html)
         for result in results:
             ids.append(result)

@@ -2,8 +2,8 @@
 # vi:si:et:sw=4:sts=4:ts=4
 import re
 
-from ox.cache import getHeaders, readUrl, readUrlUnicode
-from ox import findRe, stripTags
+from ox.cache import getHeaders, read_url
+from ox import findRe, strip_tags
 
 
 def getUrlByImdb(imdb):
@@ -14,7 +14,7 @@ def getUrlByImdb(imdb):
     return u.url
     '''
     url = "http://www.rottentomatoes.com/alias?type=imdbid&s=%s" % imdb
-    data = readUrl(url)
+    data = read_url(url)
     if "movie_title" in data:
         movies = re.compile('(/m/.*?/)').findall(data)
         if movies:
@@ -25,13 +25,13 @@ def get_og(data, key):
     return findRe(data, '<meta property="og:%s".*?content="(.*?)"' % key)
 
 def getData(url):
-    data = readUrl(url)
+    data = read_url(url)
     r = {}
     r['title'] = findRe(data, '<h1 class="movie_title">(.*?)</h1>')
     if '(' in r['title']:
         r['year'] = findRe(r['title'], '\((\d*?)\)')
-        r['title'] = stripTags(re.sub('\((\d*?)\)', '', r['title'])).strip()
-    r['summary'] = stripTags(findRe(data, '<p id="movieSynopsis" class="movie_synopsis" itemprop="description">(.*?)</p>')).strip()
+        r['title'] = strip_tags(re.sub('\((\d*?)\)', '', r['title'])).strip()
+    r['summary'] = strip_tags(findRe(data, '<p id="movieSynopsis" class="movie_synopsis" itemprop="description">(.*?)</p>')).strip()
     r['summary'] = r['summary'].replace('\t', ' ').replace('\n', ' ').replace('  ', ' ').replace('  ', ' ')
     if not r['summary']:
         r['summary'] = get_og(data, 'description')

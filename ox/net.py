@@ -22,7 +22,7 @@ DEFAULT_HEADERS = {
 
 def status(url, data=None, headers=DEFAULT_HEADERS):
     try:
-        f = openUrl(url, data, headers)
+        f = open_url(url, data, headers)
         s = f.code
     except urllib2.HTTPError, e:
         s = e.code
@@ -34,9 +34,9 @@ def exists(url, data=None, headers=DEFAULT_HEADERS):
         return True
     return False
 
-def getHeaders(url, data=None, headers=DEFAULT_HEADERS):
+def headers(url, data=None, headers=DEFAULT_HEADERS):
     try:
-        f = openUrl(url, data, headers)
+        f = open_url(url, data, headers)
         f.headers['Status'] = "%s" % f.code
         headers = f.headers
         f.close()
@@ -45,30 +45,28 @@ def getHeaders(url, data=None, headers=DEFAULT_HEADERS):
         headers = e.headers
     return dict(headers)
 
-def openUrl(url, data=None, headers=DEFAULT_HEADERS):
+def open_url(url, data=None, headers=DEFAULT_HEADERS):
     url = url.replace(' ', '%20')
     req = urllib2.Request(url, data, headers)
     return urllib2.urlopen(req)
 
-def readUrl(url, data=None, headers=DEFAULT_HEADERS, returnHeaders=False):
-    f = openUrl(url, data, headers)
+def read_url(url, data=None, headers=DEFAULT_HEADERS, return_headers=False, unicode=False):
+    f = open_url(url, data, headers)
     data = f.read()
     f.close()
     if f.headers.get('content-encoding', None) == 'gzip':
         data = gzip.GzipFile(fileobj=StringIO.StringIO(data)).read()
-    if returnHeaders:
+    if unicode:
+        encoding = detect_encoding(data)
+        if not encoding:
+            encoding = 'latin-1'
+        data = data.decode(encoding)
+    if return_headers:
         f.headers['Status'] = "%s" % f.code
         return dict(f.headers), data
     return data
 
-def readUrlUnicode(url, data=None, headers=DEFAULT_HEADERS):
-    data = readUrl(url, data, headers)
-    encoding = getEncoding(data)
-    if not encoding:
-        encoding = 'latin-1'
-    return unicode(data, encoding)
-
-def getEncoding(data):
+def detect_encoding(data):
     if 'content="text/html; charset=utf-8"' in data:
         return 'utf-8'
     elif 'content="text/html; charset=iso-8859-1"' in data:
@@ -81,7 +79,7 @@ def getEncoding(data):
     detector.close()
     return detector.result['encoding']
 
-def saveUrl(url, filename, overwrite=False):
+def save_url(url, filename, overwrite=False):
     if not os.path.exists(filename) or overwrite:
         dirname = os.path.dirname(filename)
         if not os.path.exists(dirname):

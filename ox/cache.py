@@ -18,7 +18,7 @@ from utils import json
 from .file import makedirs
 
 import net
-from net import DEFAULT_HEADERS, getEncoding
+from net import DEFAULT_HEADERS, detect_encoding
 
 cache_timeout = 30*24*60*60 # default is 30 days
 
@@ -40,7 +40,7 @@ def status(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout):
       >>> status('http://google.com/mysearch')
       404
     '''
-    headers = getHeaders(url, data, headers)
+    headers = get_headers(url, data, headers)
     return int(headers['status'])
 
 def exists(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout):
@@ -55,10 +55,10 @@ def exists(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout):
         return True
     return False
 
-def getHeaders(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout):
+def get_headers(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout):
     url_headers = store.get(url, data, headers, timeout, "headers")
     if not url_headers:
-        url_headers = net.getHeaders(url, data, headers)
+        url_headers = net.get_headers(url, data, headers)
         store.set(url, data, -1, url_headers)
     return url_headers
 
@@ -68,7 +68,7 @@ class InvalidResult(Exception):
         self.result = result
         self.headers = headers
 
-def readUrl(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout, valid=None):
+def read_url(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout, valid=None, unicode=False):
     '''
         url     - url to load
         data    - possible post data
@@ -80,31 +80,29 @@ def readUrl(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout, vali
     #FIXME: send last-modified / etag from cache and only update if needed
     if isinstance(url, unicode):
         url = url.encode('utf-8')
-    result = store.get(url, data, headers, timeout)
-    if not result:
+    data = store.get(url, data, headers, timeout)
+    if not data:
         #print "get data", url
         try:
-            url_headers, result = net.readUrl(url, data, headers, returnHeaders=True)
+            url_headers, data = net.read_url(url, data, headers, return_headers=True)
         except urllib2.HTTPError, e:
             e.headers['Status'] = "%s" % e.code
             url_headers = dict(e.headers)
-            result = e.read()
+            data = e.read()
             if url_headers.get('content-encoding', None) == 'gzip':
-                result = gzip.GzipFile(fileobj=StringIO.StringIO(result)).read()
-        if not valid or valid(result, url_headers):
-            store.set(url, data, result, url_headers)
+                data = gzip.GzipFile(fileobj=StringIO.StringIO(data)).read()
+        if not valid or valid(data, url_headers):
+            store.set(url, data, data, url_headers)
         else:
-            raise InvalidResult(result, url_headers)
-    return result
+            raise InvalidResult(data, url_headers)
+    if unicode:
+        encoding = detect_encoding(data)
+        if not encoding:
+            encoding = 'latin-1'
+        data = data.decode(encoding)
+    return data
 
-def readUrlUnicode(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout, _readUrl=readUrl, valid=None):
-    data = _readUrl(url, data, headers, timeout, valid)
-    encoding = getEncoding(data)
-    if not encoding:
-        encoding = 'latin-1'
-    return unicode(data, encoding)
-
-def saveUrl(url, filename, overwrite=False):
+def save_url(url, filename, overwrite=False):
     if not os.path.exists(filename) or overwrite:
         dirname = os.path.dirname(filename)
         if not os.path.exists(dirname):

@@ -2,16 +2,16 @@
 # vi:si:et:sw=4:sts=4:ts=4
 import re
 
-from ..cache import readUrlUnicode
-from .. import stripTags, decodeHtml
+from ..cache import read_url
+from .. import strip_tags, decodeHtml
 from ..utils import datetime
 
 
 def cleanup(key, data, data_type):
     if data:
         if isinstance(data[0], basestring):
-            #FIXME: some types need stripTags
-            #data = [stripTags(decodeHtml(p)).strip() for p in data]
+            #FIXME: some types need strip_tags
+            #data = [strip_tags(decodeHtml(p)).strip() for p in data]
             data = [decodeHtml(p).strip() for p in data]
         elif isinstance(data[0], list) or isinstance(data[0], tuple):
             data = [cleanup(key, p, data_type) for p in data]
@@ -30,13 +30,13 @@ class SiteParser(dict):
     def getUrl(self, page):
         return "%s%s" % (self.baseUrl, page)
 
-    def readUrlUnicode(self, url, timeout):
-        return readUrlUnicode(url, timeout=timeout)
+    def read_url(self, url, timeout):
+        return read_url(url, timeout=timeout, unicode=True)
 
     def __init__(self, timeout=-1):
         for key in self.regex:
             url = self.getUrl(self.regex[key]['page'])
-            data = self.readUrlUnicode(url, timeout)
+            data = self.read_url(url, timeout)
             if isinstance(self.regex[key]['re'], basestring):
                 data = re.compile(self.regex[key]['re'], re.DOTALL).findall(data)
                 data = cleanup(key, data, self.regex[key]['type'])

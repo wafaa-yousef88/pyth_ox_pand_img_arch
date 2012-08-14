@@ -1,7 +1,7 @@
 import json
 import re
 
-from ox.cache import readUrlUnicode
+from ox.cache import read_url
 
 HEADERS = {
     'User-Agent': 'iTunes/10.4 (Macintosh; Intel Mac OS X 10.7) AppleWebKit/534.48.3',
@@ -26,21 +26,21 @@ def getMovieData(title, director):
     url += '&actorNames=&directorProducerName=' + director
     url += '&releaseYearTerm=&descriptionTerm=&genreIndex=1&ratingIndex=1'
     HEADERS['Referer'] = url
-    html = readUrlUnicode(url, headers=HEADERS)
+    html = read_url(url, headers=HEADERS, unicode=True)
     regexp = '<a href="(http://itunes.apple.com/us/movie/.*?)" class="artwork-link"><div class="artwork">'
     regexp += '<img width=".*?" height=".*?" alt=".*?" class="artwork" src="(.*?)" /></div></a>'
     results = re.compile(regexp).findall(html)
     if results:
         data['link'] = results[0][0]
         data['poster'] = results[0][1].replace('140x140', '600x600')
-        html = readUrlUnicode(data['link'], headers=HEADERS)
+        html = read_url(data['link'], headers=HEADERS, unicode=True)
         results = re.compile('video-preview-url="(.*?)"').findall(html)
         if results:
             data['trailer'] = results[0]
     # trailers section (preferred source for poster and trailer)
     host = 'http://trailers.apple.com'
     url = host + '/trailers/home/scripts/quickfind.php?callback=searchCallback&q=' + title
-    js = json.loads(readUrlUnicode(url)[16:-4])
+    js = json.loads(read_url(url, unicode=True)[16:-4])
     results = js['results']
     if results:
         url = host + results[0]['location']
@@ -49,11 +49,11 @@ def getMovieData(title, director):
         headers = {
             'User-Agent': USER_AGENT
         }
-        html = readUrlUnicode(url, headers=headers)
+        html = read_url(url, headers=headers, unicode=True)
         results = re.compile('"(' + host + '.*?poster\.jpg)"').findall(html)
         if results:
             data['poster'] = results[0].replace('poster.jpg', 'poster-xlarge.jpg')
-        html = readUrlUnicode(url + 'includes/playlists/web.inc', headers=headers)
+        html = read_url(url + 'includes/playlists/web.inc', headers=headers, unicode=True)
         results = re.compile('"(' + host + '\S+\.mov)"').findall(html)
         if results:
             data['trailer'] = results[-1]

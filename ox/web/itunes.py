@@ -3,8 +3,8 @@
 import re
 import urllib
 
-from ox.cache import readUrl
-from ox.html import decodeHtml, stripTags
+from ox.cache import read_url
+from ox.html import decodeHtml, strip_tags
 from ox.text import findRe
 from ox.text import findString
 
@@ -113,20 +113,20 @@ class ItunesAlbum:
 
     def getId(self):
         url = composeUrl('advancedSearch', {'media': 'music', 'title': self.title, 'artist': self.artist})
-        xml = readUrl(url, headers = ITUNES_HEADERS)
+        xml = read_url(url, headers = ITUNES_HEADERS)
         id = findRe(xml, 'viewAlbum\?id=(.*?)&')
         return id
 
     def getData(self):
         data = {'id': self.id}
         url = composeUrl('viewAlbum', {'id': self.id})
-        xml = readUrl(url, None, ITUNES_HEADERS)
+        xml = read_url(url, None, ITUNES_HEADERS)
         data['albumName'] = findRe(xml, '<B>(.*?)</B>')
         data['artistName'] = findRe(xml, '<b>(.*?)</b>')
         data['coverUrl'] = findRe(xml, 'reflection="." url="(.*?)"')
         data['genre'] = findRe(xml, 'Genre:(.*?)<')
         data['releaseDate'] = findRe(xml, 'Released(.*?)<')
-        data['review'] = stripTags(findRe(xml, 'REVIEW</b>.*?<SetFontStyle normalStyle="textColor">(.*?)</SetFontStyle>'))
+        data['review'] = strip_tags(findRe(xml, 'REVIEW</b>.*?<SetFontStyle normalStyle="textColor">(.*?)</SetFontStyle>'))
         data['tracks'] = []
         strings = findRe(xml, '<key>items</key>.*?<dict>(.*?)$').split('<dict>')
         for string in strings:
@@ -144,14 +144,14 @@ class ItunesMovie:
 
     def getId(self):
         url = composeUrl('advancedSearch', {'media': 'movie', 'title': self.title, 'director': self.director})
-        xml = readUrl(url, headers = ITUNES_HEADERS)
+        xml = read_url(url, headers = ITUNES_HEADERS)
         id = findRe(xml, 'viewMovie\?id=(.*?)&')
         return id
 
     def getData(self):
         data = {'id': self.id}
         url = composeUrl('viewMovie', {'id': self.id})
-        xml = readUrl(url, None, ITUNES_HEADERS)
+        xml = read_url(url, None, ITUNES_HEADERS)
         f = open('/Users/rolux/Desktop/iTunesData.xml', 'w')
         f.write(xml)
         f.close()

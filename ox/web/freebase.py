@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 import json
 
-from ox.cache import readUrlUnicode
+from ox.cache import read_url
 from ox import findRe
 
 class Imdb(dict):
@@ -12,7 +12,7 @@ class Imdb(dict):
             "http://graph.freebase.com/imdb.title.tt%s" % id
             might also be of interest at some point, right now not much info
         '''
-        data = readUrlUnicode(url)
+        data = read_url(url, unicode=True)
         try:
             data = json.loads(data)
         except ValueError:

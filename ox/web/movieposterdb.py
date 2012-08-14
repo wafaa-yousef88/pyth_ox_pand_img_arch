@@ -3,7 +3,7 @@
 
 import re
 
-from ox.cache import readUrlUnicode
+from ox.cache import read_url
 from ox import findRe
 
 def getData(id):
@@ -24,7 +24,7 @@ def getId(url):
 
 def getPostersByUrl(url, group=True, timeout=-1):
     posters = []
-    html = readUrlUnicode(url, timeout=timeout)
+    html = read_url(url, timeout=timeout, unicode=True)
     if url in html:
         if group:
             results = re.compile('<a href="(http://www.movieposterdb.com/group/.+?)\??">', re.DOTALL).findall(html)
@@ -32,7 +32,7 @@ def getPostersByUrl(url, group=True, timeout=-1):
                 posters += getPostersByUrl(result, False)
         results = re.compile('<a href="(http://www.movieposterdb.com/poster/.+?)">', re.DOTALL).findall(html)
         for result in results:
-            html = readUrlUnicode(result, timeout=timeout)
+            html = read_url(result, timeout=timeout, unicode=True)
             posters.append(findRe(html, '"(http://www.movieposterdb.com/posters/.+?\.jpg)"'))
     return posters
 

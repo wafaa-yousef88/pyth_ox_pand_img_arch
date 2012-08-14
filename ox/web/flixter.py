@@ -4,8 +4,8 @@
 import re
 from lxml.html import document_fromstring
 
-from ox.cache import readUrlUnicode
-from ox import findRe, stripTags
+from ox.cache import read_url
+from ox import findRe, strip_tags
 from ox.web.imdb import ImdbCombined
 
 
@@ -32,7 +32,7 @@ def getData(id, timeout=-1):
     data = {
         "url": getUrl(id),
     }
-    html = readUrlUnicode(data['url'], timeout=timeout)
+    html = read_url(data['url'], timeout=timeout, timeout=True)
     doc = document_fromstring(html)
 
     props = {

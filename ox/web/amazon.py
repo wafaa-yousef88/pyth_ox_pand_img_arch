@@ -3,14 +3,14 @@
 import re
 from urllib import quote
 
-from ox import findRe, stripTags, decodeHtml
-from ox.cache import readUrlUnicode
+from ox import findRe, strip_tags, decodeHtml
+from ox.cache import read_url
 
 
 def findISBN(title, author):
     q = '%s %s' % (title, author)
     url = "http://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Dstripbooks&field-keywords=" + "%s&x=0&y=0" % quote(q)
-    data = readUrlUnicode(url)
+    data = read_url(url, unicode=True)
     links = re.compile('href="(http://www.amazon.com/.*?/dp/.*?)"').findall(data)
     id = findRe(re.compile('href="(http://www.amazon.com/.*?/dp/.*?)"').findall(data)[0], '/dp/(.*?)/')
     data = getData(id)
@@ -20,7 +20,7 @@ def findISBN(title, author):
 
 def getData(id):
     url = "http://www.amazon.com/title/dp/%s/" % id
-    data = readUrlUnicode(url)
+    data = read_url(url, unicode=True)
 
 
     def findData(key):
@@ -44,9 +44,9 @@ def getData(id):
     if not r['pages']:
         r['pages'] = findData('Hardcover')
 
-    r['review'] = stripTags(findRe(data, '<h3 class="productDescriptionSource">Review</h3>.*?<div class="productDescriptionWrapper">(.*?)</div>').replace('<br />', '\n')).strip()
+    r['review'] = strip_tags(findRe(data, '<h3 class="productDescriptionSource">Review</h3>.*?<div class="productDescriptionWrapper">(.*?)</div>').replace('<br />', '\n')).strip()
 
-    r['description'] = stripTags(findRe(data, '<h3 class="productDescriptionSource">Product Description</h3>.*?<div class="productDescriptionWrapper">(.*?)</div>').replace('<br />', '\n')).strip()
+    r['description'] = strip_tags(findRe(data, '<h3 class="productDescriptionSource">Product Description</h3>.*?<div class="productDescriptionWrapper">(.*?)</div>').replace('<br />', '\n')).strip()
 
     r['cover'] = re.findall('src="(.*?)" id="prodImage"', data)
     if r['cover']:

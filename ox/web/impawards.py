@@ -2,8 +2,8 @@
 # encoding: utf-8
 import re
 
-from ox.cache import readUrlUnicode
-from ox.html import stripTags
+from ox.cache import read_url
+from ox.html import strip_tags
 from ox.text import findRe
 
 
@@ -21,11 +21,11 @@ def getData(id):
     data = {
         'url': getUrl(id)
     }
-    html = readUrlUnicode(data['url'])
+    html = read_url(data['url'], unicode=True)
     data['imdbId'] = findRe(html, 'imdb.com/title/tt(\d{7})')
     if not data['imdbId']:
         data['imdbId'] = _id_map.get(id, '')
-    data['title'] = stripTags(findRe(html, '<p class="name white">(.*?) \(<a href="alpha1.html">'))
+    data['title'] = strip_tags(findRe(html, '<p class="name white">(.*?) \(<a href="alpha1.html">'))
     data['year'] = findRe(html, '\(<a href="alpha1.html">(.*?)</a>\)')
     data['posters'] = []
     poster = findRe(html, '<img src="(posters.*?)"')
@@ -36,11 +36,11 @@ def getData(id):
     for result in results:
         result = result.replace('_xlg.html', '.html')
         url = 'http://www.impawards.com/%s/%s' % (data['year'], result)
-        html = readUrlUnicode(url)
+        html = read_url(url, unicode=True)
         result = findRe(html, '<a href = (\w*?_xlg.html)')
         if result:
             url = 'http://www.impawards.com/%s/%s' % (data['year'], result)
-            html = readUrlUnicode(url)
+            html = read_url(url, unicode=True)
             poster = 'http://www.impawards.com/%s/%s' % (data['year'], findRe(html, '<img SRC="(.*?)"'))
         else:
             poster = 'http://www.impawards.com/%s/%s' % (data['year'], findRe(html, '<img src="(posters.*?)"'))
@@ -61,7 +61,7 @@ def getId(url):
 
 def getIds():
     ids = []
-    html = readUrlUnicode('http://www.impawards.com/archives/latest.html', timeout = 60*60)
+    html = read_url('http://www.impawards.com/archives/latest.html', timeout = 60*60, unicode=True)
     pages = int(findRe(html, '<a href= page(.*?).html>')) + 1
     for page in range(pages, 0, -1):
         for id in getIdsByPage(page):
@@ -71,7 +71,7 @@ def getIds():
 
 def getIdsByPage(page):
     ids = []
-    html = readUrlUnicode('http://www.impawards.com/archives/page%s.html' % page, timeout = -1)
+    html = read_url('http://www.impawards.com/archives/page%s.html' % page, timeout = -1, unicode=True)
     results = re.compile('<a href = \.\./(.*?)>', re.DOTALL).findall(html)
     for result in results:
         url = 'http://impawards.com/%s' % result
@@ -80,7 +80,7 @@ def getIdsByPage(page):
 
 def getUrl(id):
     url = u"http://www.impawards.com/%s.html" % id
-    html = readUrlUnicode(url)
+    html = read_url(url, unicode=True)
     if findRe(html, "No Movie Posters on This Page"):
         url = u"http://www.impawards.com/%s_ver1.html" % id
     return url
