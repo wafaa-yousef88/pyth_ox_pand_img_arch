@@ -5,7 +5,7 @@ from urllib import urlencode
 
 from ox.utils import json
 from ox.cache import read_url
-from ox import findRe, decodeHtml
+from ox import find_re, decode_html
 
 
 def getId(url):
@@ -54,7 +54,7 @@ def getMovieData(wikipediaUrl):
     if not wikipediaUrl.startswith('http'):
         wikipediaUrl = getUrl(wikipediaUrl)
     data = getWikiData(wikipediaUrl)
-    filmbox_data = findRe(data, '''\{\{[Ii]nfobox.[Ff]ilm(.*?)\n\}\}''')
+    filmbox_data = find_re(data, '''\{\{[Ii]nfobox.[Ff]ilm(.*?)\n\}\}''')
     filmbox = {}
     _box = filmbox_data.strip().split('|')
     for row in _box:
@@ -72,12 +72,12 @@ def getMovieData(wikipediaUrl):
     if 'amg_id' in filmbox and not filmbox['amg_id'].isdigit():
         del filmbox['amg_id']
     if 'Allmovie movie' in data:
-        filmbox['amg_id'] = findRe(data, 'Allmovie movie\|.*?(\d+)')
+        filmbox['amg_id'] = find_re(data, 'Allmovie movie\|.*?(\d+)')
     elif 'Allmovie title' in data:
-        filmbox['amg_id'] = findRe(data, 'Allmovie title\|.*?(\d+)')
+        filmbox['amg_id'] = find_re(data, 'Allmovie title\|.*?(\d+)')
 
     if 'Official website' in data:
-        filmbox['website'] = findRe(data, 'Official website\|(.*?)}').strip()
+        filmbox['website'] = find_re(data, 'Official website\|(.*?)}').strip()
 
     r = re.compile('{{IMDb title\|id=(\d{7})', re.IGNORECASE).findall(data)
     if r:
@@ -99,17 +99,17 @@ def getMovieData(wikipediaUrl):
     if r:
         filmbox['rottentomatoes_id'] = r[0].replace('id=', '')
     if 'google video' in data:
-        filmbox['google_video_id'] = findRe(data, 'google video\|.*?(\d*?)[\|}]')
+        filmbox['google_video_id'] = find_re(data, 'google video\|.*?(\d*?)[\|}]')
     if 'DEFAULTSORT' in data:
-        filmbox['title_sort'] = findRe(data, '''\{\{DEFAULTSORT:(.*?)\}\}''')
+        filmbox['title_sort'] = find_re(data, '''\{\{DEFAULTSORT:(.*?)\}\}''')
     return filmbox
 
 def getImageUrl(name):
     url = 'http://en.wikipedia.org/wiki/Image:' + name.replace(' ', '%20')
     data = read_url(url, unicode=True)
-    url = findRe(data, 'href="(http://upload.wikimedia.org/.*?)"')
+    url = find_re(data, 'href="(http://upload.wikimedia.org/.*?)"')
     if not url:
-        url = findRe(data, 'href="(//upload.wikimedia.org/.*?)"')
+        url = find_re(data, 'href="(//upload.wikimedia.org/.*?)"')
         if url:
             url = 'http:' + url
     return url

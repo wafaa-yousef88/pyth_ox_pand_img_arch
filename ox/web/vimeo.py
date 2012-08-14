@@ -5,7 +5,7 @@ from StringIO import StringIO
 import xml.etree.ElementTree as ET
 
 from ox.cache import read_url
-from ox import findString, findRe
+from ox import find_string, find_re
 
 
 def getData(id):

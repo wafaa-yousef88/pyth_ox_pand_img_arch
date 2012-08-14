@@ -18,7 +18,7 @@ def latlngspan2latlng(lat, lng, latSpan, lngSpan):
         lat_ne = lat + latSpan, lng_ne = lng + latSpan
     )
 
-def parseLocationString(location_string):
+def parse_location_string(location_string):
     l = location_string.split('+')
     if len(l) == 1:
         l = location_string.split(';')

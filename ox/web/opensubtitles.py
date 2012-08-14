@@ -4,7 +4,7 @@ import re
 
 import feedparser
 from ox.cache import read_url
-from ox import findRe, strip_tags
+from ox import find_re, strip_tags
 from ox import langCode2To3, langTo3Code
 
 def findSubtitlesByImdb(imdb, parts = 1, language = "eng"):
@@ -26,7 +26,7 @@ def findSubtitlesByImdb(imdb, parts = 1, language = "eng"):
             if opensubtitleId:
                 opensubtitleId = opensubtitleId[0]
     else:
-        opensubtitleId = findRe(data, '/en/subtitles/(.*?)/')
+        opensubtitleId = find_re(data, '/en/subtitles/(.*?)/')
     return opensubtitleId
 
 def downloadSubtitleById(opensubtitle_id):

@@ -3,7 +3,7 @@
 import re
 import urllib
 import ox
-from ox import strip_tags, decodeHtml
+from ox import strip_tags, decode_html
 from ox.utils import json
 from ox.cache import read_url
 
@@ -17,6 +17,6 @@ def find(query, timeout=ox.cache.cache_timeout):
     results = []
     regex = '<a .*?class="l le" href="(.+?)">(.*?)</a>.*?<div class="cra">(.*?)</div>'
     for r in re.compile(regex, re.DOTALL).findall(data):
-        results.append((strip_tags(decodeHtml(r[1])), r[0], strip_tags(decodeHtml(r[2]))))
+        results.append((strip_tags(decode_html(r[1])), r[0], strip_tags(decode_html(r[2]))))
     return results
     

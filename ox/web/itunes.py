@@ -4,9 +4,9 @@ import re
 import urllib
 
 from ox.cache import read_url
-from ox.html import decodeHtml, strip_tags
-from ox.text import findRe
-from ox.text import findString
+from ox.html import decode_html, strip_tags
+from ox.text import find_re
+from ox.text import find_string
 
 
 # to sniff itunes traffic, use something like
@@ -65,26 +65,26 @@ def parseXmlDict(xml):
     strings = xml.split('<key>')
     for string in strings:
         if string.find('</key>') != -1:
-            key = findRe(string, '(.*?)</key>')
-            type = findRe(string, '</key><(.*?)>')
+            key = find_re(string, '(.*?)</key>')
+            type = find_re(string, '</key><(.*?)>')
             if type == 'true/':
                 value = True
             else:
-                value = findRe(string, '<%s>(.*?)</%s>' % (type, type))
+                value = find_re(string, '<%s>(.*?)</%s>' % (type, type))
                 if type == 'integer':
                   value = int(value)
                 elif type == 'string':
-                  value = decodeHtml(value)
+                  value = decode_html(value)
             values[key] = value
     return values
 
 def parseCast(xml, title):
     list = []
     try:
-        strings = findRe(xml, '<SetFontStyle normalStyle="textColor">%s(.*?)</VBoxView>' % title[:-1].upper()).split('</GotoURL>')
+        strings = find_re(xml, '<SetFontStyle normalStyle="textColor">%s(.*?)</VBoxView>' % title[:-1].upper()).split('</GotoURL>')
         strings.pop()
         for string in strings:
-            list.append(findRe(string, '<SetFontStyle normalStyle="textColor">(.*?)</SetFontStyle>'))
+            list.append(find_re(string, '<SetFontStyle normalStyle="textColor">(.*?)</SetFontStyle>'))
         return list
     except:
         return list
@@ -92,12 +92,12 @@ def parseCast(xml, title):
 def parseMovies(xml, title):
     list = []
     try:
-        strings = findRe(xml, '<SetFontStyle normalStyle="outlineTitleFontStyle"><b>%s(.*?)</Test>' % title[:-1].upper()).split('</GotoURL>')
+        strings = find_re(xml, '<SetFontStyle normalStyle="outlineTitleFontStyle"><b>%s(.*?)</Test>' % title[:-1].upper()).split('</GotoURL>')
         strings.pop()
         for string in strings:
             list.append({
-              'id': findRe(string, 'viewMovie\?id=(.*?)&'),
-              'title': findRe(string, '<SetFontStyle normalStyle="outlineTextFontStyle"><b>(.*?)</b></SetFontStyle>')
+              'id': find_re(string, 'viewMovie\?id=(.*?)&'),
+              'title': find_re(string, '<SetFontStyle normalStyle="outlineTextFontStyle"><b>(.*?)</b></SetFontStyle>')
             })
         return list
     except:
@@ -114,24 +114,24 @@ class ItunesAlbum:
     def getId(self):
         url = composeUrl('advancedSearch', {'media': 'music', 'title': self.title, 'artist': self.artist})
         xml = read_url(url, headers = ITUNES_HEADERS)
-        id = findRe(xml, 'viewAlbum\?id=(.*?)&')
+        id = find_re(xml, 'viewAlbum\?id=(.*?)&')
         return id
 
     def getData(self):
         data = {'id': self.id}
         url = composeUrl('viewAlbum', {'id': self.id})
         xml = read_url(url, None, ITUNES_HEADERS)
-        data['albumName'] = findRe(xml, '<B>(.*?)</B>')
-        data['artistName'] = findRe(xml, '<b>(.*?)</b>')
-        data['coverUrl'] = findRe(xml, 'reflection="." url="(.*?)"')
-        data['genre'] = findRe(xml, 'Genre:(.*?)<')
-        data['releaseDate'] = findRe(xml, 'Released(.*?)<')
-        data['review'] = strip_tags(findRe(xml, 'REVIEW</b>.*?<SetFontStyle normalStyle="textColor">(.*?)</SetFontStyle>'))
+        data['albumName'] = find_re(xml, '<B>(.*?)</B>')
+        data['artistName'] = find_re(xml, '<b>(.*?)</b>')
+        data['coverUrl'] = find_re(xml, 'reflection="." url="(.*?)"')
+        data['genre'] = find_re(xml, 'Genre:(.*?)<')
+        data['releaseDate'] = find_re(xml, 'Released(.*?)<')
+        data['review'] = strip_tags(find_re(xml, 'REVIEW</b>.*?<SetFontStyle normalStyle="textColor">(.*?)</SetFontStyle>'))
         data['tracks'] = []
-        strings = findRe(xml, '<key>items</key>.*?<dict>(.*?)$').split('<dict>')
+        strings = find_re(xml, '<key>items</key>.*?<dict>(.*?)$').split('<dict>')
         for string in strings:
           data['tracks'].append(parseXmlDict(string))
-        data['type'] = findRe(xml, '<key>listType</key><string>(.*?)<')
+        data['type'] = find_re(xml, '<key>listType</key><string>(.*?)<')
         return data
 
 class ItunesMovie:
@@ -145,7 +145,7 @@ class ItunesMovie:
     def getId(self):
         url = composeUrl('advancedSearch', {'media': 'movie', 'title': self.title, 'director': self.director})
         xml = read_url(url, headers = ITUNES_HEADERS)
-        id = findRe(xml, 'viewMovie\?id=(.*?)&')
+        id = find_re(xml, 'viewMovie\?id=(.*?)&')
         return id
 
     def getData(self):
@@ -156,21 +156,21 @@ class ItunesMovie:
         f.write(xml)
         f.close()
         data['actors'] = parseCast(xml, 'actors')
-        string = findRe(xml, 'Average Rating:(.*?)</HBoxView>')
+        string = find_re(xml, 'Average Rating:(.*?)</HBoxView>')
         data['averageRating'] = string.count('rating_star_000033.png') + string.count('&#189;') * 0.5
         data['directors'] = parseCast(xml, 'directors')
-        data['format'] = findRe(xml, 'Format:(.*?)<')
-        data['genre'] = decodeHtml(findRe(xml, 'Genre:(.*?)<'))
-        data['plotSummary'] = decodeHtml(findRe(xml, 'PLOT SUMMARY</b>.*?<SetFontStyle normalStyle="textColor">(.*?)</SetFontStyle>'))
-        data['posterUrl'] = findRe(xml, 'reflection="." url="(.*?)"')
+        data['format'] = find_re(xml, 'Format:(.*?)<')
+        data['genre'] = decode_html(find_re(xml, 'Genre:(.*?)<'))
+        data['plotSummary'] = decode_html(find_re(xml, 'PLOT SUMMARY</b>.*?<SetFontStyle normalStyle="textColor">(.*?)</SetFontStyle>'))
+        data['posterUrl'] = find_re(xml, 'reflection="." url="(.*?)"')
         data['producers'] = parseCast(xml, 'producers')
-        data['rated'] = findRe(xml, 'Rated(.*?)<')
+        data['rated'] = find_re(xml, 'Rated(.*?)<')
         data['relatedMovies'] = parseMovies(xml, 'related movies')
-        data['releaseDate'] = findRe(xml, 'Released(.*?)<')
-        data['runTime'] = findRe(xml, 'Run Time:(.*?)<')
+        data['releaseDate'] = find_re(xml, 'Released(.*?)<')
+        data['runTime'] = find_re(xml, 'Run Time:(.*?)<')
         data['screenwriters'] = parseCast(xml, 'screenwriters')
-        data['soundtrackId'] = findRe(xml, 'viewAlbum\?id=(.*?)&')
-        data['trailerUrl'] = findRe(xml, 'autoplay="." url="(.*?)"')
+        data['soundtrackId'] = find_re(xml, 'viewAlbum\?id=(.*?)&')
+        data['trailerUrl'] = find_re(xml, 'autoplay="." url="(.*?)"')
         return data
 
 if __name__ == '__main__':

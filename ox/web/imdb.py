@@ -8,8 +8,8 @@ import time
 import unicodedata
 
 import ox
-from ox import findRe, strip_tags
-from ox.normalize import normalizeTitle, normalizeImdbId
+from ox import find_re, strip_tags
+from ox.normalize import normalize_title, normalize_imdbid
 import ox.cache
 
 from siteparser import SiteParser
@@ -50,7 +50,7 @@ class Imdb(SiteParser):
             'page': 'business',
             're': [
                 '<h5>Budget</h5>\s*?\$(.*?)<br',
-                lambda data: findRe(ox.decodeHtml(data).replace(',', ''), '\d+')
+                lambda data: find_re(ox.decode_html(data).replace(',', ''), '\d+')
             ],
             'type': 'int'
         },
@@ -141,7 +141,7 @@ class Imdb(SiteParser):
             'page': 'business',
             're': [
                 '<h5>Gross</h5>\s*?\$(.*?)<br',
-                lambda data: findRe(data.replace(',', ''), '\d+')
+                lambda data: find_re(data.replace(',', ''), '\d+')
             ],
             'type': 'int'
         },
@@ -314,7 +314,7 @@ class Imdb(SiteParser):
         if 'runtime' in self and self['runtime']:
             if 'min' in self['runtime']: base=60
             else: base=1
-            self['runtime'] = int(findRe(self['runtime'], '([0-9]+)')) * base
+            self['runtime'] = int(find_re(self['runtime'], '([0-9]+)')) * base
         if 'runtime' in self and not self['runtime']:
             del self['runtime']
         if 'votes' in self: self['votes'] = self['votes'].replace(',', '')
@@ -551,7 +551,7 @@ def getMovieId(title, director='', year='', timeout=-1):
     #print google_query
     results = google.find(google_query, timeout=timeout)
     if results:
-        return findRe(results[0][1], 'title/tt(\d{7})')
+        return find_re(results[0][1], 'title/tt(\d{7})')
     #or nothing
     return ''
 
@@ -567,7 +567,7 @@ def getMoviePoster(imdbId):
     if 'posterId' in info:
         url = "http://www.imdb.com/rg/action-box-title/primary-photo/media/rm%s/tt%s" % (info['posterId'], imdbId)
         data = read_url(url)
-        poster = findRe(data, 'img id="primary-img".*?src="(.*?)"')
+        poster = find_re(data, 'img id="primary-img".*?src="(.*?)"')
         return poster
     elif 'series' in info:
         return getMoviePoster(info['series'])

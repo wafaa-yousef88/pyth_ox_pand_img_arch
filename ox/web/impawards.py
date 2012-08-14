@@ -4,7 +4,7 @@ import re
 
 from ox.cache import read_url
 from ox.html import strip_tags
-from ox.text import findRe
+from ox.text import find_re
 
 
 def getData(id):
@@ -22,13 +22,13 @@ def getData(id):
         'url': getUrl(id)
     }
     html = read_url(data['url'], unicode=True)
-    data['imdbId'] = findRe(html, 'imdb.com/title/tt(\d{7})')
+    data['imdbId'] = find_re(html, 'imdb.com/title/tt(\d{7})')
     if not data['imdbId']:
         data['imdbId'] = _id_map.get(id, '')
-    data['title'] = strip_tags(findRe(html, '<p class="name white">(.*?) \(<a href="alpha1.html">'))
-    data['year'] = findRe(html, '\(<a href="alpha1.html">(.*?)</a>\)')
+    data['title'] = strip_tags(find_re(html, '<p class="name white">(.*?) \(<a href="alpha1.html">'))
+    data['year'] = find_re(html, '\(<a href="alpha1.html">(.*?)</a>\)')
     data['posters'] = []
-    poster = findRe(html, '<img src="(posters.*?)"')
+    poster = find_re(html, '<img src="(posters.*?)"')
     if poster:
         poster = 'http://www.impawards.com/%s/%s' % (data['year'], poster)
         data['posters'].append(poster)
@@ -37,13 +37,13 @@ def getData(id):
         result = result.replace('_xlg.html', '.html')
         url = 'http://www.impawards.com/%s/%s' % (data['year'], result)
         html = read_url(url, unicode=True)
-        result = findRe(html, '<a href = (\w*?_xlg.html)')
+        result = find_re(html, '<a href = (\w*?_xlg.html)')
         if result:
             url = 'http://www.impawards.com/%s/%s' % (data['year'], result)
             html = read_url(url, unicode=True)
-            poster = 'http://www.impawards.com/%s/%s' % (data['year'], findRe(html, '<img SRC="(.*?)"'))
+            poster = 'http://www.impawards.com/%s/%s' % (data['year'], find_re(html, '<img SRC="(.*?)"'))
         else:
-            poster = 'http://www.impawards.com/%s/%s' % (data['year'], findRe(html, '<img src="(posters.*?)"'))
+            poster = 'http://www.impawards.com/%s/%s' % (data['year'], find_re(html, '<img src="(posters.*?)"'))
         data['posters'].append(poster)
 
     return data
@@ -54,7 +54,7 @@ def getId(url):
     split = split[4][:-5].split('_')
     if split[-1] == 'xlg':
         split.pop()
-    if findRe(split[-1], 'ver\d+$'):
+    if find_re(split[-1], 'ver\d+$'):
         split.pop()
     id = '%s/%s' % (year, '_'.join(split))
     return id
@@ -62,7 +62,7 @@ def getId(url):
 def getIds():
     ids = []
     html = read_url('http://www.impawards.com/archives/latest.html', timeout = 60*60, unicode=True)
-    pages = int(findRe(html, '<a href= page(.*?).html>')) + 1
+    pages = int(find_re(html, '<a href= page(.*?).html>')) + 1
     for page in range(pages, 0, -1):
         for id in getIdsByPage(page):
             if not id in ids:
@@ -81,7 +81,7 @@ def getIdsByPage(page):
 def getUrl(id):
     url = u"http://www.impawards.com/%s.html" % id
     html = read_url(url, unicode=True)
-    if findRe(html, "No Movie Posters on This Page"):
+    if find_re(html, "No Movie Posters on This Page"):
         url = u"http://www.impawards.com/%s_ver1.html" % id
     return url
 

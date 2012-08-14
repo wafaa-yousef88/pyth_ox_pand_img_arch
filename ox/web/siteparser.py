@@ -3,7 +3,7 @@
 import re
 
 from ..cache import read_url
-from .. import strip_tags, decodeHtml
+from .. import strip_tags, decode_html
 from ..utils import datetime
 
 
@@ -11,8 +11,8 @@ def cleanup(key, data, data_type):
     if data:
         if isinstance(data[0], basestring):
             #FIXME: some types need strip_tags
-            #data = [strip_tags(decodeHtml(p)).strip() for p in data]
-            data = [decodeHtml(p).strip() for p in data]
+            #data = [strip_tags(decode_html(p)).strip() for p in data]
+            data = [decode_html(p).strip() for p in data]
         elif isinstance(data[0], list) or isinstance(data[0], tuple):
             data = [cleanup(key, p, data_type) for p in data]
         while len(data) == 1 and not isinstance(data, basestring):

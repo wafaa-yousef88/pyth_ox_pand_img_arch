@@ -3,7 +3,7 @@
 import re
 import time
 
-from ox import strip_tags, findRe
+from ox import strip_tags, find_re
 from ox.cache import read_url
 
 import google
@@ -23,8 +23,8 @@ def getShowUrl(title):
 def getShowData(url):
     data = read_url(url, unicode=True)
     r = {}
-    r['title'] = strip_tags(findRe(data, '<h1>(.*?)</h1>'))
-    r['imdb'] = findRe(data, '<h1><a href=".*?/title/tt(\d.*?)">.*?</a></h1>')
+    r['title'] = strip_tags(find_re(data, '<h1>(.*?)</h1>'))
+    r['imdb'] = find_re(data, '<h1><a href=".*?/title/tt(\d.*?)">.*?</a></h1>')
     r['episodes'] = {}
     #1.   1- 1       1001      7 Aug 05   You Can't Miss the Bear
     for episode in re.compile('(\d+?)\..*?(\d+?-.\d.*?) .*?(\d+?) .*?(.*?) <a target="_blank" href="(.*?)">(.*?)</a>').findall(data):

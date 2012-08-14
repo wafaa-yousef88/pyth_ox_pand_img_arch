@@ -257,24 +257,24 @@ def get_sort_title(title):
             return title[length + spaces:] + ', ' + title[:length]
     return title
 
-def findRe(string, regexp):
+def find_re(string, regexp):
     result = re.compile(regexp, re.DOTALL).findall(string)
     if result:
         return result[0].strip()
     return ''
 
-def findString(string, string0='', string1 = ''):
+def find_string(string, string0='', string1 = ''):
     """Return the string between string0 and string1. 
 
     If string0 or string1 is left out, begining or end of string is used.
 
-    >>> findString('i am not there', string1=' not there')
+    >>> find_string('i am not there', string1=' not there')
     'i am'
 
-    >>> findString('i am not there', 'i am ', ' there')
+    >>> find_string('i am not there', 'i am ', ' there')
     'not'
 
-    >>> findString('i am not there', 'i am not t')
+    >>> find_string('i am not there', 'i am not t')
     'here'
 
     """
@@ -286,7 +286,7 @@ def findString(string, string0='', string1 = ''):
         string1 = re.escape(string1)
     else:
         string1 = '$'
-    return findRe(string, string0 + '(.*?)' + string1)
+    return find_re(string, string0 + '(.*?)' + string1)
 
 def parse_useragent(useragent):
     data = {}
@@ -319,7 +319,7 @@ def parse_useragent(useragent):
                 break;
     return data
 
-def removeSpecialCharacters(text):
+def remove_special_characters(text):
     """
     Removes special characters inserted by Word.
     """
@@ -346,22 +346,22 @@ def wrap(text, width):
                   text.split(' ')
                   )
 
-def wrapString(string, length=80, separator='\n', balance=False):
+def wrap_string(string, length=80, separator='\n', balance=False):
     '''
-    >>> wrapString(u"Anticonstitutionellement, Paris s'eveille", 16)
+    >>> wrap_string(u"Anticonstitutionellement, Paris s'eveille", 16)
     u"Anticonstitution\\nellement, Paris \\ns'eveille"
-    >>> wrapString(u'All you can eat', 12, '\\n', True)
+    >>> wrap_string(u'All you can eat', 12, '\\n', True)
     u'All you \\ncan eat'
     '''
     words = string.split(' ')
     if balance:
         # balance lines: test if same number of lines
         # can be achieved with a shorter line length
-        lines = wrapString(string, length, separator, False).split(separator)
+        lines = wrap_string(string, length, separator, False).split(separator)
         if len(lines) > 1:
             while length > max(map(lambda x : len(x), words)):
                 length -= 1
-                if len(wrapString(string, length, separator, False).split(separator)) > len(lines):
+                if len(wrap_string(string, length, separator, False).split(separator)) > len(lines):
                     length += 1
                     break
     lines = ['']
@@ -382,12 +382,12 @@ def wrapString(string, length=80, separator='\n', balance=False):
                 lines[len(lines) - 1] += u' '
     return separator.join(lines).strip()
 
-def truncateString(string, length, padding='...', position='right'):
-    #  >>> truncateString('anticonstitutionellement', 16, '...', 'left')
+def truncate_string(string, length, padding='...', position='right'):
+    #  >>> truncate_string('anticonstitutionellement', 16, '...', 'left')
     #  '...utionellement'
-    #  >>> truncateString('anticonstitutionellement', 16, '...', 'center')
+    #  >>> truncate_string('anticonstitutionellement', 16, '...', 'center')
     #  'anticon...lement'
-    #  >>> truncateString('anticonstitutionellement', 16, '...', 'right')
+    #  >>> truncate_string('anticonstitutionellement', 16, '...', 'right')
     #  'anticonstitut...'
     stringLength = len(string);
     paddingLength = len(padding)
@@ -402,12 +402,12 @@ def truncateString(string, length, padding='...', position='right'):
             string = '%s%s' % (string[:length - paddingLength], padding)
     return string;
 
-def truncateWords(s, num):
+def truncate_words(s, num):
     """Truncates a string after a certain number of chacters, but ends with a word
 
-    >>> truncateString('Truncates a string after a certain number of chacters, but ends with a word', 23)
+    >>> truncate_string('Truncates a string after a certain number of chacters, but ends with a word', 23)
     'Truncates a string...'
-    >>> truncateString('Truncates a string', 23)
+    >>> truncate_string('Truncates a string', 23)
     'Truncates a string'
 
     """
@@ -422,25 +422,25 @@ def truncateWords(s, num):
         ts += "..."
     return ts.strip()
 
-def trimString(string, num):
+def trim_string(string, num):
     """Truncates a string after a certain number of chacters, adding ... at -10 characters
 
-    >>> trimString('Truncates a string after a certain number of chacters', 23)
+    >>> trim_string('Truncates a string after a certain number of chacters', 23)
     'Truncates ...f chacters'
-    >>> trimString('Truncates a string', 23)
+    >>> trim_string('Truncates a string', 23)
     'Truncates a string'
     """
     if len(string) > num:
         string = string[:num - 13] + '...' + string[-10:]
     return string
 
-def getValidFilename(s):
+def get_valid_filename(s):
     """
     Returns the given string converted to a string that can be used for a clean
     filename. Specifically, leading and trailing spaces are removed; 
     all non-filename-safe characters are removed.
 
-    >>> getValidFilename("john's portrait in 2004.jpg")
+    >>> get_valid_filename("john's portrait in 2004.jpg")
     'john_s_portrait_in_2004.jpg'
     """
     s = s.strip()
@@ -449,34 +449,34 @@ def getValidFilename(s):
     s = s.replace('__', '_').replace('__', '_')
     return s
 
-def getTextList(list_, last_word='or'):
+def get_text_list(list_, last_word='or'):
     """
-    >>> getTextList([u'a', u'b', u'c', u'd'])
+    >>> get_text_list([u'a', u'b', u'c', u'd'])
     u'a, b, c or d'
-    >>> getTextList([u'a', u'b', u'c'], 'and')
+    >>> get_text_list([u'a', u'b', u'c'], 'and')
     u'a, b and c'
-    >>> getTextList([u'a', u'b'], 'and')
+    >>> get_text_list([u'a', u'b'], 'and')
     u'a and b'
-    >>> getTextList([u'a'])
+    >>> get_text_list([u'a'])
     u'a'
-    >>> getTextList([])
+    >>> get_text_list([])
     ''
     """
     if len(list_) == 0: return ''
     if len(list_) == 1: return list_[0]
     return u'%s %s %s' % (u', '.join([unicode(i) for i in list_][:-1]), last_word, list_[-1])
 
-def getListText(text, last_word='or'):
+def get_list_text(text, last_word='or'):
     """
-    >>> getListText(u'a, b, c or d')
+    >>> get_list_text(u'a, b, c or d')
     [u'a', u'b', u'c', u'd']
-    >>> getListText(u'a, b and c', u'and')
+    >>> get_list_text(u'a, b and c', u'and')
     [u'a', u'b', u'c']
-    >>> getListText(u'a and b', u'and')
+    >>> get_list_text(u'a and b', u'and')
     [u'a', u'b']
-    >>> getListText(u'a')
+    >>> get_list_text(u'a')
     [u'a']
-    >>> getListText(u'')
+    >>> get_list_text(u'')
     []
     """
     list_ = []
@@ -490,7 +490,7 @@ def getListText(text, last_word='or'):
                 list_.append(last[1].strip())
     return list_
 
-def normalizeNewlines(text):
+def normalize_newlines(text):
     return re.sub(r'\r\n|\r|\n', '\n', text)
 
 def recapitalize(text):
@@ -514,7 +514,7 @@ def phone2numeric(phone):
           'y': '9', 'x': '9'}.get(m.group(0).lower())
     return letters.sub(char2number, phone)
 
-def compressString(s):
+def compress_string(s):
     import cStringIO, gzip
     zbuf = cStringIO.StringIO()
     zfile = gzip.GzipFile(mode='wb', compresslevel=6, fileobj=zbuf)
@@ -523,13 +523,13 @@ def compressString(s):
     return zbuf.getvalue()
 
 smart_split_re = re.compile('("(?:[^"\\\\]*(?:\\\\.[^"\\\\]*)*)"|\'(?:[^\'\\\\]*(?:\\\\.[^\'\\\\]*)*)\'|[^\\s]+)')
-def smartSplit(text):
+def smart_split(text):
     """
     Generator that splits a string by spaces, leaving quoted phrases together.
     Supports both single and double quotes, and supports escaping quotes with
     backslashes. In the output, strings will keep their initial and trailing
     quote marks.
-    >>> list(smartSplit('This is "a person\\'s" test.'))
+    >>> list(smart_split('This is "a person\\'s" test.'))
     ['This', 'is', '"a person\\'s"', 'test.']
     """
     for bit in smart_split_re.finditer(text):

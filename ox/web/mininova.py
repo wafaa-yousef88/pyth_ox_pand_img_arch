@@ -6,8 +6,8 @@ import socket
 from urllib import quote
 
 from ox.cache import read_url
-from ox import findRe, cache, strip_tags, decodeHtml, getTorrentInfo, int_value, normalizeNewlines
-from ox.normalize import normalizeImdbId
+from ox import find_re, cache, strip_tags, decode_html, getTorrentInfo, int_value, normalize_newlines
+from ox.normalize import normalize_imdbid
 import ox
 
 from torrent import Torrent
@@ -20,7 +20,7 @@ def _parseResultsPage(data, max_results=10):
         torrentDate = row[0]
         torrentExtra = row[1]
         torrentId = row[2]
-        torrentTitle = decodeHtml(row[3]).strip()
+        torrentTitle = decode_html(row[3]).strip()
         torrentLink = "http://www.mininova.org/tor/" + torrentId
         privateTracker = 'priv.gif' in torrentExtra
         if not privateTracker:
@@ -38,13 +38,13 @@ def findMovieByImdb(imdbId):
     '''find torrents on mininova for a given imdb id
     '''
     results = []
-    imdbId = normalizeImdbId(imdbId)
+    imdbId = normalize_imdbid(imdbId)
     data = read_url("http://www.mininova.org/imdb/?imdb=%s" % imdbId, unicode=True)
     return _parseResultsPage(data)
 
 def getId(mininovaId):
     mininovaId = unicode(mininovaId)
-    d = findRe(mininovaId, "/(\d+)")
+    d = find_re(mininovaId, "/(\d+)")
     if d:
         return d
     mininovaId = mininovaId.split('/')
@@ -81,14 +81,14 @@ def getData(mininovaId):
     for d in re.compile('<p>.<strong>(.*?):</strong>(.*?)</p>', re.DOTALL).findall(data):
         key = d[0].lower().strip()
         key = _key_map.get(key, key)
-        value = decodeHtml(strip_tags(d[1].strip()))
+        value = decode_html(strip_tags(d[1].strip()))
         torrent[key] = value
 
-    torrent[u'title'] = findRe(data, '<title>(.*?):.*?</title>')
-    torrent[u'imdbId'] = findRe(data, 'title/tt(\d{7})')
-    torrent[u'description'] = findRe(data, '<div id="description">(.*?)</div>')
+    torrent[u'title'] = find_re(data, '<title>(.*?):.*?</title>')
+    torrent[u'imdbId'] = find_re(data, 'title/tt(\d{7})')
+    torrent[u'description'] = find_re(data, '<div id="description">(.*?)</div>')
     if torrent['description']:
-        torrent['description'] = normalizeNewlines(decodeHtml(strip_tags(torrent['description']))).strip()
+        torrent['description'] = normalize_newlines(decode_html(strip_tags(torrent['description']))).strip()
     t = read_url(torrent[u'torrent_link'])
     torrent[u'torrent_info'] = getTorrentInfo(t)
     return torrent

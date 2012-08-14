@@ -37,13 +37,13 @@ _noarticles = (
     'i was',
 )
 
-def canonicalTitle(title):
+def canonical_title(title):
     """Return the title in the canonic format 'Movie Title, The'.
     
-    >>> canonicalTitle('The Movie Title')
+    >>> canonical_title('The Movie Title')
     'Movie Title, The'
 
-    >>> canonicalTitle('Los Angeles Plays Itself')
+    >>> canonical_title('Los Angeles Plays Itself')
     'Los Angeles Plays Itself'
     """
     try:
@@ -72,10 +72,10 @@ def canonicalTitle(title):
     ##        break
     return title
 
-def normalizeTitle(title):
+def normalize_title(title):
     """Return the title in the normal "The Title" format.
 
-    >>> normalizeTitle('Movie Title, The')
+    >>> normalize_title('Movie Title, The')
     'The Movie Title'
     """
     stitle = title.split(', ')
@@ -85,14 +85,14 @@ def normalizeTitle(title):
         title = '%s%s%s' % (stitle[-1], sep, ', '.join(stitle[:-1]))
     return title
 
-def normalizeImdbId(imdbId):
+def normalize_imdbid(imdbId):
     """Return 7 digit imdbId.
 
-    >>> normalizeImdbId('http://www.imdb.com/title/tt0159206/')
+    >>> normalize_imdbid('http://www.imdb.com/title/tt0159206/')
     '0159206'
-    >>> normalizeImdbId(159206)
+    >>> normalize_imdbid(159206)
     '0159206'
-    >>> normalizeImdbId('tt0159206')
+    >>> normalize_imdbid('tt0159206')
     '0159206'
     """
     if isinstance(imdbId, basestring):
@@ -106,20 +106,20 @@ def normalizeImdbId(imdbId):
 _sname_suffixes = ('de', 'la', 'der', 'den', 'del', 'y', 'da', 'van',
                     'e', 'von', 'vom', 'the', 'di', 'du', 'el', 'al')
 
-def canonicalName(name):
+def canonical_name(name):
     """Return the given name in canonical "Surname, Name" format.
     It assumes that name is in the 'Name Surname' format.
     
-    >>> canonicalName('Jean Luc Godard')
+    >>> canonical_name('Jean Luc Godard')
     'Godard, Jean Luc'
 
-    >>> canonicalName('Ivan Ivanov-Vano')
+    >>> canonical_name('Ivan Ivanov-Vano')
     'Ivanov-Vano, Ivan'
 
-    >>> canonicalName('Gus Van Sant')
+    >>> canonical_name('Gus Van Sant')
     'Van Sant, Gus'
 
-    >>> canonicalName('Brian De Palma')
+    >>> canonical_name('Brian De Palma')
     'De Palma, Brian'
     """
 
@@ -167,19 +167,19 @@ def canonicalName(name):
             name = '%s, %s' % (sname[-1], ' '.join(sname[:-1]))
     return name
 
-def normalizeName(name):
+def normalize_name(name):
     """Return a name in the normal "Name Surname" format.
     
-    >>> normalizeName('Godard, Jean Luc')
+    >>> normalize_name('Godard, Jean Luc')
     'Jean Luc Godard'
 
-    >>> normalizeName('Ivanov-Vano, Ivan')
+    >>> normalize_name('Ivanov-Vano, Ivan')
     'Ivan Ivanov-Vano'
 
-    >>> normalizeName('Van Sant, Gus')
+    >>> normalize_name('Van Sant, Gus')
     'Gus Van Sant'
 
-    >>> normalizeName('De Palma, Brian')
+    >>> normalize_name('De Palma, Brian')
     'Brian De Palma'
     """
     sname = name.split(', ')
@@ -187,12 +187,12 @@ def normalizeName(name):
         name = '%s %s' % (sname[1], sname[0])
     return name
 
-def normalizePath(path):
+def normalize_path(path):
     path = path.replace(':', '_').replace('/', '_')
     if path.endswith('.'): path = path[:-1] + '_'
     return path
 
-def stripAccents(s):
+def strip_accents(s):
     if isinstance(s, str):
         s = unicode(s)
     return ''.join((c for c in unicodedata.normalize('NFD', s) if unicodedata.category(c) != 'Mn'))

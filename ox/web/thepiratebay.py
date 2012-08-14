@@ -6,8 +6,8 @@ import socket
 from urllib import quote, urlencode
 from urllib2 import URLError
 
-from ox import findRe, cache, strip_tags, decodeHtml, getTorrentInfo, normalizeNewlines
-from ox.normalize import normalizeImdbId
+from ox import find_re, cache, strip_tags, decode_html, getTorrentInfo, normalize_newlines
+from ox.normalize import normalize_imdbid
 import ox
 
 from torrent import Torrent
@@ -38,7 +38,7 @@ def findMovies(query, max_results=10):
         for row in  re.compile(regexp, re.DOTALL).findall(data):
             torrentType = row[0]
             torrentLink = "http://thepiratebay.org" + row[1]
-            torrentTitle = decodeHtml(row[2])
+            torrentTitle = decode_html(row[2])
             # 201 = Movies , 202 = Movie DVDR, 205 TV Shows
             if torrentType in ['201']:
                 results.append((torrentTitle, torrentLink, ''))
@@ -48,15 +48,15 @@ def findMovies(query, max_results=10):
     return results
 
 def findMovieByImdb(imdb):
-    return findMovies("tt" + normalizeImdbId(imdb))
+    return findMovies("tt" + normalize_imdbid(imdb))
 
 def getId(piratebayId):
     if piratebayId.startswith('http://torrents.thepiratebay.org/'):
         piratebayId = piratebayId.split('org/')[1]
-    d = findRe(piratebayId, "tor/(\d+)")
+    d = find_re(piratebayId, "tor/(\d+)")
     if d:
         piratebayId = d
-    d = findRe(piratebayId, "torrent/(\d+)")
+    d = find_re(piratebayId, "torrent/(\d+)")
     if d:
         piratebayId = d
     return piratebayId
@@ -80,21 +80,21 @@ def getData(piratebayId):
     torrent[u'comment_link'] = 'http://thepiratebay.org/torrent/%s' % piratebayId
 
     data = read_url(torrent['comment_link'], unicode=True)
-    torrent[u'title'] = findRe(data, '<title>(.*?) \(download torrent\) - TPB</title>')
+    torrent[u'title'] = find_re(data, '<title>(.*?) \(download torrent\) - TPB</title>')
     if not torrent[u'title']:
         return None
-    torrent[u'title'] = decodeHtml(torrent[u'title']).strip()
-    torrent[u'imdbId'] = findRe(data, 'title/tt(\d{7})')
+    torrent[u'title'] = decode_html(torrent[u'title']).strip()
+    torrent[u'imdbId'] = find_re(data, 'title/tt(\d{7})')
     title = quote(torrent['title'].encode('utf-8'))
     torrent[u'torrent_link']="http://torrents.thepiratebay.org/%s/%s.torrent" % (piratebayId, title)
     for d in re.compile('dt>(.*?):</dt>.*?<dd.*?>(.*?)</dd>', re.DOTALL).findall(data):
         key = d[0].lower().strip()
         key = _key_map.get(key, key)
-        value = decodeHtml(strip_tags(d[1].strip()))
+        value = decode_html(strip_tags(d[1].strip()))
         torrent[key] = value
-    torrent[u'description'] = findRe(data, '<div class="nfo">(.*?)</div>')
+    torrent[u'description'] = find_re(data, '<div class="nfo">(.*?)</div>')
     if torrent[u'description']:
-        torrent['description'] = normalizeNewlines(decodeHtml(strip_tags(torrent['description']))).strip()
+        torrent['description'] = normalize_newlines(decode_html(strip_tags(torrent['description']))).strip()
     t = _read_url(torrent[u'torrent_link'])
     torrent[u'torrent_info'] = getTorrentInfo(t)
     return torrent

@@ -5,7 +5,7 @@ import re
 from lxml.html import document_fromstring
 
 from ox.cache import read_url
-from ox import findRe, strip_tags
+from ox import find_re, strip_tags
 from ox.web.imdb import ImdbCombined
 
 

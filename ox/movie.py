@@ -8,8 +8,8 @@ import hashlib
 import os
 import re
 
-from normalize import normalizeName
-from text import get_sort_name, findRe
+from normalize import normalize_name
+from text import get_sort_name, find_re
 
 __all__ = ['parse_movie_path', 'create_movie_path', 'get_oxid']
 
@@ -308,14 +308,14 @@ def parse_movie_path(path):
     if title.endswith('_'):
         title = title[:-1] + '.'
 
-    year = findRe(title, '(\(\d{4}\))')
+    year = find_re(title, '(\(\d{4}\))')
     if not year:
-        year = findRe(title, '(\(\d{4}-\d*\))')
+        year = find_re(title, '(\(\d{4}-\d*\))')
     if year and title.endswith(year):
         title = title[:-len(year)].strip()
         year = year[1:-1]
         if '-' in year:
-            year = findRe(year, '\d{4}')
+            year = find_re(year, '\d{4}')
 
     #director
     if len(parts) == 4:
@@ -323,7 +323,7 @@ def parse_movie_path(path):
         if director.endswith('_'):
             director = "%s." % director[:-1]
         director = director.split('; ')
-        director = [normalizeName(d).strip() for d in director]
+        director = [normalize_name(d).strip() for d in director]
         director = filter(lambda d: d not in ('Unknown Director', 'Various Directors'), director)
     else:
         director = []
@@ -338,13 +338,13 @@ def parse_movie_path(path):
         language = ''
     
     #season/episode/episodeTitle
-    season = findRe(parts[-1], '\.Season (\d+)\.')
+    season = find_re(parts[-1], '\.Season (\d+)\.')
     if season:
         season = int(season)
     else:
         season = None
 
-    episode = findRe(parts[-1], '\.Episode (\d+)\.')
+    episode = find_re(parts[-1], '\.Episode (\d+)\.')
     if episode:
         episode = int(episode)
     else:
@@ -373,7 +373,7 @@ def parse_movie_path(path):
             title = u'%s %s' % (title, episodeTitle)
 
     #part
-    part = findRe(parts[-1], '\.Part (\d+)\.')
+    part = find_re(parts[-1], '\.Part (\d+)\.')
     if part:
         part = int(part)
     else:

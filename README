@@ -10,12 +10,12 @@ Depends:
 Usage:
  import ox
  
- data = ox.cache.readUrl('http:/...')
- text = ox.stripTags(data)
- ox.normalizeNewlines(text)
- ox.formatBytes(len(data))
+ data = ox.cache.read_url('http:/...')
+ text = ox.strip_tags(data)
+ ox.normalize_newlines(text)
+ ox.format_bytes(len(data))
 
- ox.formatBytes(1234567890)
+ ox.format_bytes(1234567890)
  '1.15 GB'
 
  import ox.web.imdb

@@ -3,7 +3,7 @@
 import re
 
 from ox.cache import getHeaders, read_url
-from ox import findRe, strip_tags
+from ox import find_re, strip_tags
 
 
 def getUrlByImdb(imdb):
@@ -22,16 +22,16 @@ def getUrlByImdb(imdb):
     return None
 
 def get_og(data, key):
-    return findRe(data, '<meta property="og:%s".*?content="(.*?)"' % key)
+    return find_re(data, '<meta property="og:%s".*?content="(.*?)"' % key)
 
 def getData(url):
     data = read_url(url)
     r = {}
-    r['title'] = findRe(data, '<h1 class="movie_title">(.*?)</h1>')
+    r['title'] = find_re(data, '<h1 class="movie_title">(.*?)</h1>')
     if '(' in r['title']:
-        r['year'] = findRe(r['title'], '\((\d*?)\)')
+        r['year'] = find_re(r['title'], '\((\d*?)\)')
         r['title'] = strip_tags(re.sub('\((\d*?)\)', '', r['title'])).strip()
-    r['summary'] = strip_tags(findRe(data, '<p id="movieSynopsis" class="movie_synopsis" itemprop="description">(.*?)</p>')).strip()
+    r['summary'] = strip_tags(find_re(data, '<p id="movieSynopsis" class="movie_synopsis" itemprop="description">(.*?)</p>')).strip()
     r['summary'] = r['summary'].replace('\t', ' ').replace('\n', ' ').replace('  ', ' ').replace('  ', ' ')
     if not r['summary']:
         r['summary'] = get_og(data, 'description')
@@ -40,9 +40,9 @@ def getData(url):
     meter = filter(lambda m: m[1].isdigit(), meter)
     if meter:
         r['tomatometer'] = meter[0][1]
-    r['rating'] = findRe(data, 'Average Rating: <span>([\d.]+)/10</span>')
-    r['user_score'] = findRe(data, '<span class="meter popcorn numeric ">(\d+)</span>')
-    r['user_rating'] = findRe(data, 'Average Rating: ([\d.]+)/5')
+    r['rating'] = find_re(data, 'Average Rating: <span>([\d.]+)/10</span>')
+    r['user_score'] = find_re(data, '<span class="meter popcorn numeric ">(\d+)</span>')
+    r['user_rating'] = find_re(data, 'Average Rating: ([\d.]+)/5')
     poster = get_og(data, 'image')
     if poster and not 'poster_default.gif' in poster:
         r['posters'] = [poster]

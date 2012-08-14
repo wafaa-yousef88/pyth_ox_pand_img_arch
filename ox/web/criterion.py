@@ -5,7 +5,7 @@ import re
 import ox.cache
 from ox.cache import read_url
 from ox.html import strip_tags
-from ox.text import findRe, removeSpecialCharacters
+from ox.text import find_re, remove_special_characters
 
 import imdb
 
@@ -33,40 +33,40 @@ def getData(id, timeout=ox.cache.cache_timeout, get_imdb=False):
         html = read_url(data["url"], timeout=timeout, unicode=True)
     except:
         html = ox.cache.read_url(data["url"], timeout=timeout)
-    data["number"] = findRe(html, "<li>Spine #(\d+)")
+    data["number"] = find_re(html, "<li>Spine #(\d+)")
 
-    data["title"] = findRe(html, "<meta property=['\"]og:title['\"] content=['\"](.*?)['\"]")
+    data["title"] = find_re(html, "<meta property=['\"]og:title['\"] content=['\"](.*?)['\"]")
     data["title"] = data["title"].split(u' \u2014 The Television Version')[0]
-    data["director"] = strip_tags(findRe(html, "<h2 class=\"director\">(.*?)</h2>"))
-    results = findRe(html, '<div class="left_column">(.*?)</div>')
+    data["director"] = strip_tags(find_re(html, "<h2 class=\"director\">(.*?)</h2>"))
+    results = find_re(html, '<div class="left_column">(.*?)</div>')
     results = re.compile("<li>(.*?)</li>").findall(results)
     data["country"] = results[0]
     data["year"] = results[1]
-    data["synopsis"] = strip_tags(findRe(html, "<p><strong>SYNOPSIS:</strong> (.*?)</p>"))
+    data["synopsis"] = strip_tags(find_re(html, "<p><strong>SYNOPSIS:</strong> (.*?)</p>"))
 
-    result = findRe(html, "<div class=\"purchase\">(.*?)</div>")
+    result = find_re(html, "<div class=\"purchase\">(.*?)</div>")
     if 'Blu-Ray' in result or 'Essential Art House DVD' in result:
         r = re.compile('<h3 class="section_title first">Other Editions</h3>(.*?)</div>', re.DOTALL).findall(html)
         if r:
             result = r[0]
-    result = findRe(result, "<a href=\"(.*?)\"")
+    result = find_re(result, "<a href=\"(.*?)\"")
     if not "/boxsets/" in result:
         data["posters"] = [result]
     else:
         html_ = read_url(result, unicode=True)
-        result = findRe(html_, '<a href="http://www.criterion.com/films/%s.*?">(.*?)</a>' % id)
-        result = findRe(result, "src=\"(.*?)\"")
+        result = find_re(html_, '<a href="http://www.criterion.com/films/%s.*?">(.*?)</a>' % id)
+        result = find_re(result, "src=\"(.*?)\"")
         if result:
             data["posters"] = [result.replace("_w100", "")]
         else:
             data["posters"] = []
-    result = findRe(html, "<img alt=\"Film Still\" height=\"252\" src=\"(.*?)\"")
+    result = find_re(html, "<img alt=\"Film Still\" height=\"252\" src=\"(.*?)\"")
     if result:
         data["stills"] = [result]
         data["trailers"] = []
     else:
-        data["stills"] = filter(lambda x: x, [findRe(html, "\"thumbnailURL\", \"(.*?)\"")])
-        data["trailers"] = filter(lambda x: x, [findRe(html, "\"videoURL\", \"(.*?)\"")])
+        data["stills"] = filter(lambda x: x, [find_re(html, "\"thumbnailURL\", \"(.*?)\"")])
+        data["trailers"] = filter(lambda x: x, [find_re(html, "\"videoURL\", \"(.*?)\"")])
 
     if timeout == ox.cache.cache_timeout:
         timeout = -1

@@ -5,7 +5,7 @@ from urllib import quote
 from lxml.html import document_fromstring
 
 from ox.cache import read_url
-from ox import findRe, strip_tags
+from ox import find_re, strip_tags
 
 def getUrl(id):
     return 'http://www.metacritic.com/movie/%s' % id
@@ -16,14 +16,14 @@ def getId(url):
 def getUrlByImdb(imdb):
     url = "http://www.imdb.com/title/tt%s/criticreviews" % imdb
     data = read_url(url)
-    metacritic_url = findRe(data, '"(http://www.metacritic.com/movie/.*?)"')
+    metacritic_url = find_re(data, '"(http://www.metacritic.com/movie/.*?)"')
     return metacritic_url or None
 
 def getMetacriticShowUrl(title):
     title = quote(title)
     url = "http://www.metacritic.com/search/process?ty=6&ts=%s&tfs=tvshow_title&x=0&y=0&sb=0&release_date_s=&release_date_e=&metascore_s=&metascore_e=" % title
     data = read_url(url)
-    return findRe(data, '(http://www.metacritic.com/tv/shows/.*?)\?')
+    return find_re(data, '(http://www.metacritic.com/tv/shows/.*?)\?')
 
 def getData(url):
     data = read_url(url, unicode=True)

@@ -5,7 +5,7 @@ import re
 import time
 
 import ox.cache
-from ox.html import decodeHtml, strip_tags
+from ox.html import decode_html, strip_tags
 import ox.net
 
 
@@ -44,8 +44,8 @@ def getNews(year, month, day):
                     new['date'] = '%s-%s-%s 00:00' % (dateString[6:10], dateString[3:5], dateString[:2])
                 else:
                     new['date'] = '%s-%s-%s %s:%s' % (dateString[6:10], dateString[3:5], dateString[:2], dateString[12:14], dateString[15:17])
-                # fix decodeHtml
-                # new['description'] = formatString(decodeHtml(description))
+                # fix decode_html
+                # new['description'] = formatString(decode_html(description))
                 new['description'] = formatString(description)
                 new['imageUrl'] = imageUrl
                 new['section'] = formatSection(section)

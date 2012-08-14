@@ -11,7 +11,7 @@ import ox
 __all__ = []
 
 
-def _detectEncoding(fp):
+def _detect_encoding(fp):
     bomDict={ # bytepattern : name
               (0x00, 0x00, 0xFE, 0xFF): "utf_32_be",
               (0xFF, 0xFE, 0x00, 0x00): "utf_32_le",
@@ -63,7 +63,7 @@ def load(filename, offset=0):
         return offset + ox.time2ms(t.replace(',', '.')) / 1000
 
     with open(filename) as f:
-        encoding = _detectEncoding(f)
+        encoding = _detect_encoding(f)
         data = f.read()
     try:
         data = unicode(data, encoding)

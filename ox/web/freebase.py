@@ -3,7 +3,7 @@
 import json
 
 from ox.cache import read_url
-from ox import findRe
+from ox import find_re
 
 class Imdb(dict):
     def __init__(self, id, timeout=-1):
@@ -36,7 +36,7 @@ class Imdb(dict):
 
         if 'nytimes' in self:
             self['nytimes'] = self['nytimes'].replace('_/overview', '%s/overview' % self['name'].replace(' ', '-'))
-            self['amgId'] = findRe(self['nytimes'], 'movie/(\d+)/')
+            self['amgId'] = find_re(self['nytimes'], 'movie/(\d+)/')
 
 
 

@@ -4,7 +4,7 @@ import re
 import urllib
 
 import ox
-from ox import strip_tags, decodeHtml
+from ox import strip_tags, decode_html
 
 DEFAULT_MAX_RESULTS = 10
 DEFAULT_TIMEOUT = 24*60*60
@@ -34,7 +34,7 @@ def find(query, max_results=DEFAULT_MAX_RESULTS, timeout=DEFAULT_TIMEOUT):
     for a in re.compile(
         '<a href="(\S+?)" class=l .*?>(.*?)</a>.*?<span class="st">(.*?)<\/span>'
     ).findall(data):
-        results.append((strip_tags(decodeHtml(a[1])), a[0], strip_tags(decodeHtml(a[2]))))
+        results.append((strip_tags(decode_html(a[1])), a[0], strip_tags(decode_html(a[2]))))
         if len(results) >= max_results:
             break
     return results

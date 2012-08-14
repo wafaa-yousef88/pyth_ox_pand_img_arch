@@ -3,7 +3,7 @@
 import re
 import time
 
-from ox import strip_tags, findRe
+from ox import strip_tags, find_re
 from ox.cache import read_url
 
 
@@ -16,11 +16,11 @@ def getEpisodeData(url):
     '''
     data = read_url(url, unicode=True)
     r = {}
-    r['description'] = strip_tags(findRe(data, 'div id="main-col">.*?<div>(.*?)</div').split('\r')[0])
-    r['show'] = findRe(data, '<h1>(.*?)</h1>')
-    r['title'] =  findRe(data, '<title>.*?: (.*?) - TV.com  </title>')
+    r['description'] = strip_tags(find_re(data, 'div id="main-col">.*?<div>(.*?)</div').split('\r')[0])
+    r['show'] = find_re(data, '<h1>(.*?)</h1>')
+    r['title'] =  find_re(data, '<title>.*?: (.*?) - TV.com  </title>')
     #episode score
-    r['episode score'] = findRe(data, '<span class="f-28 f-bold mt-10 mb-10 f-FF9 db lh-18">(.*?)</span>')
+    r['episode score'] = find_re(data, '<span class="f-28 f-bold mt-10 mb-10 f-FF9 db lh-18">(.*?)</span>')
 
     match = re.compile('Episode Number: (\d*?) &nbsp;&nbsp; Season Num: (\d*?) &nbsp;&nbsp; First Aired: (.*?) &nbsp').findall(data) 
     if match:

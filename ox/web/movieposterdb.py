@@ -4,7 +4,7 @@
 import re
 
 from ox.cache import read_url
-from ox import findRe
+from ox import find_re
 
 def getData(id):
     '''
@@ -33,7 +33,7 @@ def getPostersByUrl(url, group=True, timeout=-1):
         results = re.compile('<a href="(http://www.movieposterdb.com/poster/.+?)">', re.DOTALL).findall(html)
         for result in results:
             html = read_url(result, timeout=timeout, unicode=True)
-            posters.append(findRe(html, '"(http://www.movieposterdb.com/posters/.+?\.jpg)"'))
+            posters.append(find_re(html, '"(http://www.movieposterdb.com/posters/.+?\.jpg)"'))
     return posters
 
 def getUrl(id):

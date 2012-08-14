@@ -56,15 +56,15 @@ def strip_tags(value):
 
 stripTags = strip_tags
 
-def stripSpacesBetweenTags(value):
+def strip_spaces_between_tags(value):
     "Returns the given HTML with spaces between tags normalized to a single space"
     return re.sub(r'>\s+<', '> <', value)
 
-def stripEntities(value):
+def strip_entities(value):
     "Returns the given HTML with all entities (&something;) stripped"
     return re.sub(r'&(?:\w+|#\d);', '', value)
 
-def fixAmpersands(value):
+def fix_ampersands(value):
     "Returns the given HTML with all unencoded ampersands encoded correctly"
     return unencoded_ampersands_re.sub('&amp;', value)
 
@@ -113,11 +113,11 @@ def clean_html(text):
         * Removes stuff like "<p>&nbsp;&nbsp;</p>", but only if it's at the
           bottom of the text.
     """
-    from text import normalizeNewlines
-    text = normalizeNewlines(text)
+    from text import normalize_newlines
+    text = normalize_newlines(text)
     text = re.sub(r'<(/?)\s*b\s*>', '<\\1strong>', text)
     text = re.sub(r'<(/?)\s*i\s*>', '<\\1em>', text)
-    text = fixAmpersands(text)
+    text = fix_ampersands(text)
     # Remove all target="" attributes from <a> tags.
     text = link_target_attribute_re.sub('\\1', text)
     # Trim stupid HTML such as <br clear="all">.
@@ -167,8 +167,6 @@ def decode_html(html):
         else:
             return match.group(0)
     return charrefpat.sub(entitydecode, html).replace(u'\xa0', ' ')
-
-decodeHtml = decode_html
 
 def highlight(text, query, hlClass="hl"):
     """
