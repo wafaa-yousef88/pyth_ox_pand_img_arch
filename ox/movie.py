@@ -1,15 +1,129 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-# GPL 2011
+# GPL 2012
+
 from __future__ import division
 
-import os
 import hashlib 
+import os
+import re
 
 from normalize import normalizeName
 from text import get_sort_name, findRe
 
 __all__ = ['parse_movie_path', 'create_movie_path', 'get_oxid']
+
+def format_path(data):
+    def format_underscores(string):
+        return re.sub('^\.|\.$|/|:', '_', string)
+    director_sort = data['series_director_sort' if data['is_episode'] else 'director_sort']
+    title = data['series_title' if data['is_episode'] else 'title']
+    year = data['series_year' if data['is_episode'] else 'year']
+    return '/'.join(map(format_underscores, [
+        data['directory'],
+        '; '.join(director_sort),
+        '%s%s' % (title, ' (%s)' % year if year else ''),
+        '%s%s%s%s%s%s' % (
+            data['title'],
+            '.%s' % data['version'] if data['version'] else '',
+            '.Part %s' % data['part'] if data['part'] else '',
+            '.%s' % data['part_title'] if data['part_title'] else '',
+            '.%s' % data['language'].replace('/', '.') if data['language'] else '',
+            '.%s' % data['extension']
+        )
+    ]))
+
+def parse_path(path):
+    def parse_series(string):
+        match = re.search(' \((S\d{2})?(E\d{2}([+-]\d{2})?)?\)(.+)?', string)
+        season = int(match.group(1)[1:]) if match and match.group(1) else None
+        episode = int(match.group(2)[1:3]) if match and match.group(2) else None
+        episode_title = match.group(4)[1:] if match and match.group(4) else None
+        return season, episode, episode_title
+    def parse_title(string):
+        match = re.search(' \(\d{4}(-\d{4})?\)$', string)
+        year = match.group(0)[2:-1] if match else None
+        title = string[:-len(match.group(0))] if match else string
+        return title, year
+    def parse_type(string):
+        if string in ['aac', 'm4a', 'mp3', 'ogg']:
+            type = 'audio'
+        elif string in ['idx', 'srt', 'sub']:
+            type = 'subtitle'
+        elif string in ['avi', 'm4v', 'mkv', 'mov', 'mpg', 'ogv']:
+            type = 'video'
+        else:
+            type = None
+        return type
+    def parse_underscores(string):
+        string = re.sub('^_', '.', string)
+        string = re.sub('_$', '.', string)
+        string = re.sub('(?=\w)_(?=\w)', '/', string)
+        string = re.sub(' _ ', ' / ', string)
+        string = re.sub('(?=\w)_ ', ': ', string)
+        return string
+    data = {}
+    parts = map(parse_underscores, path.split('/'))
+    # directory
+    data['directory'] = parts[0]
+    # director_sort
+    data['director_sort'] = filter(
+        lambda x: x != 'Unknown Director',
+        parts[1].split('; ')
+    )
+    # director
+    data['director'] = map(
+        lambda x: ' '.join(reversed(x.split(', '))),
+        data['director_sort']
+    )
+    # title, year
+    data['title'], data['year'] = parse_title(parts[2])
+    parts = re.split('\.(?! )', parts[3])
+    # season, episode, episode_title
+    data['season'], data['episode'], data['episode_title'] = parse_series(parts.pop(0))
+    if data['season'] or data['episode']:
+        data['is_episode'] = True
+        data['series_director'] = data['director']
+        data['director'] = None
+        data['series_director_sort'] = data['director_sort']
+        data['director_sort'] = None
+        data['series_title'] = data['title']
+        data['title'] = '%s (%s%s)%s' % (
+            data['title'],
+            'S%02d' % data['season'] if data['season'] else '',
+            'E%02d' % data['episode'] if data['episode'] else '',
+            ' %s' % data['episode_title'] if data['episode_title'] else ''
+        )
+        data['series_year'] = data['year']
+        data['year'] = None
+    else:
+        data['is_episode'] = False
+        data['series_director'] = None
+        data['series_director_sort'] = None
+        data['series_title'] = None
+        data['series_year'] = None
+    # version
+    data['version'] = parts.pop(0) if re.search('^[A-Z0-9]', parts[0]) and not re.search('^Part ', parts[0]) else None        
+    # part
+    data['part'] = parts.pop(0)[5:] if re.search('^Part ', parts[0]) else None
+    # part_title
+    data['part_title'] = parts.pop(0) if re.search('^[A-Z0-9]', parts[0]) else None
+    # language
+    data['language'] = None
+    while re.search('^[a-z]{2}$', parts[0]):
+        data['language'] = parts.pop(0) if not data['language'] else '%s/%s' % (
+            data['language'], parts.pop(0)
+        )
+    # extension
+    data['extension'] = parts.pop()
+    # type
+    data['type'] = parse_type(data['extension'])
+    if data['type'] == 'subtitle' and not data['language']:
+        data['language'] = 'en'
+    # _unknown
+    data['_unknown'] = '.'.join(parts) if len(parts) else None
+    return data
+
 
 def parse_movie_path(path):
     """
@@ -174,4 +288,3 @@ def get_oxid(title, director=[], year='',
         oxid = get_hash('\n'.join([director, title, str(year), str(season)]))[:8] + \
                get_hash('\n'.join([str(episode), episode_director, episode_title, str(episode_year)]))[:8]
     return u'0x' + oxid
-
