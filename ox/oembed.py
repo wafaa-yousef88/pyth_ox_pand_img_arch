@@ -7,7 +7,7 @@ from utils import json, ET
 
 def get_embed_code(url, maxwidth=None, maxheight=None):
     embed = {}
-    header = cache.getHeaders(url)
+    header = cache.get_headers(url)
     if header.get('content-type', '').startswith('text/html'):
         html = cache.readUrl(url)
         json_oembed = filter(lambda l: 'json+oembed' in l, re.compile('<link.*?>').findall(html))

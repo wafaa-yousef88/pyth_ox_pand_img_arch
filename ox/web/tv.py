@@ -7,12 +7,12 @@ from ox import strip_tags, find_re
 from ox.cache import read_url
 
 
-def getEpisodeData(url):
+def get_episode_data(url):
     '''
       prases informatin on tvcom episode pages
       returns dict with title, show, description, score
       example:
-        getEpisodeData('http://www.tv.com/lost/do-no-harm/episode/399310/summary.html')
+        get_episode_data('http://www.tv.com/lost/do-no-harm/episode/399310/summary.html')
     '''
     data = read_url(url, unicode=True)
     r = {}

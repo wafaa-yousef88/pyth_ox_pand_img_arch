@@ -5,7 +5,7 @@ from urllib import unquote
 from ox.cache import read_url
 
 
-def getVideoUrl(url):
+def get_video_url(url):
     '''
     >>> getVideoUrl('http://www.dailymotion.com/relevance/search/priere%2Bpour%2Brefuznik/video/x3opar_priere-pour-refuznik-1-jeanluc-goda_shortfilms').split('?auth')[0]
     'http://www.dailymotion.com/cdn/FLV-320x240/video/x3opar_priere-pour-refuznik-1-jean-luc-god_shortfilms.flv'

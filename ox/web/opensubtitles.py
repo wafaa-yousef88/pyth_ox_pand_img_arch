@@ -7,7 +7,7 @@ from ox.cache import read_url
 from ox import find_re, strip_tags
 from ox import langCode2To3, langTo3Code
 
-def findSubtitlesByImdb(imdb, parts = 1, language = "eng"):
+def find_subtitles(imdb, parts = 1, language = "eng"):
     if len(language) == 2:
         language = langCode2To3(language)
     elif len(language) != 3:
@@ -29,7 +29,7 @@ def findSubtitlesByImdb(imdb, parts = 1, language = "eng"):
         opensubtitleId = find_re(data, '/en/subtitles/(.*?)/')
     return opensubtitleId
 
-def downloadSubtitleById(opensubtitle_id):
+def download_subtitle(opensubtitle_id):
     srts = {}
     data = read_url('http://www.opensubtitles.org/en/subtitles/%s' % opensubtitle_id)
     reg_exp = 'href="(/en/download/file/.*?)">(.*?)</a>'

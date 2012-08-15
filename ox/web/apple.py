@@ -14,7 +14,7 @@ HEADERS = {
 USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7) '
 USER_AGENT += 'AppleWebKit/534.48.3 (KHTML, like Gecko) Version/5.1 Safari/534.48.3'
 
-def getMovieData(title, director):
+def get_movie_data(title, director):
     if isinstance(title, unicode):
         title = title.encode('utf-8')
     if isinstance(director, unicode):
@@ -60,8 +60,8 @@ def getMovieData(title, director):
     return data
 
 if __name__ == '__main__':
-    print getMovieData('Alphaville', 'Jean-Luc Godard')
-    print getMovieData('Sin City', 'Roberto Rodriguez')
-    print getMovieData('Breathless', 'Jean-Luc Godard')
-    print getMovieData('Capitalism: A Love Story', 'Michael Moore')
-    print getMovieData('Film Socialisme', 'Jean-Luc Godard')
+    print get_movie_data('Alphaville', 'Jean-Luc Godard')
+    print get_movie_data('Sin City', 'Roberto Rodriguez')
+    print get_movie_data('Breathless', 'Jean-Luc Godard')
+    print get_movie_data('Capitalism: A Love Story', 'Michael Moore')
+    print get_movie_data('Film Socialisme', 'Jean-Luc Godard')

@@ -13,17 +13,17 @@ def findISBN(title, author):
     data = read_url(url, unicode=True)
     links = re.compile('href="(http://www.amazon.com/.*?/dp/.*?)"').findall(data)
     id = find_re(re.compile('href="(http://www.amazon.com/.*?/dp/.*?)"').findall(data)[0], '/dp/(.*?)/')
-    data = getData(id)
+    data = get_data(id)
     if author in data['authors']:
         return data
     return {}
 
-def getData(id):
+def get_data(id):
     url = "http://www.amazon.com/title/dp/%s/" % id
     data = read_url(url, unicode=True)
 
 
-    def findData(key):
+    def find_data(key):
         return find_re(data, '<li><b>%s:</b>(.*?)</li>'% key).strip()
 
     r = {}
@@ -34,15 +34,15 @@ def getData(id):
     t = re.compile('>(.*?)</a> \(Translator\)').findall(data)
     if t:
         r['translator'] = t
-    r['publisher'] = findData('Publisher')
-    r['language'] = findData('Language')
-    r['isbn-10'] = findData('ISBN-10')
-    r['isbn-13'] = findData('ISBN-13').replace('-', '')
+    r['publisher'] = find_data('Publisher')
+    r['language'] = find_data('Language')
+    r['isbn-10'] = find_data('ISBN-10')
+    r['isbn-13'] = find_data('ISBN-13').replace('-', '')
     r['dimensions'] = find_re(data, '<li><b>.*?Product Dimensions:.*?</b>(.*?)</li>')
 
-    r['pages'] = findData('Paperback')
+    r['pages'] = find_data('Paperback')
     if not r['pages']:
-        r['pages'] = findData('Hardcover')
+        r['pages'] = find_data('Hardcover')
 
     r['review'] = strip_tags(find_re(data, '<h3 class="productDescriptionSource">Review</h3>.*?<div class="productDescriptionWrapper">(.*?)</div>').replace('<br />', '\n')).strip()
 

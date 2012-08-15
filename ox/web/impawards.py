@@ -7,19 +7,19 @@ from ox.html import strip_tags
 from ox.text import find_re
 
 
-def getData(id):
+def get_data(id):
     '''
-    >>> getData('1991/silence_of_the_lambs')['imdbId']
+    >>> get_data('1991/silence_of_the_lambs')['imdbId']
     u'0102926'
 
-    >>> getData('1991/silence_of_the_lambs')['posters'][0]
+    >>> get_data('1991/silence_of_the_lambs')['posters'][0]
     u'http://www.impawards.com/1991/posters/silence_of_the_lambs_ver1.jpg'
 
-    >>> getData('1991/silence_of_the_lambs')['url']
+    >>> get_data('1991/silence_of_the_lambs')['url']
     u'http://www.impawards.com/1991/silence_of_the_lambs_ver1.html'
     '''
     data = {
-        'url': getUrl(id)
+        'url': get_url(id)
     }
     html = read_url(data['url'], unicode=True)
     data['imdbId'] = find_re(html, 'imdb.com/title/tt(\d{7})')
@@ -48,7 +48,7 @@ def getData(id):
 
     return data
 
-def getId(url):
+def get_id(url):
     split = url.split('/')
     year = split[3]
     split = split[4][:-5].split('_')
@@ -59,26 +59,25 @@ def getId(url):
     id = '%s/%s' % (year, '_'.join(split))
     return id
 
-def getIds():
+def get_ids(page=None):
     ids = []
+    if page:
+        html = read_url('http://www.impawards.com/archives/page%s.html' % page, timeout = -1, unicode=True)
+        results = re.compile('<a href = \.\./(.*?)>', re.DOTALL).findall(html)
+        for result in results:
+            url = 'http://impawards.com/%s' % result
+            ids.append(get_id(url))
+        return set(ids)
+    #get all
     html = read_url('http://www.impawards.com/archives/latest.html', timeout = 60*60, unicode=True)
     pages = int(find_re(html, '<a href= page(.*?).html>')) + 1
     for page in range(pages, 0, -1):
-        for id in getIdsByPage(page):
+        for id in get_ids(page):
             if not id in ids:
                 ids.append(id)
     return ids
 
-def getIdsByPage(page):
-    ids = []
-    html = read_url('http://www.impawards.com/archives/page%s.html' % page, timeout = -1, unicode=True)
-    results = re.compile('<a href = \.\./(.*?)>', re.DOTALL).findall(html)
-    for result in results:
-        url = 'http://impawards.com/%s' % result
-        ids.append(getId(url))
-    return set(ids)
-
-def getUrl(id):
+def get_url(id):
     url = u"http://www.impawards.com/%s.html" % id
     html = read_url(url, unicode=True)
     if find_re(html, "No Movie Posters on This Page"):
@@ -297,5 +296,5 @@ _id_map = {
 }
 
 if __name__ == '__main__':
-    ids = getIds()
+    ids = get_ids()
     print sorted(ids), len(ids)

@@ -9,7 +9,7 @@ from ox.cache import read_url
 import google
 
 
-def getShowUrl(title):
+def get_show_url(title):
     ''' 
     Search Epguide Url for Show via Show Title.
     Use Google to search the url, this is also done on Epguide.
@@ -20,7 +20,7 @@ def getShowUrl(title):
                     return url
     return None
 
-def getShowData(url):
+def get_show_data(url):
     data = read_url(url, unicode=True)
     r = {}
     r['title'] = strip_tags(find_re(data, '<h1>(.*?)</h1>'))

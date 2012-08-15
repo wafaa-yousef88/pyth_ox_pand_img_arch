@@ -9,7 +9,7 @@ from ox.html import decode_html, strip_tags
 import ox.net
 
 
-def getNews(year, month, day):
+def get_news(year, month, day):
     sections = [
         'politik', 'wirtschaft', 'panorama', 'sport', 'kultur', 'netzwelt',
         'wissenschaft', 'unispiegel', 'schulspiegel', 'reise', 'auto'
@@ -27,7 +27,7 @@ def getNews(year, month, day):
         for item in re.compile('<div class="spTeaserCenterpage(.*?)</p>', re.DOTALL).findall(html):
             dateString = strip_tags(re.compile('<div class="spDateTime">(.*?)</div>', re.DOTALL).findall(item)[0]).strip()
             try:
-                description = formatString(re.compile('<p>(.*?)<', re.DOTALL).findall(item)[0])
+                description = format_string(re.compile('<p>(.*?)<', re.DOTALL).findall(item)[0])
             except:
                 description = ''
             try:
@@ -35,7 +35,7 @@ def getNews(year, month, day):
             except:
                 imageUrl = ''
             try:
-                title = formatString(re.compile('alt=[\'|"](.*?)[\'|"] title=', re.DOTALL).findall(item)[0]).replace(' : ', ': ').replace('::', ':')
+                title = format_string(re.compile('alt=[\'|"](.*?)[\'|"] title=', re.DOTALL).findall(item)[0]).replace(' : ', ': ').replace('::', ':')
             except:
                 title = ''
             if dateString[:10] == date and description and imageUrl and title.find(': ') != -1:
@@ -45,12 +45,12 @@ def getNews(year, month, day):
                 else:
                     new['date'] = '%s-%s-%s %s:%s' % (dateString[6:10], dateString[3:5], dateString[:2], dateString[12:14], dateString[15:17])
                 # fix decode_html
-                # new['description'] = formatString(decode_html(description))
-                new['description'] = formatString(description)
+                # new['description'] = format_string(decode_html(description))
+                new['description'] = format_string(description)
                 new['imageUrl'] = imageUrl
-                new['section'] = formatSection(section)
-                new['title'] = formatString(title)
-                new['title1'] = new['title'].replace('\xdf', '\xdf\xdf')[:len(formatString(re.compile('<h4>(.*?)</h4>', re.DOTALL).findall(item)[0]))].replace('\xdf\xdf', '\xdf')
+                new['section'] = format_section(section)
+                new['title'] = format_string(title)
+                new['title1'] = new['title'].replace('\xdf', '\xdf\xdf')[:len(format_string(re.compile('<h4>(.*?)</h4>', re.DOTALL).findall(item)[0]))].replace('\xdf\xdf', '\xdf')
                 if new['title1'][-1:] == ':':
                     new['title1'] = new['title1'][0:-1]
                 new['title2'] = new['title'][len(new['title1']) + 2:]
@@ -67,21 +67,21 @@ def getNews(year, month, day):
             '''
     return news
 
-def splitTitle(title):
+def split_title(title):
     title1 = re.compile('(.*?): ').findall(title)[0]
     title2 = re.compile(': (.*?)$').findall(title)[0]
     return [title1, title2]
 
-def formatString(string):
+def format_string(string):
     string = string.replace('<span class="spOptiBreak"> </span>', '')
     string = string.replace('\n', ' ').replace('  ', ' ').strip()
     string = string.replace('&amp;', '&').replace('&apos;', '\'').replace('&quot;', '"')
     return string
 
-def formatSection(string):
+def format_section(string):
     return string[:1].upper() + string[1:].replace('spiegel', 'SPIEGEL')
 
-def formatSubsection(string):
+def format_subsection(string):
     # SPIEGEL, SPIEGEL special
     subsection = {
         'abi': 'Abi - und dann?',
@@ -98,7 +98,7 @@ def formatSubsection(string):
         return subsection[string].replace(u'\xc3', 'ae')
     return string[:1].upper() + string[1:]
         
-def getIssue(year, week):
+def get_issue(year, week):
     coverUrl = 'http://www.spiegel.de/static/epaper/SP/%d/%d/ROSPANZ%d%03d0001-312.jpg' % (year, week, year, week)
     if not ox.net.exists(coverUrl):
         return None
@@ -122,7 +122,7 @@ def getIssue(year, week):
     return {'pages': pages, 'contents': contents, 'coverUrl': coverUrl, 'pageUrl': pageUrl}
 
 
-def archiveIssues():
+def archive_issues():
     '''
     this is just an example of an archiving application
     '''
@@ -140,8 +140,8 @@ def archiveIssues():
         else:
             wMax = 53
         for w in range(wMax, 0, -1):
-            print 'getIssue(%d, %d)' % (y, w)
-            issue = getIssue(y, w)
+            print 'get_issue(%d, %d)' % (y, w)
+            issue = get_issue(y, w)
             if issue:
                 dirname = '%s/%d/%02d' % (archivePath, y, w)
                 if not os.path.exists(dirname):
@@ -188,7 +188,7 @@ def archiveIssues():
                 print p['min'], p['sum'] / p['num'], p['max']
             
 
-def archiveNews():
+def archive_news():
     '''
     this is just an example of an archiving application
     '''
@@ -235,7 +235,7 @@ def archiveNews():
                         f.close()
                     filename = filename[:-5] + '.txt'
                     if not os.path.exists(filename) or True:
-                        data = splitTitle(new['title'])
+                        data = split_title(new['title'])
                         data.append(new['description'])
                         data = '\n'.join(data)
                         f = open(filename, 'w')
@@ -256,18 +256,13 @@ def archiveNews():
                         count[string] = {'count': 1, 'string': '%s %s http://www.spiegel.de/%s/0,1518,archiv-%d-%03d,00.html' % (new['date'], new['date'], new['section'].lower(), y, int(datetime(y, m, d).strftime('%j')))}
                     else:
                         count[string] = {'count': count[string]['count'] + 1, 'string': '%s %s' % (new['date'], count[string]['string'][17:])}
-                    strings = splitTitle(new['title'])
+                    strings = split_title(new['title'])
                     if strings[0] != new['title1'] or strings[1] != new['title2']:
                         colon.append('%s %s %s: %s' % (new['date'], new['title'], new['title1'], new['title2']))
-            for key in sortDictByKey(count):
+            for key in sorted(count):
                 print '%6d %-24s %s' % (count[key]['count'], key, count[key]['string'])
             for value in colon:
                 print value
-
-def sortDictByKey(d):
-    keys = d.keys()
-    keys.sort()
-    return keys
 
 if __name__ == '__main__':
     # spiegel = Spiegel(2008, 8)
@@ -281,12 +276,12 @@ if __name__ == '__main__':
         news = getNews(2008, 2, d)
         for new in news:
             strings = new['url'].split('/')
-            string = formatSection(strings[3])
+            string = format_section(strings[3])
             if len(strings) == 6:
-                string += '/' + formatSubsection(strings[4])
+                string += '/' + format_subsection(strings[4])
             if not string in x:
                 x.append(string)
         print x
     '''
-    # archiveIssues()
-    archiveNews()
+    # archive_issues()
+    archive_news()

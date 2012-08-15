@@ -13,7 +13,7 @@ import ox
 from torrent import Torrent
 
 
-def _parseResultsPage(data, max_results=10):
+def _parse_results_page(data, max_results=10):
     results=[]
     regexp = '''<tr><td>(.*?)</td><td>(.*?)<a href="/tor/(.*?)">(.*?)</a>.*?</td>.*?</tr>'''
     for row in  re.compile(regexp, re.DOTALL).findall(data):
@@ -27,22 +27,17 @@ def _parseResultsPage(data, max_results=10):
             results.append((torrentTitle, torrentLink, ''))
     return results
 
-def findMovie(query, max_results=10):
+def find_movie(query=None, imdb=None, max_results=10):
     '''search for torrents on mininova
     '''
-    url = "http://www.mininova.org/search/%s/seeds" % quote(query)
+    if imdb:
+        url = "http://www.mininova.org/imdb/?imdb=%s" % normalize_imdbid(imdb)
+    else:
+        url = "http://www.mininova.org/search/%s/seeds" % quote(query)
     data = read_url(url, unicode=True)
-    return _parseResultsPage(data, max_results)
+    return _parse_results_page(data, max_results)
 
-def findMovieByImdb(imdbId):
-    '''find torrents on mininova for a given imdb id
-    '''
-    results = []
-    imdbId = normalize_imdbid(imdbId)
-    data = read_url("http://www.mininova.org/imdb/?imdb=%s" % imdbId, unicode=True)
-    return _parseResultsPage(data)
-
-def getId(mininovaId):
+def get_id(mininovaId):
     mininovaId = unicode(mininovaId)
     d = find_re(mininovaId, "/(\d+)")
     if d:
@@ -54,7 +49,7 @@ def getId(mininovaId):
         return mininovaId[-1]
 
 def exists(mininovaId):
-    mininovaId = getId(mininovaId)
+    mininovaId = get_id(mininovaId)
     data = ox.net.read_url("http://www.mininova.org/tor/%s" % mininovaId)
     if not data or 'Torrent not found...' in data:
         return False
@@ -62,11 +57,11 @@ def exists(mininovaId):
         return False
     return True
 
-def getData(mininovaId):
+def get_data(mininovaId):
     _key_map = {
         'by': u'uploader',
     }
-    mininovaId = getId(mininovaId)
+    mininovaId = get_id(mininovaId)
     torrent = dict()
     torrent[u'id'] = mininovaId
     torrent[u'domain'] = 'mininova.org'
@@ -101,7 +96,7 @@ class Mininova(Torrent):
     '72dfa59d2338e4a48c78cec9de25964cddb64104'
     '''
     def __init__(self, mininovaId):
-        self.data = getData(mininovaId)
+        self.data = get_data(mininovaId)
         if not self.data:
             return
         Torrent.__init__(self)

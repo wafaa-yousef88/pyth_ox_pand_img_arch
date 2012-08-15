@@ -9,28 +9,28 @@ from ox import find_re, strip_tags
 from ox.web.imdb import ImdbCombined
 
 
-def getData(id, timeout=-1):
+def get_data(id, timeout=-1):
     '''
-    >>> getData('the-matrix')['poster']
+    >>> get_data('the-matrix')['poster']
     'http://content7.flixster.com/movie/16/90/52/1690525_gal.jpg'
 
-    >>> getData('0133093')['poster']
+    >>> get_data('0133093')['poster']
     'http://content7.flixster.com/movie/16/90/52/1690525_gal.jpg'
 
-    >>> getData('2-or-3-things-i-know-about-her')['poster']
+    >>> get_data('2-or-3-things-i-know-about-her')['poster']
     'http://content6.flixster.com/movie/10/95/43/10954392_gal.jpg'
 
-    >>> getData('0078875')['rottentomatoes_id']
+    >>> get_data('0078875')['rottentomatoes_id']
     'http://www.rottentomatoes.com/m/the-tin-drum/'
     '''
     if len(id) == 7:
         try:
             int(id)
-            id = getIdByImdb(id)
+            id = get_id(imdb=id)
         except:
             pass
     data = {
-        "url": getUrl(id),
+        "url": get_url(id),
     }
     html = read_url(data['url'], timeout=timeout, timeout=True)
     doc = document_fromstring(html)
@@ -55,21 +55,20 @@ def getData(id, timeout=-1):
         return None
     return data
 
-def getIdByImdb(imdbId):
+def get_id(url=None, imdb=None):
     '''
-    >>> getIdByImdb('0133093')
+    >>> get_id(imdb='0133093')
     u'the-matrix'
 
-    #>>> getIdByImdb('0060304')
+    #>>> get_id(imdb='0060304')
     #u'2-or-3-things-i-know-about-her'
     '''
-    i = ImdbCombined(imdbId)
-    title = i['title']
-    return title.replace(' ', '-').lower().replace("'", '')
-
-def getId(url):
+    if imdb:
+        i = ImdbCombined(imdb)
+        title = i['title']
+        return title.replace(' ', '-').lower().replace("'", '')
     return url.split('/')[-1]
 
-def getUrl(id):
+def get_url(id):
     return "http://www.flixster.com/movie/%s"%id
 

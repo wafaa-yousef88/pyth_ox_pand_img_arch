@@ -5,7 +5,7 @@ import json
 from ox.cache import read_url
 from ox import find_re
 
-class Imdb(dict):
+class Freebase(dict):
     def __init__(self, id, timeout=-1):
         url = "http://ids.freebaseapps.com/get_ids?id=/authority/imdb/title/tt%s" % id
         '''

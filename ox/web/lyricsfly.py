@@ -5,7 +5,7 @@ from ox.html import decode_html
 from ox.text import find_re
 
 
-def getLyrics(title, artist):
+def get_lyrics(title, artist):
     html = read_url('http://lyricsfly.com/api/')
     key = find_re(html, '<font color=green><b>(.*?)</b></font>')
     url = 'http://lyricsfly.com/api/api.php?i=%s&a=%s&t=%s' % (key, artist, title)

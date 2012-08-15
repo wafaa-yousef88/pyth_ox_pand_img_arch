@@ -3,7 +3,7 @@
 import re
 from ox.net import read_url
 
-def getPosterUrl(id):
+def get_poster_url(id):
     url = 'http://piratecinema.org/posters/'
     html = read_url(url, unicode=True)
     results = re.compile('src="(.+)" title=".+\((\d{7})\)"').findall(html)
@@ -13,5 +13,5 @@ def getPosterUrl(id):
     return ''
 
 if __name__ == '__main__':
-    print getPosterUrl('0749451')
+    print get_poster_url('0749451')
 

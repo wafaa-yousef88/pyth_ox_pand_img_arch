@@ -8,52 +8,45 @@ from ox.cache import read_url
 from ox import find_re, decode_html
 
 
-def getId(url):
+def get_id(url):
     return url.split("/")[-1]
 
-def getUrl(id):
+def get_url(id=None, imdb=None, allmovie=None):
+    if imdb:
+        query = '"%s"'% imdbId
+        result = find(query)
+        if result:
+            url = result[0][1]
+            data = get_movie_data(url)
+            if 'imdb_id' in data:
+                return url
+        return ""
+    if allmovie:
+        query = '"amg_id = 1:%s"'% allmovie
+        result = find(query)
+        if result:
+            url = result[0][1]
+            return url
+        return ''
     return "http://en.wikipedia.org/wiki/%s" % id
 
-
-def getMovieId(title, director='', year=''):
+def get_movie_id(title, director='', year=''):
     query = '"%s" film %s %s' % (title, director, year)
     result = find(query, 1)
     if result:
         return result[0][1]
     return ''
 
-def getUrlByImdbId(imdbId):
-    query = '"%s"'% imdbId
-    result = find(query)
-    if result:
-        url = result[0][1]
-        data = getMovieData(url)
-        if 'imdb_id' in data:
-            return url
-    return ""
-
-def getUrlByImdb(imdbId):
-    # deprecated, use getUrlByImdbId()
-    return getUrlByImdbId(imdbId)
-
-def getUrlByAllmovieId(allmovieId):
-    query = '"amg_id = 1:%s"'% allmovieId
-    result = find(query)
-    if result:
-        url = result[0][1]
-        return url
-    return ''
-
-def getWikiData(wikipediaUrl):
-    url = wikipediaUrl.replace('wikipedia.org/wiki/', 'wikipedia.org/w/index.php?title=')
+def get_wiki_data(wikipedia_url):
+    url = wikipedia_url.replace('wikipedia.org/wiki/', 'wikipedia.org/w/index.php?title=')
     url = "%s&action=raw" % url
     data = read_url(url).decode('utf-8')
     return data
 
-def getMovieData(wikipediaUrl):
-    if not wikipediaUrl.startswith('http'):
-        wikipediaUrl = getUrl(wikipediaUrl)
-    data = getWikiData(wikipediaUrl)
+def get_movie_data(wikipedia_url):
+    if not wikipedia_url.startswith('http'):
+        wikipedia_url = get_url(wikipedia_url)
+    data = get_wiki_data(wikipedia_url)
     filmbox_data = find_re(data, '''\{\{[Ii]nfobox.[Ff]ilm(.*?)\n\}\}''')
     filmbox = {}
     _box = filmbox_data.strip().split('|')
@@ -104,7 +97,7 @@ def getMovieData(wikipediaUrl):
         filmbox['title_sort'] = find_re(data, '''\{\{DEFAULTSORT:(.*?)\}\}''')
     return filmbox
 
-def getImageUrl(name):
+def get_image_url(name):
     url = 'http://en.wikipedia.org/wiki/Image:' + name.replace(' ', '%20')
     data = read_url(url, unicode=True)
     url = find_re(data, 'href="(http://upload.wikimedia.org/.*?)"')
@@ -114,19 +107,19 @@ def getImageUrl(name):
             url = 'http:' + url
     return url
 
-def getPosterUrl(wikipediaUrl):
-    if not wikipediaUrl.startswith('http'): wikipediaUrl = getUrl(wikipediaUrl)
-    data = getMovieData(wikipediaUrl)
+def get_poster_url(wikipedia_url):
+    if not wikipedia_url.startswith('http'): wikipedia_url = get_url(wikipedia_url)
+    data = get_movie_data(wikipedia_url)
     if 'image' in data:
-        return getImageUrl(data['image'])
+        return get_image_url(data['image'])
     return ''
 
-def getMoviePoster(wikipediaUrl):
-    # deprecated, use getPosterUrl()
-    return getPosterUrl(wikipediaUrl)
+def get_movie_poster(wikipedia_url):
+    # deprecated, use get_poster_url()
+    return get_poster_url(wikipedia_url)
 
-def getAllmovieId(wikipediaUrl):
-    data = getMovieData(wikipediaUrl)
+def get_allmovie_id(wikipedia_url):
+    data = get_movie_data(wikipedia_url)
     return data.get('amg_id', '')
 
 def find(query, max_results=10):

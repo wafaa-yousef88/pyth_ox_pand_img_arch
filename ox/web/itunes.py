@@ -24,7 +24,7 @@ ITUNES_HEADERS = {
     'Connection': 'close',
 }
 
-def composeUrl(request, parameters):
+def compose_url(request, parameters):
     if request == 'advancedSearch':
         url = 'http://ax.phobos.apple.com.edgesuite.net/WebObjects/MZSearch.woa/wa/advancedSearch?'
         if parameters['media'] == 'music':
@@ -60,7 +60,7 @@ def composeUrl(request, parameters):
         url = 'http://phobos.apple.com/WebObjects/MZStore.woa/wa/viewMovie?id=%s&prvw=1' % parameters['id']
     return url
 
-def parseXmlDict(xml):
+def parse_xml_dict(xml):
     values = {}
     strings = xml.split('<key>')
     for string in strings:
@@ -78,7 +78,7 @@ def parseXmlDict(xml):
             values[key] = value
     return values
 
-def parseCast(xml, title):
+def parse_cast(xml, title):
     list = []
     try:
         strings = find_re(xml, '<SetFontStyle normalStyle="textColor">%s(.*?)</VBoxView>' % title[:-1].upper()).split('</GotoURL>')
@@ -89,7 +89,7 @@ def parseCast(xml, title):
     except:
         return list
 
-def parseMovies(xml, title):
+def parse_movies(xml, title):
     list = []
     try:
         strings = find_re(xml, '<SetFontStyle normalStyle="outlineTitleFontStyle"><b>%s(.*?)</Test>' % title[:-1].upper()).split('</GotoURL>')
@@ -109,17 +109,17 @@ class ItunesAlbum:
         self.title = title
         self.artist = artist
         if not id:
-            self.id = self.getId()
+            self.id = self.get_id()
 
-    def getId(self):
-        url = composeUrl('advancedSearch', {'media': 'music', 'title': self.title, 'artist': self.artist})
+    def get_id(self):
+        url = compose_url('advancedSearch', {'media': 'music', 'title': self.title, 'artist': self.artist})
         xml = read_url(url, headers = ITUNES_HEADERS)
         id = find_re(xml, 'viewAlbum\?id=(.*?)&')
         return id
 
-    def getData(self):
+    def get_data(self):
         data = {'id': self.id}
-        url = composeUrl('viewAlbum', {'id': self.id})
+        url = compose_url('viewAlbum', {'id': self.id})
         xml = read_url(url, None, ITUNES_HEADERS)
         data['albumName'] = find_re(xml, '<B>(.*?)</B>')
         data['artistName'] = find_re(xml, '<b>(.*?)</b>')
@@ -130,7 +130,7 @@ class ItunesAlbum:
         data['tracks'] = []
         strings = find_re(xml, '<key>items</key>.*?<dict>(.*?)$').split('<dict>')
         for string in strings:
-          data['tracks'].append(parseXmlDict(string))
+          data['tracks'].append(parse_xml_dict(string))
         data['type'] = find_re(xml, '<key>listType</key><string>(.*?)<')
         return data
 
@@ -140,48 +140,48 @@ class ItunesMovie:
         self.title = title
         self.director = director
         if not id:
-            self.id = self.getId()
+            self.id = self.get_id()
 
-    def getId(self):
-        url = composeUrl('advancedSearch', {'media': 'movie', 'title': self.title, 'director': self.director})
+    def get_id(self):
+        url = compose_url('advancedSearch', {'media': 'movie', 'title': self.title, 'director': self.director})
         xml = read_url(url, headers = ITUNES_HEADERS)
         id = find_re(xml, 'viewMovie\?id=(.*?)&')
         return id
 
-    def getData(self):
+    def get_data(self):
         data = {'id': self.id}
-        url = composeUrl('viewMovie', {'id': self.id})
+        url = compose_url('viewMovie', {'id': self.id})
         xml = read_url(url, None, ITUNES_HEADERS)
         f = open('/Users/rolux/Desktop/iTunesData.xml', 'w')
         f.write(xml)
         f.close()
-        data['actors'] = parseCast(xml, 'actors')
+        data['actors'] = parse_cast(xml, 'actors')
         string = find_re(xml, 'Average Rating:(.*?)</HBoxView>')
         data['averageRating'] = string.count('rating_star_000033.png') + string.count('&#189;') * 0.5
-        data['directors'] = parseCast(xml, 'directors')
+        data['directors'] = parse_cast(xml, 'directors')
         data['format'] = find_re(xml, 'Format:(.*?)<')
         data['genre'] = decode_html(find_re(xml, 'Genre:(.*?)<'))
         data['plotSummary'] = decode_html(find_re(xml, 'PLOT SUMMARY</b>.*?<SetFontStyle normalStyle="textColor">(.*?)</SetFontStyle>'))
         data['posterUrl'] = find_re(xml, 'reflection="." url="(.*?)"')
-        data['producers'] = parseCast(xml, 'producers')
+        data['producers'] = parse_cast(xml, 'producers')
         data['rated'] = find_re(xml, 'Rated(.*?)<')
-        data['relatedMovies'] = parseMovies(xml, 'related movies')
+        data['relatedMovies'] = parse_movies(xml, 'related movies')
         data['releaseDate'] = find_re(xml, 'Released(.*?)<')
         data['runTime'] = find_re(xml, 'Run Time:(.*?)<')
-        data['screenwriters'] = parseCast(xml, 'screenwriters')
+        data['screenwriters'] = parse_cast(xml, 'screenwriters')
         data['soundtrackId'] = find_re(xml, 'viewAlbum\?id=(.*?)&')
         data['trailerUrl'] = find_re(xml, 'autoplay="." url="(.*?)"')
         return data
 
 if __name__ == '__main__':
     from ox.utils import json
-    data = ItunesAlbum(title = 'So Red the Rose', artist = 'Arcadia').getData()
+    data = ItunesAlbum(title = 'So Red the Rose', artist = 'Arcadia').get_data()
     print json.dumps(data, sort_keys = True, indent = 4)
-    data = ItunesMovie(title = 'The Matrix', director = 'Wachowski').getData()
+    data = ItunesMovie(title = 'The Matrix', director = 'Wachowski').get_data()
     print json.dumps(data, sort_keys = True, indent = 4)
     for v in data['relatedMovies']:
-        data = ItunesMovie(id = v['id']).getData()
+        data = ItunesMovie(id = v['id']).get_data()
         print json.dumps(data, sort_keys = True, indent = 4)
-    data = ItunesMovie(id='272960052').getData()
+    data = ItunesMovie(id='272960052').get_data()
     print json.dumps(data, sort_keys = True, indent = 4)
 

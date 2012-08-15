@@ -20,7 +20,7 @@ def read_url(url, data=None, headers=ox.cache.DEFAULT_HEADERS, timeout=ox.cache.
     headers = headers.copy()
     return ox.cache.read_url(url, data, headers, timeout, unicode=unicode)
 
-def getUrl(id):
+def get_url(id):
     return "http://www.imdb.com/title/tt%s/" % id
 
 class Imdb(SiteParser):
@@ -420,7 +420,7 @@ class ImdbCombined(Imdb):
         self.regex = _regex
         super(ImdbCombined, self).__init__(id, timeout)
 
-def getMovieIdByTitle(title, timeout=-1):
+def get_movie_by_title(title, timeout=-1):
     '''
     This only works for exact title matches from the data dump
     Usually in the format
@@ -431,22 +431,22 @@ def getMovieIdByTitle(title, timeout=-1):
     If there is more than one film with that title for the year
         Title (Year/I)
 
-    >>> getMovieIdByTitle(u'"Father Knows Best" (1954) {(#5.34)}')
+    >>> get_movie_by_title(u'"Father Knows Best" (1954) {(#5.34)}')
     u'1602860'
 
-    >>> getMovieIdByTitle(u'The Matrix (1999)')
+    >>> get_movie_by_title(u'The Matrix (1999)')
     u'0133093'
 
-    >>> getMovieIdByTitle(u'Little Egypt (1951)')
+    >>> get_movie_by_title(u'Little Egypt (1951)')
     u'0043748'
 
-    >>> getMovieIdByTitle(u'Little Egypt (1897/I)')
+    >>> get_movie_by_title(u'Little Egypt (1897/I)')
     u'0214882'
     
-    >>> getMovieIdByTitle(u'Little Egypt')
+    >>> get_movie_by_title(u'Little Egypt')
     None 
 
-    >>> getMovieIdByTitle(u'"Dexter" (2006) {Father Knows Best (#1.9)}')
+    >>> get_movie_by_title(u'"Dexter" (2006) {Father Knows Best (#1.9)}')
     u'0866567'
     '''
     params = {'s':'tt','q': title}
@@ -465,21 +465,21 @@ def getMovieIdByTitle(title, timeout=-1):
         return results[0]
     return None
  
-def getMovieId(title, director='', year='', timeout=-1):
+def get_movie_id(title, director='', year='', timeout=-1):
     '''
-    >>> getMovieId('The Matrix')
+    >>> get_movie_id('The Matrix')
     u'0133093'
 
-    >>> getMovieId('2 or 3 Things I Know About Her', 'Jean-Luc Godard')
+    >>> get_movie_id('2 or 3 Things I Know About Her', 'Jean-Luc Godard')
     u'0060304'
 
-    >>> getMovieId('2 or 3 Things I Know About Her', 'Jean-Luc Godard', '1967')
+    >>> get_movie_id('2 or 3 Things I Know About Her', 'Jean-Luc Godard', '1967')
     u'0060304'
 
-    >>> getMovieId(u"Histoire(s) du cinema: Le controle de l'univers", 'Jean-Luc Godard')
+    >>> get_movie_id(u"Histoire(s) du cinema: Le controle de l'univers", 'Jean-Luc Godard')
     u'0179214'
 
-    >>> getMovieId(u"Histoire(s) du cinéma: Le contrôle de l'univers", 'Jean-Luc Godard')
+    >>> get_movie_id(u"Histoire(s) du cinéma: Le contrôle de l'univers", 'Jean-Luc Godard')
     u'0179214'
     '''
     imdbId = {
@@ -555,12 +555,12 @@ def getMovieId(title, director='', year='', timeout=-1):
     #or nothing
     return ''
 
-def getMoviePoster(imdbId):
+def get_movie_poster(imdbId):
     '''
-    >>> getMoviePoster('0133093')
+    >>> get_movie_poster('0133093')
     'http://ia.media-imdb.com/images/M/MV5BMjEzNjg1NTg2NV5BMl5BanBnXkFtZTYwNjY3MzQ5._V1._SX338_SY475_.jpg'
 
-    >>> getMoviePoster('0994352')
+    >>> get_movie_poster('0994352')
     'http://ia.media-imdb.com/images/M/MV5BMjA3NzMyMzU1MV5BMl5BanBnXkFtZTcwNjc1ODUwMg@@._V1._SX594_SY755_.jpg'
     '''
     info = ImdbCombined(imdbId)
@@ -570,10 +570,10 @@ def getMoviePoster(imdbId):
         poster = find_re(data, 'img id="primary-img".*?src="(.*?)"')
         return poster
     elif 'series' in info:
-        return getMoviePoster(info['series'])
+        return get_movie_poster(info['series'])
     return ''
 
-def maxVotes():
+def max_votes():
     url = 'http://www.imdb.com/search/title?num_votes=500000,&sort=num_votes,desc'
     data = ox.cache.read_url(url)
     votes = max([int(v.replace(',', ''))
@@ -581,7 +581,7 @@ def maxVotes():
     return votes
 
 def guess(title, director='', timeout=-1):
-    return getMovieId(title, director, timeout=timeout)
+    return get_movie_id(title, director, timeout=timeout)
 
 if __name__ == "__main__":
     import json

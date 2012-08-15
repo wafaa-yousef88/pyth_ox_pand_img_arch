@@ -27,7 +27,7 @@ class SiteParser(dict):
     baseUrl = ''
     regex = {}
 
-    def getUrl(self, page):
+    def get_url(self, page):
         return "%s%s" % (self.baseUrl, page)
 
     def read_url(self, url, timeout):
@@ -35,7 +35,7 @@ class SiteParser(dict):
 
     def __init__(self, timeout=-1):
         for key in self.regex:
-            url = self.getUrl(self.regex[key]['page'])
+            url = self.get_url(self.regex[key]['page'])
             data = self.read_url(url, timeout)
             if isinstance(self.regex[key]['re'], basestring):
                 data = re.compile(self.regex[key]['re'], re.DOTALL).findall(data)

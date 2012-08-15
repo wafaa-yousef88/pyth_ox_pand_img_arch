@@ -2,29 +2,30 @@
 # vi:si:et:sw=4:sts=4:ts=4
 import re
 
-from ox.cache import getHeaders, read_url
+from ox.cache import read_url
 from ox import find_re, strip_tags
 
 
-def getUrlByImdb(imdb):
+def get_url(id=None, imdb=None):
     #this would also wor but does not cache:
     '''
     from urllib2 import urlopen
     u = urlopen(url)
     return u.url
     '''
-    url = "http://www.rottentomatoes.com/alias?type=imdbid&s=%s" % imdb
-    data = read_url(url)
-    if "movie_title" in data:
-        movies = re.compile('(/m/.*?/)').findall(data)
-        if movies:
-            return "http://www.rottentomatoes.com" + movies[0]
+    if imdb:
+        url = "http://www.rottentomatoes.com/alias?type=imdbid&s=%s" % imdb
+        data = read_url(url)
+        if "movie_title" in data:
+            movies = re.compile('(/m/.*?/)').findall(data)
+            if movies:
+                return "http://www.rottentomatoes.com" + movies[0]
     return None
 
 def get_og(data, key):
     return find_re(data, '<meta property="og:%s".*?content="(.*?)"' % key)
 
-def getData(url):
+def get_data(url):
     data = read_url(url)
     r = {}
     r['title'] = find_re(data, '<h1 class="movie_title">(.*?)</h1>')

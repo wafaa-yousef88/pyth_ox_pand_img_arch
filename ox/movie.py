@@ -307,6 +307,8 @@ def parse_movie_path(path):
     title = title.replace('_ ', ': ')
     if title.endswith('_'):
         title = title[:-1] + '.'
+    if title.startswith('_'):
+        title = '.' + title[1:]
 
     year = find_re(title, '(\(\d{4}\))')
     if not year:
@@ -344,8 +346,9 @@ def parse_movie_path(path):
     else:
         season = None
 
-    episode = find_re(parts[-1], '\.Episode (\d+)\.')
+    episode = find_re(parts[-1], '\.Episode[s]* ([\d+]+)\.')
     if episode:
+        episode = episode.split('+')[0]
         episode = int(episode)
     else:
         episode = None

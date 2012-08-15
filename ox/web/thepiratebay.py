@@ -22,7 +22,9 @@ def read_url(url, data=None, headers=cache.DEFAULT_HEADERS, timeout=cache.cache_
     headers['Cookie'] = 'language=en_EN'
     return cache.read_url(url, data, headers, timeout, unicode=unicode)
 
-def findMovies(query, max_results=10):
+def find_movies(query=None, imdb=None, max_results=10):
+    if imdb:
+        query = "tt" + normalize_imdbid(imdb)
     results = []
     next = ["http://thepiratebay.org/search/%s/0/3/200" % quote(query), ]
     page_count = 1
@@ -47,10 +49,7 @@ def findMovies(query, max_results=10):
         next = re.compile('<a.*?href="(.*?)".*?>.*?next.gif.*?</a>').findall(data)
     return results
 
-def findMovieByImdb(imdb):
-    return findMovies("tt" + normalize_imdbid(imdb))
-
-def getId(piratebayId):
+def get_id(piratebayId):
     if piratebayId.startswith('http://torrents.thepiratebay.org/'):
         piratebayId = piratebayId.split('org/')[1]
     d = find_re(piratebayId, "tor/(\d+)")
@@ -62,10 +61,10 @@ def getId(piratebayId):
     return piratebayId
 
 def exists(piratebayId):
-    piratebayId = getId(piratebayId)
+    piratebayId = get_id(piratebayId)
     return ox.net.exists("http://thepiratebay.org/torrent/%s" % piratebayId)
 
-def getData(piratebayId):
+def get_data(piratebayId):
     _key_map = {
       'spoken language(s)': u'language',
       'texted language(s)': u'subtitle language',
@@ -73,7 +72,7 @@ def getData(piratebayId):
       'leechers': 'leecher',
       'seeders': 'seeder',
     }
-    piratebayId = getId(piratebayId)
+    piratebayId = get_id(piratebayId)
     torrent = dict()
     torrent[u'id'] = piratebayId
     torrent[u'domain'] = 'thepiratebay.org'
@@ -108,7 +107,7 @@ class Thepiratebay(Torrent):
     '4e84415d36ed7b54066160c05a0b0f061898d12b'
     '''
     def __init__(self, piratebayId):
-        self.data = getData(piratebayId)
+        self.data = get_data(piratebayId)
         if not self.data:
             return
         Torrent.__init__(self)

@@ -8,7 +8,7 @@ from ox.cache import read_url
 from ox import find_string, find_re
 
 
-def getData(id):
+def get_data(id):
     url = 'http://www.vimeo.com/moogaloop/load/clip:%s' %id
     xml = read_url(url)
     tree = ET.parse(StringIO(xml))

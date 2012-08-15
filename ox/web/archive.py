@@ -3,15 +3,15 @@
 from .. import cache
 from ..utils import json
 
-def getId(url):
+def get_id(url):
     return url.split("/")[-1]
 
-def getUrl(id):
+def get_url(id):
     return "http://www.archive.org/details/%s" % id
 
-def getData(id):
+def get_data(id):
     data = {}
-    url = getUrl(id)
+    url = get_url(id)
     details = cache.read_url('%s?output=json' % url)
     details = json.loads(details)
     for key in ('title', 'description', 'runtime'):

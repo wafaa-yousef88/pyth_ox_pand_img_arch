@@ -8,7 +8,7 @@ import feedparser
 from ox.cache import read_url, cache_timeout
 
  
-def getVideoUrl(youtubeId, format='mp4', timeout=cache_timeout):
+def video_url(youtubeId, format='mp4', timeout=cache_timeout):
     """
         youtubeId - if of video
         format - video format, options: webm, 1080p, 720p, mp4, high

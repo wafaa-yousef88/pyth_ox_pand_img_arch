@@ -9,25 +9,25 @@ from ox.text import find_re, remove_special_characters
 
 import imdb
 
-def getId(url):
+def get_id(url):
     return url.split("/")[-1]
 
-def getUrl(id):
+def get_url(id):
     return "http://www.criterion.com/films/%s" % id
 
-def getData(id, timeout=ox.cache.cache_timeout, get_imdb=False):
+def get_data(id, timeout=ox.cache.cache_timeout, get_imdb=False):
     '''
-    >>> getData('1333')['imdbId']
+    >>> get_data('1333')['imdbId']
     u'0060304'
 
-    >>> getData('236')['posters'][0]
+    >>> get_data('236')['posters'][0]
     u'http://criterion_production.s3.amazonaws.com/release_images/1586/ThirdManReplace.jpg'
 
-    >>> getData('786')['posters'][0]
+    >>> get_data('786')['posters'][0]
     u'http://criterion_production.s3.amazonaws.com/product_images/185/343_box_348x490.jpg'
     '''
     data = {
-        "url": getUrl(id)
+        "url": get_url(id)
     }
     try:
         html = read_url(data["url"], timeout=timeout, unicode=True)
@@ -71,21 +71,21 @@ def getData(id, timeout=ox.cache.cache_timeout, get_imdb=False):
     if timeout == ox.cache.cache_timeout:
         timeout = -1
     if get_imdb:
-        data['imdbId'] = imdb.getMovieId(data['title'],
+        data['imdbId'] = imdb.get_movie_id(data['title'],
             data['director'], data['year'], timeout=timeout)
     return data
 
-def getIds():
+def get_ids():
     ids = []
     html = read_url("http://www.criterion.com/library/expanded_view?m=dvd&p=1&pp=50&s=spine", unicode=True)
     results = re.compile("\&amp;p=(\d+)\&").findall(html)
     pages = max(map(int, results))
     for page in range(1, pages):
-        for id in getIdsByPage(page):
+        for id in get_idsByPage(page):
             ids.append(id)
     return map(lambda id: str(id), sorted(map(lambda id: int(id), set(ids))))
 
-def getIdsByPage(page):
+def get_idsByPage(page):
     ids = []
     url = "http://www.criterion.com/library/expanded_view?m=dvd&p=%s&pp=50&s=spine" % page
     html = read_url(url, unicode=True)
@@ -101,4 +101,4 @@ def getIdsByPage(page):
     return set(ids)
 
 if __name__ == '__main__':
-    print getIds()
+    print get_ids()
