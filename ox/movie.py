@@ -28,7 +28,7 @@ def format_path(data):
             '.%s' % data['version'] if data['version'] else '',
             '.Part %s' % data['part'] if data['part'] else '',
             '.%s' % data['part_title'] if data['part_title'] else '',
-            '.%s' % data['language'].replace('/', '.') if data['language'] else '',
+            '.%s' % data['language'].replace('/', '.') if not data['language'] in [None, 'en'] else '',
             '.%s' % data['extension']
         )
     ]))
@@ -50,7 +50,7 @@ def parse_path(path):
             type = 'audio'
         elif string in ['idx', 'srt', 'sub']:
             type = 'subtitle'
-        elif string in ['avi', 'm4v', 'mkv', 'mov', 'mpg', 'ogv']:
+        elif string in ['avi', 'm4v', 'mkv', 'mov', 'mpg', 'ogv', 'rm']:
             type = 'video'
         else:
             type = None
@@ -79,7 +79,7 @@ def parse_path(path):
     # title, year
     data['title'], data['year'] = parse_title(parts[2])
     parts = re.split('\.(?! )', parts[3])
-    # season, episode, episode_title
+    # is_episode, season, episode, episode_title
     data['season'], data['episode'], data['episode_title'] = parse_series(parts.pop(0))
     if data['season'] or data['episode']:
         data['is_episode'] = True
@@ -110,7 +110,7 @@ def parse_path(path):
     data['part_title'] = parts.pop(0) if re.search('^[A-Z0-9]', parts[0]) else None
     # language
     data['language'] = None
-    while re.search('^[a-z]{2}$', parts[0]):
+    while len(parts) > 1 and re.search('^[a-z]{2}$', parts[0]):
         data['language'] = parts.pop(0) if not data['language'] else '%s/%s' % (
             data['language'], parts.pop(0)
         )
