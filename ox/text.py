@@ -54,61 +54,85 @@ UA_ALIASES = {
 UA_NAMES = {
     'browser': {
         'chromeframe': 'Chrome Frame',
+        'Gecko': 'Mozilla',
+        'Mozilla': 'Netscape',
         'MSIE': 'Internet Explorer'
     },
     'robot': {},
     'system': {
         'CPU OS': 'iOS',
+        'iPhone': 'iOS',
         'iPhone OS': 'iOS',
-        'Macintosh': 'Mac OS X'
+        'Mac_PowerPC': 'Mac OS',
+        'Mac_PPC': 'Mac OS',
+        'Macintosh': 'Mac OS',
+        'Win': 'Windows',
+        'X11': 'Linux'
     }
 }
 UA_REGEXPS = {
     'browser': [
         '(Camino)\/(\d+)',
+        '(Chimera)\/(\d+)',
         '(chromeframe)\/(\d+)',
         '(Chrome)\/(\d+)',
         '(Epiphany)\/(\d+)',
         '(Firefox)\/(\d+)',
         '(Galeon)\/(\d+)',
+        '(iCab) (\d+)',
+        '(iCab)\/(\d+)',
         '(Konqueror)\/(\d+)',
-        '(MSIE) (\d+)',
+        '(Lynx)\/(\d+)',
         '(Netscape)\d?\/(\d+)',
         '(NokiaBrowser)\/(\d+)',
+        '(OmniWeb)\/(\d+)',
         '(Opera) (\d+)',
+        '(Opera)\/(\d+)',
         '(Opera)\/.+Version\/(\d+)',
         'Version\/(\d+).+(Safari)',
-        '(WebKit)\/(\d+)'
+        '(WebKit)\/(\d+)',
+        '(MSIE) (\d+)', # last, since Opera used to mask as MSIE
+        '(Gecko)',
+        '(Mozilla)\/(3|4)'
     ],
     'robot': [
         '(BingPreview)\/(\d+)',
         '(Google Web Preview).+Chrome\/(\d+)',
-        '(Googlebot)\/(\d+)'
+        '(Googlebot)\/(\d+)',
+        '(WebCrawler)\/(\d+)'
     ],
     'system': [
         '(Android) (\d+)',
         '(BeOS)',
         '(BlackBerry) (\d+)',
+        '(BlackBerry)',
         '(Darwin)',
         '(BSD) (FreeBSD|NetBSD|OpenBSD)',
         '(CPU OS) (\d+)',
         '(iPhone OS) (\d+)',
+        '(iPhone)', # Opera
         '(Linux).+(CentOS|CrOS|Debian|Fedora|Gentoo|Mandriva|MeeGo|Mint|Red Hat|SUSE|Ubuntu|webOS)',
         '(CentOS|CrOS|Debian|Fedora|Gentoo|Mandriva|MeeGo|Mint|Red Hat|SUSE|Ubuntu|webOS).+(Linux)',
         '(Linux)',
         '(Mac OS X) (10.\d)',
         '(Mac OS X)',
+        '(Mac_PowerPC)',
+        '(Mac_PPC)',
         '(Macintosh)',
+        '(Symbian OS)',
         '(SymbianOS)\/(\d+)',
         '(SymbOS)',
         '(OS\/2)',
         '(Unix) (AIX|HP-UX|IRIX|SunOS)',
         '(Unix)',
         '(Windows) (NT \d\.\d)',
-        '(Windows) (95|98|2000|2003|ME|NT|XP)', # Opera
-        '(Windows).+(Win 9x 4\.90)', # Firefox
-        '(Windows).+(Win9\d)', # Firefox
-        '(Windows).+(WinNT4.0)' # Firefox
+        '(Windows) (3\.1|95|98|2000|2003|CE|ME|Mobile|NT|XP)', # Opera
+        '(Win) (9x 4\.90)', # Firefox
+        '(Win)(16)', # Firefox
+        '(Win)(9\d)', # Firefox
+        '(Win)(NT)', # Firefox
+        '(Win)(NT4\.0)', # Firefox
+        '(X11)'
     ]
 }
 UA_VERSIONS = {
@@ -125,25 +149,27 @@ UA_VERSIONS = {
         '10.7': '10.7 (Lion)',
         '10.8': '10.8 (Mountain Lion)',
         'CrOS': 'Chrome OS',
+        'NT 3.1': 'NT 3.1 (3.1)',
+        'NT 3.5': 'NT 3.5 (NT)',
         'NT 4.0': 'NT 4.0 (NT)',
         'NT 4.1': 'NT 4.1 (98)',
-        'Win 9x 4.90': 'NT 4.9 (ME)',
+        '9x 4.90': 'NT 4.9 (ME)',
         'NT 5.0': 'NT 5.0 (2000)',
         'NT 5.1': 'NT 5.1 (XP)',
         'NT 5.2': 'NT 5.2 (2003)',
         'NT 6.0': 'NT 6.0 (Vista)',
         'NT 6.1': 'NT 6.1 (7)',
         'NT 6.2': 'NT 6.2 (8)',
+        '16': 'NT 3.1 (3.1)',
+        '3.1': 'NT 3.1 (3.1)',
         '95': 'NT 4.0 (95)',
         'NT': 'NT 4.0 (NT)',
+        'NT4.0': 'NT 4.0 (NT)',
         '98': 'NT 4.1 (98)',
         'ME': 'NT 4.9 (ME)',
         '2000': 'NT 5.0 (2000)',
-        '2003': 'NT 5.2 (2003)',
         'XP': 'NT 5.1 (XP)',
-        'Win95': 'NT 4.0 (95)',
-        'WinNT4.0': 'NT 4.0 (NT)',
-        'Win98': 'NT 4.1 (98)'
+        '2003': 'NT 5.2 (2003)'
     }
 }
 
