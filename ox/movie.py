@@ -16,9 +16,9 @@ __all__ = ['parse_movie_path', 'create_movie_path', 'get_oxid']
 def format_path(data):
     def format_underscores(string):
         return re.sub('^\.|\.$|/|:', '_', string)
-    director_sort = data['series_director_sort' if data['is_episode'] else 'director_sort']
-    title = data['series_title' if data['is_episode'] else 'title']
-    year = data['series_year' if data['is_episode'] else 'year']
+    director_sort = data['seriesDirectorSort' if data['isEpisode'] else 'directorSort']
+    title = data['seriesTitle' if data['isEpisode'] else 'title']
+    year = data['seriesYear' if data['isEpisode'] else 'year']
     return '/'.join(map(format_underscores, [
         data['directory'],
         '; '.join(director_sort) or 'Unknown Director',
@@ -27,7 +27,7 @@ def format_path(data):
             data['title'],
             '.%s' % data['version'] if data['version'] else '',
             '.Part %s' % data['part'] if data['part'] else '',
-            '.%s' % data['part_title'] if data['part_title'] else '',
+            '.%s' % data['partTitle'] if data['partTitle'] else '',
             '.%s' % data['language'].replace('/', '.') if not data['language'] in [None, 'en'] else '',
             '.%s' % data['extension']
         )
@@ -66,48 +66,48 @@ def parse_path(path):
     parts = map(parse_underscores, path.split('/'))
     # directory
     data['directory'] = parts[0]
-    # director_sort
-    data['director_sort'] = filter(
+    # directorSort
+    data['directorSort'] = filter(
         lambda x: x != 'Unknown Director',
         parts[1].split('; ')
     )
     # director
     data['director'] = map(
         lambda x: ' '.join(reversed(x.split(', '))),
-        data['director_sort']
+        data['directorSort']
     )
     # title, year
     data['title'], data['year'] = parse_title(parts[2])
     parts = re.split('\.(?! )', parts[3])
-    # is_episode, season, episode, episode_title
-    data['season'], data['episode'], data['episode_title'] = parse_series(parts.pop(0))
+    # isEpisode, seriesDirector, seriesTitle, seriesYear, season, episode, episodeTitle
+    data['season'], data['episode'], data['episodeTitle'] = parse_series(parts.pop(0))
     if data['season'] or data['episode']:
-        data['is_episode'] = True
-        data['series_director'] = data['director']
+        data['isEpisode'] = True
+        data['seriesDirector'] = data['director']
         data['director'] = None
-        data['series_director_sort'] = data['director_sort']
-        data['director_sort'] = None
-        data['series_title'] = data['title']
+        data['seriesDirectorSort'] = data['directorSort']
+        data['directorSort'] = None
+        data['seriesTitle'] = data['title']
         data['title'] = '%s (%s%s)%s' % (
             data['title'],
             'S%02d' % data['season'] if data['season'] else '',
             'E%02d' % data['episode'] if data['episode'] else '',
-            ' %s' % data['episode_title'] if data['episode_title'] else ''
+            ' %s' % data['episodeTitle'] if data['episodeTitle'] else ''
         )
-        data['series_year'] = data['year']
+        data['seriesYear'] = data['year']
         data['year'] = None
     else:
-        data['is_episode'] = False
-        data['series_director'] = None
-        data['series_director_sort'] = None
-        data['series_title'] = None
-        data['series_year'] = None
+        data['isEpisode'] = False
+        data['seriesDirector'] = None
+        data['seriesDirectorSort'] = None
+        data['seriesTitle'] = None
+        data['seriesYear'] = None
     # version
     data['version'] = parts.pop(0) if re.search('^[A-Z0-9]', parts[0]) and not re.search('^Part ', parts[0]) else None        
     # part
     data['part'] = parts.pop(0)[5:] if re.search('^Part ', parts[0]) else None
-    # part_title
-    data['part_title'] = parts.pop(0) if re.search('^[A-Z0-9]', parts[0]) else None
+    # partTitle
+    data['partTitle'] = parts.pop(0) if re.search('^[A-Z0-9]', parts[0]) else None
     # language
     data['language'] = None
     while len(parts) > 1 and re.search('^[a-z]{2}$', parts[0]):
