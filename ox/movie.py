@@ -21,7 +21,7 @@ def format_path(data):
     year = data['series_year' if data['is_episode'] else 'year']
     return '/'.join(map(format_underscores, [
         data['directory'],
-        '; '.join(director_sort),
+        '; '.join(director_sort) or 'Unknown Director',
         '%s%s' % (title, ' (%s)' % year if year else ''),
         '%s%s%s%s%s%s' % (
             data['title'],
