@@ -25,11 +25,10 @@ def format_path(data, has_director_directory=True):
     director = data['seriesDirectorSort' if data['isEpisode'] else 'directorSort'] or ['Unknown Director']
     title = data['seriesTitle' if data['isEpisode'] else 'title'] or 'Untitled'
     year = data['seriesYear' if data['isEpisode'] else 'year']
-    return '/'.join(map(format_underscores, filter(lambda x: x != None, [
+    parts = map(format_underscores, filter(lambda x: x != None, [
         data['directory'] or director[0][0] if has_director_directory else title[0],
         '; '.join(director) if has_director_directory else None,
         '%s%s' % (title, ' (%s)' % year if year else ''),
-        data['subdirectory'],
         '%s%s%s%s%s%s' % (
             data['title'] or 'Untitled',
             '.%s' % data['version'] if data['version'] else '',
@@ -38,7 +37,10 @@ def format_path(data, has_director_directory=True):
             '.%s' % data['language'].replace('/', '.') if not data['language'] in [None, 'en'] else '',
             '.%s' % data['extension'] if data['extension'] else ''
         )
-    ])))
+    ]))
+    if data['subdirectory']:
+        parts.insert(-1, data['subdirectory'])
+    return '/'.join(parts)
 
 def parse_path(path):
     '''
@@ -87,7 +89,7 @@ def parse_path(path):
     parts = map(parse_underscores, path.split('/'))
     # subdirectory
     if len(parts) > 4:
-        data['subdirectory'] = parts[3:-1]
+        data['subdirectory'] = '/'.join(parts[3:-1])
         parts = parts[:3] + parts[-1:]
     else:
         data['subdirectory'] = None
