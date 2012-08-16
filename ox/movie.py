@@ -28,8 +28,8 @@ extensions = {
 
 '''
 Naming scheme:
-X/[Group, The; Lastname, Firstname/]The Title[ (YEAR[-YEAR])]/
-The Title[ ([SXX][EYY])[ Episode Title]][.Version][.Part XY[.Part Title][.en][.fr].xyz
+X/[Group, The; Lastname, Firstname/]The Title[ (YEAR[-[YEAR]])]/
+The Title[ ([SXX][EYY[+ZZ|-ZZ]])[ Episode Title]][.Version][.Part XY[.Part Title][.en][.fr].xyz
 '''
 
 def format_path(data, has_director_directory=True):
@@ -69,6 +69,7 @@ def parse_path(path):
     # handle underscores
     >>> parse_path('U/Unknown Director/_com_ 1_0 _ NaN.._/_com_ 1_0 _ NaN....avi')['title']
     '.com: 1/0 / NaN...'
+    # TODO: '.com.avi'
     '''
     def parse_title(string):
         return title, year
@@ -114,7 +115,7 @@ def parse_path(path):
         data['directorSort'] = data['director'] = []
     # title, year
     if title:
-        match = re.search(' \(\d{4}(-\d{4})?\)$', title)
+        match = re.search(' \(\d{4}(-\(d{4})?)?\)$', title)
         data['title'] = title[:-len(match.group(0))] if match else title
         data['year'] = match.group(0)[2:-1] if match else None        
         file_title = re.sub('^\.|/|:', '_', data['title'])
