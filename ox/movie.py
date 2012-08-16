@@ -13,27 +13,45 @@ from text import get_sort_name, findRe
 
 __all__ = ['parse_movie_path', 'create_movie_path', 'get_oxid']
 
-def format_path(data):
+def format_path(data, has_director_directory=True):
     def format_underscores(string):
         return re.sub('^\.|\.$|/|:', '_', string)
-    director_sort = data['seriesDirectorSort' if data['isEpisode'] else 'directorSort']
+    director = data['seriesDirectorSort' if data['isEpisode'] else 'directorSort']
     title = data['seriesTitle' if data['isEpisode'] else 'title']
     year = data['seriesYear' if data['isEpisode'] else 'year']
-    return '/'.join(map(format_underscores, [
+    if has_director_directory and not director:
+        director = ['Unknown Director']
+    return '/'.join(map(format_underscores, filter(lambda x: x != None, [
         data['directory'],
-        '; '.join(director_sort) or 'Unknown Director',
-        '%s%s' % (title, ' (%s)' % year if year else ''),
+        '; '.join(director) if director else None,
+        '%s%s' % (title, ' (%s)' % year if year else '') if title else None,
+        data['subdirectory'],
         '%s%s%s%s%s%s' % (
-            data['title'],
+            data['title'] or '',
             '.%s' % data['version'] if data['version'] else '',
             '.Part %s' % data['part'] if data['part'] else '',
             '.%s' % data['partTitle'] if data['partTitle'] else '',
             '.%s' % data['language'].replace('/', '.') if not data['language'] in [None, 'en'] else '',
             '.%s' % data['extension']
         )
-    ]))
+    ])))
 
 def parse_path(path):
+    '''
+    # all keys
+    >>> parse_path('F/Frost, Mark; Lynch, David/Twin Peaks (1991)/Twin Peaks (S01E01) Pilot.European Version.Part 1.Welcome to Twin Peaks.en.fr.MPEG')['path']
+    'F/Frost, Mark; Lynch, David/Twin Peaks (1991)/Twin Peaks (S01E01) Pilot.European Version.Part 1.Welcome to Twin Peaks.en.fr.mpg'
+    # pop directory title off file name
+    >>> parse_path('U/Unknown Director/www.xxx.com.._/www.xxx.com....Directors\'s Cut.avi')['version']
+    'Director\'s Cut'
+    # handle dots
+    >>> parse_path('U/Unknown Director/Unknown Title (2000)/... Mr. .com....Director\'s Cut.srt')['version']
+    'Director\'s Cut'
+    # handle underscores
+    >>> parse_path('U/Unknown Director/_com_ 1_0 _ NaN.._/_com_ 1_0 _ NaN....avi')['title']
+    '.com: 1/0 / NaN...'
+    >>> parse_path('.foo')
+    '''
     def parse_series(string):
         match = re.search(' \((S\d{2})?(E\d{2}([+-]\d{2})?)?\)(.+)?', string)
         season = int(match.group(1)[1:]) if match and match.group(1) else None
@@ -50,7 +68,7 @@ def parse_path(path):
             type = 'audio'
         elif string in ['idx', 'srt', 'sub']:
             type = 'subtitle'
-        elif string in ['avi', 'm4v', 'mkv', 'mov', 'mpg', 'ogv', 'rm']:
+        elif string in ['avi', 'divx', 'm4v', 'mkv', 'mov', 'mpg', 'ogv', 'rm']:
             type = 'video'
         else:
             type = None
@@ -58,35 +76,60 @@ def parse_path(path):
     def parse_underscores(string):
         string = re.sub('^_', '.', string)
         string = re.sub('_$', '.', string)
-        string = re.sub('(?=\w)_(?=\w)', '/', string)
+        string = re.sub('(?<=\w)_(?=\w)', '/', string)
         string = re.sub(' _ ', ' / ', string)
-        string = re.sub('(?=\w)_ ', ': ', string)
+        string = re.sub('(?<=\w)_ ', ': ', string)
         return string
     data = {}
     parts = map(parse_underscores, path.split('/'))
+    # subdirectory
+    if len(parts) > 4:
+        data['subdirectory'] = parts[3:-1]
+        parts = parts[:3] + parts[-1:]
+    else:
+        data['subdirectory'] = None
+    length = len(parts)
     # directory
-    data['directory'] = parts[0]
-    # directorSort
-    data['directorSort'] = filter(
-        lambda x: x != 'Unknown Director',
-        parts[1].split('; ')
-    )
-    # director
-    data['director'] = map(
-        lambda x: ' '.join(reversed(x.split(', '))),
-        data['directorSort']
-    )
+    data['directory'], director, title, file = [
+        parts[0] if length > 2 else None,
+        parts[1] if length == 4 else None,
+        parts[-2] if length > 1 else None,
+        parts[-1]
+    ]
+    # directorSort, director
+    if director:
+        data['directorSort'] = filter(
+            lambda x: x != 'Unknown Director',
+            director.split('; ')
+        )
+        data['director'] = map(
+            lambda x: ' '.join(reversed(x.split(', '))),
+            data['directorSort']
+        )
+    else:
+        data['directorSort'] = data['director'] = []
     # title, year
-    data['title'], data['year'] = parse_title(parts[2])
-    parts = re.split('\.(?! )', parts[3])
-    # isEpisode, seriesDirector, seriesTitle, seriesYear, season, episode, episodeTitle
-    data['season'], data['episode'], data['episodeTitle'] = parse_series(parts.pop(0))
+    if title:
+        data['title'], data['year'] = parse_title(title)
+        file_title = re.sub('^\.|/|:', '_', data['title'])
+        title = re.sub('^' + re.escape(file_title), '', title)
+    else:
+        data['title'] = data['year'] = None
+    parts = re.split('(?<!\s)\.(?=\w)', file)
+    title, parts, extension = [
+        parts[0],
+        parts[1:-1],
+        parts[-1] if len(parts) > 1 else None
+    ]
+    # season, episode, episodeTitle
+    data['season'], data['episode'], data['episodeTitle'] = parse_series(title)
+    # isEpisode, seriesDirector, seriesDirectorSort, seriesTitle, seriesYear
     if data['season'] or data['episode']:
         data['isEpisode'] = True
         data['seriesDirector'] = data['director']
-        data['director'] = None
+        data['director'] = []
         data['seriesDirectorSort'] = data['directorSort']
-        data['directorSort'] = None
+        data['directorSort'] = []
         data['seriesTitle'] = data['title']
         data['title'] = '%s (%s%s)%s' % (
             data['title'],
@@ -98,30 +141,28 @@ def parse_path(path):
         data['year'] = None
     else:
         data['isEpisode'] = False
-        data['seriesDirector'] = None
-        data['seriesDirectorSort'] = None
-        data['seriesTitle'] = None
-        data['seriesYear'] = None
+        data['seriesDirector'] = data['seriesDirectorSort'] = []
+        data['seriesTitle'] = data['seriesYear'] = None
     # version
-    data['version'] = parts.pop(0) if re.search('^[A-Z0-9]', parts[0]) and not re.search('^Part ', parts[0]) else None        
+    data['version'] = parts.pop(0) if len(parts) and re.search('^[A-Z0-9]', parts[0]) and not re.search('^Part .', parts[0]) else None        
     # part
-    data['part'] = parts.pop(0)[5:] if re.search('^Part ', parts[0]) else None
+    data['part'] = parts.pop(0)[5:] if len(parts) and re.search('^Part .', parts[0]) else None
     # partTitle
-    data['partTitle'] = parts.pop(0) if re.search('^[A-Z0-9]', parts[0]) else None
+    data['partTitle'] = parts.pop(0) if len(parts) and re.search('^[A-Z0-9]', parts[0]) and data['part'] else None
     # language
     data['language'] = None
-    while len(parts) > 1 and re.search('^[a-z]{2}$', parts[0]):
+    while len(parts) and re.search('^[a-z]{2}$', parts[0]):
         data['language'] = parts.pop(0) if not data['language'] else '%s/%s' % (
             data['language'], parts.pop(0)
         )
     # extension
-    data['extension'] = parts.pop().lower()
+    data['extension'] = re.sub('^mpeg$', 'mpg', extension.lower())
     # type
     data['type'] = parse_type(data['extension'])
     if data['type'] == 'subtitle' and not data['language']:
         data['language'] = 'en'
-    # _unknown
-    data['_unknown'] = '.'.join(parts) if len(parts) else None
+    # path
+    data['path'] = format_path(data)
     return data
 
 
@@ -288,3 +329,4 @@ def get_oxid(title, director=[], year='',
         oxid = get_hash('\n'.join([director, title, str(year), str(season)]))[:8] + \
                get_hash('\n'.join([str(episode), episode_director, episode_title, str(episode_year)]))[:8]
     return u'0x' + oxid
+
