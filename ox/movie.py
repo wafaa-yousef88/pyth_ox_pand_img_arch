@@ -13,6 +13,19 @@ from text import get_sort_name, findRe
 
 __all__ = ['parse_movie_path', 'create_movie_path', 'get_oxid']
 
+extensions = {
+    'audio': [
+        'aac', 'flac', 'm4a', 'mp3', 'oga', 'ogg', 'wav', 'wma'
+    ],
+    'subtitle': [
+        'idx', 'srt', 'sub'
+    ],
+    'video': [
+        'avi', 'divx', 'dv', 'flv', 'm4v', 'mkv', 'mov', 'mp4',
+        'mpeg', 'mpg', 'mts', 'ogm', 'ogv', 'rm', 'webm', 'wmv'
+    ],
+}
+
 '''
 Naming scheme:
 X/[Group, The; Lastname, Firstname/]The Title[ (YEAR[-YEAR])]/
@@ -60,15 +73,10 @@ def parse_path(path):
     def parse_title(string):
         return title, year
     def parse_type(string):
-        if string in ['aac', 'm4a', 'mp3', 'ogg']:
-            type = 'audio'
-        elif string in ['idx', 'srt', 'sub']:
-            type = 'subtitle'
-        elif string in ['avi', 'divx', 'm4v', 'mkv', 'mov', 'mpg', 'ogv', 'rm']:
-            type = 'video'
-        else:
-            type = None
-        return type
+        for type in extensions:
+            if string in extensions[type]:
+                return type
+        return None
     def parse_underscores(string):
         string = re.sub('^_', '.', string)
         string = re.sub('_$', '.', string)
