@@ -16,7 +16,7 @@ __all__ = ['parse_movie_path', 'create_movie_path', 'get_oxid']
 '''
 Naming scheme:
 X/[Group, The; Lastname, Firstname/]The Title[ (YEAR[-YEAR])]/
-The Title[ ([SXX][EYY])[ Episode Title]][.Version][.Part XY[.Part Title][.en].ext
+The Title[ ([SXX][EYY])[ Episode Title]][.Version][.Part XY[.Part Title][.en][.fr].xyz
 '''
 
 def format_path(data, has_director_directory=True):
@@ -57,16 +57,7 @@ def parse_path(path):
     >>> parse_path('U/Unknown Director/_com_ 1_0 _ NaN.._/_com_ 1_0 _ NaN....avi')['title']
     '.com: 1/0 / NaN...'
     '''
-    def parse_series(string):
-        match = re.search(' \((S\d{2})?(E\d{2}([+-]\d{2})?)?\)(.+)?', string)
-        season = int(match.group(1)[1:]) if match and match.group(1) else None
-        episode = int(match.group(2)[1:3]) if match and match.group(2) else None
-        episode_title = match.group(4)[1:] if match and match.group(4) else None
-        return season, episode, episode_title
     def parse_title(string):
-        match = re.search(' \(\d{4}(-\d{4})?\)$', string)
-        year = match.group(0)[2:-1] if match else None
-        title = string[:-len(match.group(0))] if match else string
         return title, year
     def parse_type(string):
         if string in ['aac', 'm4a', 'mp3', 'ogg']:
@@ -115,7 +106,9 @@ def parse_path(path):
         data['directorSort'] = data['director'] = []
     # title, year
     if title:
-        data['title'], data['year'] = parse_title(title)
+        match = re.search(' \(\d{4}(-\d{4})?\)$', title)
+        data['title'] = title[:-len(match.group(0))] if match else title
+        data['year'] = match.group(0)[2:-1] if match else None        
         file_title = re.sub('^\.|/|:', '_', data['title'])
         title = re.sub('^' + re.escape(file_title), '', title)
     else:
@@ -129,7 +122,10 @@ def parse_path(path):
     if not data['title'] and title:
         data['title'] = title
     # season, episode, episodeTitle
-    data['season'], data['episode'], data['episodeTitle'] = parse_series(title)
+    match = re.search(' \((S\d{2})?(E\d{2}([+-]\d{2})?)?\)(.+)?', title)
+    data['season'] = int(match.group(1)[1:]) if match and match.group(1) else None
+    data['episode'] = int(match.group(2)[1:3]) if match and match.group(2) else None
+    data['episodeTitle'] = match.group(4)[1:] if match and match.group(4) else None    
     # isEpisode, seriesDirector, seriesDirectorSort, seriesTitle, seriesYear
     if data['season'] or data['episode']:
         data['isEpisode'] = True
