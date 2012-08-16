@@ -115,7 +115,7 @@ def parse_path(path):
             data['language'], parts.pop(0)
         )
     # extension
-    data['extension'] = parts.pop()
+    data['extension'] = parts.pop().lower()
     # type
     data['type'] = parse_type(data['extension'])
     if data['type'] == 'subtitle' and not data['language']:
