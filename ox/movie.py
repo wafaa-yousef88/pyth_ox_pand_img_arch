@@ -13,26 +13,30 @@ from text import get_sort_name, findRe
 
 __all__ = ['parse_movie_path', 'create_movie_path', 'get_oxid']
 
+'''
+Naming scheme:
+X/[Group, The; Lastname, Firstname/]The Title[ (YEAR[-YEAR])]/
+The Title[ ([SXX][EYY])[ Episode Title]][.Version][.Part XY[.Part Title][.en].ext
+'''
+
 def format_path(data, has_director_directory=True):
     def format_underscores(string):
         return re.sub('^\.|\.$|/|:', '_', string)
-    director = data['seriesDirectorSort' if data['isEpisode'] else 'directorSort']
-    title = data['seriesTitle' if data['isEpisode'] else 'title']
+    director = data['seriesDirectorSort' if data['isEpisode'] else 'directorSort'] or ['Unknown Director']
+    title = data['seriesTitle' if data['isEpisode'] else 'title'] or 'Untitled'
     year = data['seriesYear' if data['isEpisode'] else 'year']
-    if has_director_directory and not director:
-        director = ['Unknown Director']
     return '/'.join(map(format_underscores, filter(lambda x: x != None, [
-        data['directory'],
-        '; '.join(director) if director else None,
-        '%s%s' % (title, ' (%s)' % year if year else '') if title else None,
+        data['directory'] or director[0][0] if has_director_directory else title[0],
+        '; '.join(director) if has_director_directory else None,
+        '%s%s' % (title, ' (%s)' % year if year else ''),
         data['subdirectory'],
         '%s%s%s%s%s%s' % (
-            data['title'] or '',
+            data['title'] or 'Untitled',
             '.%s' % data['version'] if data['version'] else '',
             '.Part %s' % data['part'] if data['part'] else '',
             '.%s' % data['partTitle'] if data['partTitle'] else '',
             '.%s' % data['language'].replace('/', '.') if not data['language'] in [None, 'en'] else '',
-            '.%s' % data['extension']
+            '.%s' % data['extension'] if data['extension'] else ''
         )
     ])))
 
@@ -50,7 +54,6 @@ def parse_path(path):
     # handle underscores
     >>> parse_path('U/Unknown Director/_com_ 1_0 _ NaN.._/_com_ 1_0 _ NaN....avi')['title']
     '.com: 1/0 / NaN...'
-    >>> parse_path('.foo')
     '''
     def parse_series(string):
         match = re.search(' \((S\d{2})?(E\d{2}([+-]\d{2})?)?\)(.+)?', string)
@@ -121,6 +124,8 @@ def parse_path(path):
         parts[1:-1],
         parts[-1] if len(parts) > 1 else None
     ]
+    if not data['title'] and title:
+        data['title'] = title
     # season, episode, episodeTitle
     data['season'], data['episode'], data['episodeTitle'] = parse_series(title)
     # isEpisode, seriesDirector, seriesDirectorSort, seriesTitle, seriesYear
@@ -156,7 +161,7 @@ def parse_path(path):
             data['language'], parts.pop(0)
         )
     # extension
-    data['extension'] = re.sub('^mpeg$', 'mpg', extension.lower())
+    data['extension'] = re.sub('^mpeg$', 'mpg', extension.lower()) if extension else None
     # type
     data['type'] = parse_type(data['extension'])
     if data['type'] == 'subtitle' and not data['language']:
@@ -329,4 +334,3 @@ def get_oxid(title, director=[], year='',
         oxid = get_hash('\n'.join([director, title, str(year), str(season)]))[:8] + \
                get_hash('\n'.join([str(episode), episode_director, episode_title, str(episode_year)]))[:8]
     return u'0x' + oxid
-
