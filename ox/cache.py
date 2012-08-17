@@ -68,6 +68,11 @@ class InvalidResult(Exception):
         self.result = result
         self.headers = headers
 
+def _fix_unicode_url(url):
+    if isinstance(url, unicode):
+        url = url.encode('utf-8')
+    return url
+
 def read_url(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout, valid=None, unicode=False):
     '''
         url     - url to load
@@ -78,29 +83,27 @@ def read_url(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout, val
                   if this function fails, InvalidResult will be raised deal with it in your code 
     '''
     #FIXME: send last-modified / etag from cache and only update if needed
-    if isinstance(url, unicode):
-        url = url.encode('utf-8')
-    data = store.get(url, data, headers, timeout)
-    if not data:
-        #print "get data", url
+    url = _fix_unicode_url(url)
+    result = store.get(url, data, headers, timeout)
+    if not result:
         try:
-            url_headers, data = net.read_url(url, data, headers, return_headers=True)
+            url_headers, result = net.read_url(url, data, headers, return_headers=True)
         except urllib2.HTTPError, e:
             e.headers['Status'] = "%s" % e.code
             url_headers = dict(e.headers)
-            data = e.read()
+            result = e.read()
             if url_headers.get('content-encoding', None) == 'gzip':
-                data = gzip.GzipFile(fileobj=StringIO.StringIO(data)).read()
-        if not valid or valid(data, url_headers):
-            store.set(url, data, data, url_headers)
+                result = gzip.GzipFile(fileobj=StringIO.StringIO(result)).read()
+        if not valid or valid(result, url_headers):
+            store.set(url, post_data=data, data=result, headers=url_headers)
         else:
-            raise InvalidResult(data, url_headers)
+            raise InvalidResult(result, url_headers)
     if unicode:
-        encoding = detect_encoding(data)
+        encoding = detect_encoding(result)
         if not encoding:
             encoding = 'latin-1'
-        data = data.decode(encoding)
-    return data
+        result = result.decode(encoding)
+    return result
 
 def save_url(url, filename, overwrite=False):
     if not os.path.exists(filename) or overwrite:
@@ -169,7 +172,6 @@ class SQLiteCache(Cache):
         r = None
         if timeout == 0:
             return r
-
         if data:
             url_hash = hashlib.sha1(url + '?' + data).hexdigest()
         else:

@@ -52,19 +52,19 @@ def open_url(url, data=None, headers=DEFAULT_HEADERS):
 
 def read_url(url, data=None, headers=DEFAULT_HEADERS, return_headers=False, unicode=False):
     f = open_url(url, data, headers)
-    data = f.read()
+    result = f.read()
     f.close()
     if f.headers.get('content-encoding', None) == 'gzip':
-        data = gzip.GzipFile(fileobj=StringIO.StringIO(data)).read()
+        result = gzip.GzipFile(fileobj=StringIO.StringIO(result)).read()
     if unicode:
-        encoding = detect_encoding(data)
+        encoding = detect_encoding(result)
         if not encoding:
             encoding = 'latin-1'
-        data = data.decode(encoding)
+        result = result.decode(encoding)
     if return_headers:
         f.headers['Status'] = "%s" % f.code
-        return dict(f.headers), data
-    return data
+        return dict(f.headers), result
+    return result
 
 def detect_encoding(data):
     if 'content="text/html; charset=utf-8"' in data:
