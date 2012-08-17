@@ -86,7 +86,7 @@ def parse_path(path):
         string = re.sub('(?<=\w)_ ', ': ', string)
         return string
     data = {}
-    parts = map(parse_underscores, path.split('/'))
+    parts = map(lambda x: parse_underscores(x.strip()), path.split('/'))
     # subdirectory
     if len(parts) > 4:
         data['subdirectory'] = '/'.join(parts[3:-1])
