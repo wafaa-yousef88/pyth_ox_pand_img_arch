@@ -136,7 +136,7 @@ def parse_path(path):
     data['episode'] = int(match.group(2)[1:3]) if match and match.group(2) else None
     data['episodeTitle'] = match.group(4)[1:] if match and match.group(4) else None    
     # isEpisode, seriesDirector, seriesDirectorSort, seriesTitle, seriesYear
-    if data['season'] or data['episode']:
+    if data['season'] != None or data['episode'] != None:
         data['isEpisode'] = True
         data['seriesDirector'] = data['director']
         data['director'] = []
@@ -171,8 +171,6 @@ def parse_path(path):
     data['extension'] = re.sub('^mpeg$', 'mpg', extension.lower()) if extension else None
     # type
     data['type'] = parse_type(data['extension'])
-    if data['type'] == 'subtitle' and not data['language']:
-        data['language'] = 'en'
     # path
     data['path'] = format_path(data)
     return data
