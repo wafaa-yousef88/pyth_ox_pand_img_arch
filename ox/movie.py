@@ -115,7 +115,7 @@ def parse_path(path):
         data['directorSort'] = data['director'] = []
     # title, year
     if title:
-        match = re.search(' \(\d{4}(-\(d{4})?)?\)$', title)
+        match = re.search(' \(\d{4}(-(d{4})?)?\)$', title)
         data['title'] = title[:-len(match.group(0))] if match else title
         data['year'] = match.group(0)[2:-1] if match else None        
         file_title = re.sub('^\.|/|:', '_', data['title'])
