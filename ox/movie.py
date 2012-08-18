@@ -38,6 +38,7 @@ def format_path(data, has_director_directory=True):
     director = data['seriesDirectorSort' if data['isEpisode'] else 'directorSort'] or ['Unknown Director']
     title = data['seriesTitle' if data['isEpisode'] else 'title'] or 'Untitled'
     year = data['seriesYear' if data['isEpisode'] else 'year']
+    language = 'en' if data['type'] == 'subtitle' and data['language'] == None else data['language']
     parts = map(format_underscores, filter(lambda x: x != None, [
         data['directory'] or director[0][0] if has_director_directory else title[0],
         '; '.join(director) if has_director_directory else None,
@@ -47,7 +48,7 @@ def format_path(data, has_director_directory=True):
             '.%s' % data['version'] if data['version'] else '',
             '.Part %s' % data['part'] if data['part'] else '',
             '.%s' % data['partTitle'] if data['partTitle'] else '',
-            '.%s' % data['language'].replace('/', '.') if data['language'] != None else '',
+            '.%s' % language.replace('/', '.') if language != None else '',
             '.%s' % data['extension'] if data['extension'] else ''
         )
     ]))
