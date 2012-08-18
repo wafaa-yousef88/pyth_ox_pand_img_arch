@@ -47,7 +47,7 @@ def format_path(data, has_director_directory=True):
             '.%s' % data['version'] if data['version'] else '',
             '.Part %s' % data['part'] if data['part'] else '',
             '.%s' % data['partTitle'] if data['partTitle'] else '',
-            '.%s' % data['language'].replace('/', '.') if not data['language'] in [None, 'en'] else '',
+            '.%s' % data['language'].replace('/', '.') if data['language'] != None else '',
             '.%s' % data['extension'] if data['extension'] else ''
         )
     ]))
