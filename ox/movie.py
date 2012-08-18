@@ -66,6 +66,8 @@ def parse_path(path):
     # handle dots
     >>> parse_path('U/Unknown Director/Unknown Title (2000)/... Mr. .com....Director\'s Cut.srt')['version']
     'Director\'s Cut'
+    >>> parse_path('G/Groening, Matt/The Simpsons (1989)/The Simpsons (S01E01) D.I.Y..Part 1.avi')['episodeTitle']
+    'D.I.Y.'
     # handle underscores
     >>> parse_path('U/Unknown Director/_com_ 1_0 _ NaN.._/_com_ 1_0 _ NaN....avi')['title']
     '.com: 1/0 / NaN...'
@@ -134,7 +136,9 @@ def parse_path(path):
     match = re.search(' \((S\d{2})?(E\d{2}([+-]\d{2})?)?\)(.+)?', title)
     data['season'] = int(match.group(1)[1:]) if match and match.group(1) else None
     data['episode'] = int(match.group(2)[1:3]) if match and match.group(2) else None
-    data['episodeTitle'] = match.group(4)[1:] if match and match.group(4) else None    
+    data['episodeTitle'] = match.group(4)[1:] if match and match.group(4) else None
+    while data['episodeTitle'] and len(parts) and re.search('^\w+\.*$', parts[0]) and not re.search('^[a-z]{2}$', parts[0]):
+        data['episodeTitle'] += '.%s' % parts.pop(0)
     # isEpisode, seriesDirector, seriesDirectorSort, seriesTitle, seriesYear
     if data['season'] != None or data['episode'] != None:
         data['isEpisode'] = True
