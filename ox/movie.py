@@ -67,9 +67,9 @@ def parse_path(path):
     # handle dots
     >>> parse_path('U/Unknown Director/Unknown Title (2000)/... Mr. .com....Director\'s Cut.srt')['version']
     'Director\'s Cut'
-    # multiple years, season zero, multiple episodes, dots in episode title
-    >>> parse_path('G/Groening, Matt/The Simpsons (1989-2012)/The Simpsons (S00E01-02) D.I.Y..Uncensored Version.Part 1.de.avi')['path']
-    'G/Groening, Matt/The Simpsons (1989-2012)/The Simpsons (S01E01+02) D.I.Y..Uncensored Version.Part 1.de.avi'
+    # multiple years, season zero, multiple episodes, dots in episode title and part title
+    >>> parse_path('G/Groening, Matt/The Simpsons (1989-2012)/The Simpsons (S00E01-02) D.I.Y..Uncensored Version.Part 1.D.I.Y..de.avi')['path']
+    'G/Groening, Matt/The Simpsons (1989-2012)/The Simpsons (S01E01+02) D.I.Y..Uncensored Version.Part 1.D.I.Y..de.avi'
     # handle underscores
     >>> parse_path('U/Unknown Director/_com_ 1_0 _ NaN.._/_com_ 1_0 _ NaN....avi')['title']
     '.com: 1/0 / NaN...'
@@ -177,6 +177,8 @@ def parse_path(path):
     data['part'] = parts.pop(0)[5:] if len(parts) and re.search('^Part .', parts[0]) else None
     # partTitle
     data['partTitle'] = parts.pop(0) if len(parts) and re.search('^[A-Z0-9]', parts[0]) and data['part'] else None
+    while data['partTitle'] and len(parts) and not re.search('^[a-z]{2}$', parts[0]):
+        data['partTitle'] += '.%s' % parts.pop(0)
     # language
     data['language'] = None
     while len(parts) and re.search('^[a-z]{2}$', parts[0]):
