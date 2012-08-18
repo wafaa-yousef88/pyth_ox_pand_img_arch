@@ -58,7 +58,7 @@ def format_path(data, has_director_directory=True):
 def parse_path(path):
     '''
     # all keys
-    >>> parse_path('F/Frost, Mark; Lynch, David/Twin Peaks (1991)/Twin Peaks (S01E00) Pilot.European Version.Part 1.Welcome to Twin Peaks.en.fr.MPEG')['path']
+    >>> parse_path('F/Frost, Mark; Lynch, David/Twin Peaks (1991)/Twin Peaks (S01E01) Pilot.European Version.Part 1.Welcome to Twin Peaks.en.fr.MPEG')['path']
     'F/Frost, Mark; Lynch, David/Twin Peaks (1991)/Twin Peaks (S01E00) Pilot.European Version.Part 1.Welcome to Twin Peaks.en.fr.mpg'
     # pop directory title off file name
     >>> parse_path('U/Unknown Director/www.xxx.com.._/www.xxx.com....Directors\'s Cut.avi')['version']
@@ -66,8 +66,9 @@ def parse_path(path):
     # handle dots
     >>> parse_path('U/Unknown Director/Unknown Title (2000)/... Mr. .com....Director\'s Cut.srt')['version']
     'Director\'s Cut'
-    >>> parse_path('G/Groening, Matt/The Simpsons (1989)/The Simpsons (S01E01) D.I.Y..Part 1.avi')['episodeTitle']
-    'D.I.Y.'
+    # multiple episodes, dots in episode title
+    >>> parse_path('G/Groening, Matt/The Simpsons (1989)/The Simpsons (S00E01-02) D.I.Y..Uncensored Version.Part 1.de.avi')['path']
+    'G/Groening, Matt/The Simpsons (1989)/The Simpsons (S01E01+02) D.I.Y..Uncensored Version.Part 1.de.avi'
     # handle underscores
     >>> parse_path('U/Unknown Director/_com_ 1_0 _ NaN.._/_com_ 1_0 _ NaN....avi')['title']
     '.com: 1/0 / NaN...'
@@ -133,26 +134,40 @@ def parse_path(path):
     if not data['title'] and title:
         data['title'] = title
     # season, episode, episodeTitle
+    data['season'] = data['episode'] = data['episodeTitle'] = None
+    data['episodes'] = []
     match = re.search(' \((S\d{2})?(E\d{2}([+-]\d{2})?)?\)(.+)?', title)
-    data['season'] = int(match.group(1)[1:]) if match and match.group(1) else None
-    data['episode'] = int(match.group(2)[1:3]) if match and match.group(2) else None
-    data['episodeTitle'] = match.group(4)[1:] if match and match.group(4) else None
+    if match:
+        if match.group(1):
+            data['season'] = int(match.group(1)[1:])
+        if match.group(2):
+            if len(match.group(2)) == 3:
+                data['episode'] = int(match.group(2)[1:])
+            else:
+                data['episodes'] = range(int(match.group(2)[1:3]), int(match.group(2)[-2:]) + 1)
+        if match.group(4):
+            data['episodeTitle'] = match.group(4)[1:]
     while data['episodeTitle'] and len(parts) and re.search('^\w+\.*$', parts[0]) and not re.search('^[a-z]{2}$', parts[0]):
         data['episodeTitle'] += '.%s' % parts.pop(0)
     # isEpisode, seriesDirector, seriesDirectorSort, seriesTitle, seriesYear
-    if data['season'] != None or data['episode'] != None:
+    if data['season'] != None or data['episode'] != None or data['episodes']:
         data['isEpisode'] = True
         data['seriesDirector'] = data['director']
         data['director'] = []
         data['seriesDirectorSort'] = data['directorSort']
         data['directorSort'] = []
         data['seriesTitle'] = data['title']
-        data['title'] = '%s (%s%s)%s' % (
-            data['title'],
-            'S%02d' % data['season'] if data['season'] != None else '',
-            'E%02d' % data['episode'] if data['episode'] != None else '',
-            ' %s' % data['episodeTitle'] if data['episodeTitle'] else ''
-        )
+        title = data['title']
+        season = 'S%02d' % data['season'] if data['season'] != None else ''
+        episode = ''
+        if data['episode'] != None:
+            episode = 'E%02d' % data['episode']
+        elif data['episodes']:
+            episode = 'E%02d%s%02d' % (
+                data['episodes'][0], '+' if len(data['episodes']) == 2 else '-', data['episodes'][-1]
+            )
+        episodeTitle = ' %s' % data['episodeTitle'] if data['episodeTitle'] else '' 
+        data['title'] = '%s (%s%s)%s' % (title, season, episode, episodeTitle)
         data['seriesYear'] = data['year']
         data['year'] = None
     else:
