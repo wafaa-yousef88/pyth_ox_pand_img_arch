@@ -123,7 +123,7 @@ def parse_path(path):
         data['title'] = title[:-len(match.group(0))] if match else title
         data['year'] = match.group(0)[2:-1] if match else None        
         file_title = re.sub('[/:]', '_', data['title'])
-        file = re.sub('^' + re.escape(file_title) + '(?=.*\.)', '', file)
+        file = re.sub('^' + re.escape(file_title) + '(?=.*\.)', '', file).strip()
     parts = re.split('(?<!\s)\.(?=\w)', file)
     title, parts, extension = [
         parts[0],
