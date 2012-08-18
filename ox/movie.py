@@ -66,9 +66,9 @@ def parse_path(path):
     # handle dots
     >>> parse_path('U/Unknown Director/Unknown Title (2000)/... Mr. .com....Director\'s Cut.srt')['version']
     'Director\'s Cut'
-    # multiple episodes, dots in episode title
-    >>> parse_path('G/Groening, Matt/The Simpsons (1989)/The Simpsons (S00E01-02) D.I.Y..Uncensored Version.Part 1.de.avi')['path']
-    'G/Groening, Matt/The Simpsons (1989)/The Simpsons (S01E01+02) D.I.Y..Uncensored Version.Part 1.de.avi'
+    # multiple years, season zero, multiple episodes, dots in episode title
+    >>> parse_path('G/Groening, Matt/The Simpsons (1989-2012)/The Simpsons (S00E01-02) D.I.Y..Uncensored Version.Part 1.de.avi')['path']
+    'G/Groening, Matt/The Simpsons (1989-2012)/The Simpsons (S01E01+02) D.I.Y..Uncensored Version.Part 1.de.avi'
     # handle underscores
     >>> parse_path('U/Unknown Director/_com_ 1_0 _ NaN.._/_com_ 1_0 _ NaN....avi')['title']
     '.com: 1/0 / NaN...'
@@ -105,6 +105,7 @@ def parse_path(path):
         parts[-1]
     ]
     # directorSort, director
+    data['directorSort'] = data['director'] = []
     if director:
         data['directorSort'] = filter(
             lambda x: x != 'Unknown Director',
@@ -114,17 +115,14 @@ def parse_path(path):
             lambda x: ' '.join(reversed(x.split(', '))),
             data['directorSort']
         )
-    else:
-        data['directorSort'] = data['director'] = []
     # title, year
+    data['title'] = data['year'] = None
     if title:
-        match = re.search(' \(\d{4}(-(d{4})?)?\)$', title)
+        match = re.search(' \(\d{4}(-(\d{4})?)?\)$', title)
         data['title'] = title[:-len(match.group(0))] if match else title
         data['year'] = match.group(0)[2:-1] if match else None        
         file_title = re.sub('^\.|/|:', '_', data['title'])
         file = re.sub('^' + re.escape(file_title), '', file)
-    else:
-        data['title'] = data['year'] = None
     parts = re.split('(?<!\s)\.(?=\w)', file)
     title, parts, extension = [
         parts[0],
@@ -133,7 +131,7 @@ def parse_path(path):
     ]
     if not data['title'] and title:
         data['title'] = title
-    # season, episode, episodeTitle
+    # season, episode, episodes, episodeTitle
     data['season'] = data['episode'] = data['episodeTitle'] = None
     data['episodes'] = []
     match = re.search(' \((S\d{2})?(E\d{2}([+-]\d{2})?)?\)(.+)?', title)
@@ -150,6 +148,9 @@ def parse_path(path):
     while data['episodeTitle'] and len(parts) and re.search('^\w+\.*$', parts[0]) and not re.search('^[a-z]{2}$', parts[0]):
         data['episodeTitle'] += '.%s' % parts.pop(0)
     # isEpisode, seriesDirector, seriesDirectorSort, seriesTitle, seriesYear
+    data['isEpisode'] = False
+    data['seriesDirector'] = data['seriesDirectorSort'] = []
+    data['seriesTitle'] = data['seriesYear'] = None
     if data['season'] != None or data['episode'] != None or data['episodes']:
         data['isEpisode'] = True
         data['seriesDirector'] = data['director']
@@ -157,7 +158,6 @@ def parse_path(path):
         data['seriesDirectorSort'] = data['directorSort']
         data['directorSort'] = []
         data['seriesTitle'] = data['title']
-        title = data['title']
         season = 'S%02d' % data['season'] if data['season'] != None else ''
         episode = ''
         if data['episode'] != None:
@@ -167,13 +167,9 @@ def parse_path(path):
                 data['episodes'][0], '+' if len(data['episodes']) == 2 else '-', data['episodes'][-1]
             )
         episodeTitle = ' %s' % data['episodeTitle'] if data['episodeTitle'] else '' 
-        data['title'] = '%s (%s%s)%s' % (title, season, episode, episodeTitle)
+        data['title'] += ' (%s%s)%s' % (season, episode, episodeTitle)
         data['seriesYear'] = data['year']
         data['year'] = None
-    else:
-        data['isEpisode'] = False
-        data['seriesDirector'] = data['seriesDirectorSort'] = []
-        data['seriesTitle'] = data['seriesYear'] = None
     # version
     data['version'] = parts.pop(0) if len(parts) and re.search('^[A-Z0-9]', parts[0]) and not re.search('^Part .', parts[0]) else None        
     # part
