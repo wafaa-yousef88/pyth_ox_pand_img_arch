@@ -58,8 +58,8 @@ def format_path(data, has_director_directory=True):
 def parse_path(path):
     '''
     # all keys
-    >>> parse_path('F/Frost, Mark; Lynch, David/Twin Peaks (1991)/Twin Peaks (S01E01) Pilot.European Version.Part 1.Welcome to Twin Peaks.en.fr.MPEG')['path']
-    'F/Frost, Mark; Lynch, David/Twin Peaks (1991)/Twin Peaks (S01E01) Pilot.European Version.Part 1.Welcome to Twin Peaks.en.fr.mpg'
+    >>> parse_path('F/Frost, Mark; Lynch, David/Twin Peaks (1991)/Twin Peaks (S01E00) Pilot.European Version.Part 1.Welcome to Twin Peaks.en.fr.MPEG')['path']
+    'F/Frost, Mark; Lynch, David/Twin Peaks (1991)/Twin Peaks (S01E00) Pilot.European Version.Part 1.Welcome to Twin Peaks.en.fr.mpg'
     # pop directory title off file name
     >>> parse_path('U/Unknown Director/www.xxx.com.._/www.xxx.com....Directors\'s Cut.avi')['version']
     'Director\'s Cut'
@@ -149,8 +149,8 @@ def parse_path(path):
         data['seriesTitle'] = data['title']
         data['title'] = '%s (%s%s)%s' % (
             data['title'],
-            'S%02d' % data['season'] if data['season'] else '',
-            'E%02d' % data['episode'] if data['episode'] else '',
+            'S%02d' % data['season'] if data['season'] != None else '',
+            'E%02d' % data['episode'] if data['episode'] != None else '',
             ' %s' % data['episodeTitle'] if data['episodeTitle'] else ''
         )
         data['seriesYear'] = data['year']
