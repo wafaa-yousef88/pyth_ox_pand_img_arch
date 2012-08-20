@@ -201,7 +201,7 @@ def parse_path(path):
 
 
 def parse_paths(paths):
-    files = [parse_path(path) for path in paths]
+    files = [dict(parse_path(path), originalPath=path) for path in sorted(paths)]
     data = {}
     version_files = {}
     versions = sorted(list(set([file['version'] for file in files])))
@@ -249,12 +249,12 @@ def parse_paths(paths):
             ] if data[version]['subtitleLanguages'] else []
             for file in files_by_part:
                 file['isMainFile'] = (
-                    len(videos) > 0 and file['path'] == videos[0]['path']
+                    len(videos) > 0 and file['originalPath'] == videos[0]['originalPath']
                 ) or (
-                    len(subtitles) > 0 and file['path'] == subtitles[0]['path']
+                    len(subtitles) > 0 and file['originalPath'] == subtitles[0]['originalPath']
                 )
             data[version]['files'].append([
-                {'isMainFile': file['isMainFile'], 'path': file['path']} for file in files_by_part
+                {'isMainFile': file['isMainFile'], 'path': file['originalPath']} for file in files_by_part
             ])
     # isMainVersion
     filtered = sorted(
