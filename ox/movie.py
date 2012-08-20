@@ -56,6 +56,7 @@ def format_path(data, has_director_directory=True):
         parts.insert(-1, data['subdirectory'])
     return '/'.join(parts)
 
+
 def parse_path(path):
     '''
     # all keys
@@ -193,6 +194,46 @@ def parse_path(path):
     data['type'] = parse_type(data['extension'])
     # path
     data['path'] = format_path(data)
+    return data
+
+
+def parse_paths(paths):
+    files = [parse_path(path) for path in paths]
+    data = {}
+    version_files = {}
+    versions = sorted(list(set([file['version'] for file in files])))
+    for version in versions:
+        files_by_version = [file for file in files if file['version'] == version]
+        parts = sorted(list(set([file['part'] for file in files_by_version])))
+        if parts[0] == None and len(parts) > 1:
+            version_files[''] = [file for file in files_by_version if file['part'] == None]
+            version_files['%s[1]' % (' ' + version if version else '')] = [file for file in files_by_version if file['part'] != None]
+        else:
+            version_files[version or ''] = files_by_version
+    versions = sorted(version_files.keys())
+    for version in versions:
+        data[version] = {'files': []}
+        parts = sorted(list(set([file['part'] for file in version_files[version]])))
+        data[version]['hasVideo'] = len([file for file in version_files[version] if file['type'] == 'video']) == len(parts)
+        data[version]['hasSubtitles'] = len([file for file in version_files[version] if file['extension'] == 'srt']) == len(parts)
+        for part in parts:
+            files_by_part = [file for file in version_files[version] if file['part'] == part]
+            videos = [file for file in files_by_part if file['type'] == 'video']
+            subtitles = [file for file in files_by_part if file['extension'] == 'srt']
+            for i, file in enumerate(files_by_part):
+                files_by_part[i]['isMain'] = (
+                    len(videos) > 0 and file['path'] == videos[0]['path']
+                ) or (
+                    len(subtitles) > 0 and file['path'] == subtitles[0]['path']
+                )
+            data[version]['files'].append([{'path': file['path'], 'isMain': file['isMain']} for file in files_by_part])
+    filtered = [version for version in versions if data[version]['hasVideo'] and data[version]['hasSubtitles']]
+    if filtered:
+        data[filtered[0]]['isMain'] = True
+    else:
+        filtered = [version for version in versions if data[version]['hasVideo']]
+        if filtered:
+            data[filtered[0]]['isMain'] = True 
     return data
 
 
