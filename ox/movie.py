@@ -125,7 +125,7 @@ def parse_path(path):
         file_title = re.sub('[/:]', '_', data['title'])
         # (remove title from beginning of filename if the rest contains a dot)
         file = re.sub('^' + re.escape(file_title) + '(?=.*\.)', '', file)
-    # (split by nospace+dot+word, but remove spaces before extension)
+    # (split by nospace+dot+word, but remove spaces preceding extension)
     parts = re.split('(?<!\s)\.(?=\w)', re.sub('\s+(?=.\w+$)', '', file))
     title, parts, extension = [
         parts[0],
