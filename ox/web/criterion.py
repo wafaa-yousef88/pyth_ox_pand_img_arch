@@ -75,30 +75,26 @@ def get_data(id, timeout=ox.cache.cache_timeout, get_imdb=False):
             data['director'], data['year'], timeout=timeout)
     return data
 
-def get_ids():
+def get_ids(page=None):
+
     ids = []
+    if page:
+        url = "http://www.criterion.com/library/expanded_view?m=dvd&p=%s&pp=50&s=spine" % page
+        html = read_url(url)
+        results = re.compile("films/(\d+)").findall(html)
+        ids += results
+        results = re.compile("boxsets/(.*?)\"").findall(html)
+        for result in results:
+            html = read_url("http://www.criterion.com/boxsets/" + result)
+            results = re.compile("films/(\d+)").findall(html)
+            ids += results
+        return set(ids)
     html = read_url("http://www.criterion.com/library/expanded_view?m=dvd&p=1&pp=50&s=spine", unicode=True)
     results = re.compile("\&amp;p=(\d+)\&").findall(html)
     pages = max(map(int, results))
     for page in range(1, pages):
-        for id in get_idsByPage(page):
-            ids.append(id)
-    return map(lambda id: str(id), sorted(map(lambda id: int(id), set(ids))))
-
-def get_idsByPage(page):
-    ids = []
-    url = "http://www.criterion.com/library/expanded_view?m=dvd&p=%s&pp=50&s=spine" % page
-    html = read_url(url, unicode=True)
-    results = re.compile("films/(\d+)").findall(html)
-    for result in results:
-        ids.append(result)
-    results = re.compile("boxsets/(.*?)\"").findall(html)
-    for result in results:
-        html = read_url("http://www.criterion.com/boxsets/" + result, unicode=True)
-        results = re.compile("films/(\d+)").findall(html)
-        for result in results:
-            ids.append(result)
-    return set(ids)
+        ids += get_ids(page)
+    return sorted(set(ids), key=int)
 
 if __name__ == '__main__':
     print get_ids()
