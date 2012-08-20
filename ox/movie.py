@@ -13,7 +13,7 @@ from text import get_sort_name, findRe
 
 __all__ = ['parse_movie_path', 'create_movie_path', 'get_oxid']
 
-extensions = {
+EXTENSIONS = {
     'audio': [
         'aac', 'flac', 'm4a', 'mp3', 'oga', 'ogg', 'wav', 'wma'
     ],
@@ -25,6 +25,7 @@ extensions = {
         'mpeg', 'mpg', 'mts', 'ogm', 'ogv', 'rm', 'webm', 'wmv'
     ],
 }
+LANGUAGES = ['en', 'fr', 'de', 'es', 'it']
 
 '''
 Naming scheme:
@@ -79,8 +80,8 @@ def parse_path(path):
     def parse_title(string):
         return title, year
     def parse_type(string):
-        for type in extensions:
-            if string in extensions[type]:
+        for type in EXTENSIONS:
+            if string in EXTENSIONS[type]:
                 return type
         return None
     def parse_underscores(string):
@@ -192,6 +193,8 @@ def parse_path(path):
     data['extension'] = re.sub('^mpeg$', 'mpg', extension.lower()) if extension else None
     # type
     data['type'] = parse_type(data['extension'])
+    if data['type'] == 'subtitle' and not data['language']:
+        data['language'] = LANGUAGES[0]
     # path
     data['path'] = format_path(data)
     return data
@@ -206,34 +209,68 @@ def parse_paths(paths):
         files_by_version = [file for file in files if file['version'] == version]
         parts = sorted(list(set([file['part'] for file in files_by_version])))
         if parts[0] == None and len(parts) > 1:
-            version_files[''] = [file for file in files_by_version if file['part'] == None]
-            version_files['%s[1]' % (' ' + version if version else '')] = [file for file in files_by_version if file['part'] != None]
+            version_files[''] = [
+                file for file in files_by_version if file['part'] == None
+            ]
+            version_files['%s[1]' % (' ' + version if version else '')] = [
+                file for file in files_by_version if file['part'] != None
+            ]
         else:
             version_files[version or ''] = files_by_version
     versions = sorted(version_files.keys())
     for version in versions:
-        data[version] = {'files': []}
-        parts = sorted(list(set([file['part'] for file in version_files[version]])))
-        data[version]['hasVideo'] = len([file for file in version_files[version] if file['type'] == 'video']) == len(parts)
-        data[version]['hasSubtitles'] = len([file for file in version_files[version] if file['extension'] == 'srt']) == len(parts)
+        data[version] = {'isMainVersion': False, 'files': [], 'videoExtensions': [], 'subtitleLanguages': []}
+        parts = sorted(list(set([
+            file['part'] for file in version_files[version]
+        ])))
+        # videoExtensions
+        extensions = sorted(list(set([
+            file['extension'] for file in version_files[version] if file['type'] == 'video'
+        ])))
+        for extension in extensions:
+            if len([
+                file for file in version_files[version] if file['extension'] == extension
+            ]) >= len(parts):
+                data[version]['videoExtensions'].append(extension)
+                break
+        # subtitleLanguages
+        languages = sorted(list(set([
+            file['language'] for file in version_files[version] if file['extension'] == 'srt'
+        ])))
+        for language in sorted(languages, key=lambda x: LANGUAGES.index(x) if x in LANGUAGES else x):
+            if len([
+                file for file in version_files[version] if file['extension'] == 'srt' and file['language'] == language
+            ]) >= len(parts):
+                data[version]['subtitleLanguages'].append(language)
+        # files
         for part in parts:
             files_by_part = [file for file in version_files[version] if file['part'] == part]
-            videos = [file for file in files_by_part if file['type'] == 'video']
-            subtitles = [file for file in files_by_part if file['extension'] == 'srt']
+            videos = [
+                file for file in files_by_part if file['extension'] == data[version]['videoExtensions'][0]
+            ] if data[version]['videoExtensions'] else []
+            subtitles = [
+                file for file in files_by_part if file['extension'] == 'srt' and file['language'] == data[version]['subtitleLanguages'][0]
+            ] if data[version]['subtitleLanguages'] else []
             for i, file in enumerate(files_by_part):
-                files_by_part[i]['isMain'] = (
+                files_by_part[i]['isMainFile'] = (
                     len(videos) > 0 and file['path'] == videos[0]['path']
                 ) or (
                     len(subtitles) > 0 and file['path'] == subtitles[0]['path']
                 )
-            data[version]['files'].append([{'path': file['path'], 'isMain': file['isMain']} for file in files_by_part])
-    filtered = [version for version in versions if data[version]['hasVideo'] and data[version]['hasSubtitles']]
+            data[version]['files'].append([
+                {'isMainFile': file['isMainFile'], 'path': file['path']} for file in files_by_part
+            ])
+    # isMainVersion
+    filtered = sorted(
+        [version for version in versions if data[version]['videoExtensions'] and data[version]['subtitleLanguages']],
+        key=lambda x: LANGUAGES.index(data[x]['subtitleLanguages'][0]) if data[x]['subtitleLanguages'][0] in LANGUAGES else data[x]['subtitleLanguages'][0]
+    )
     if filtered:
-        data[filtered[0]]['isMain'] = True
+        data[filtered[0]]['isMainVersion'] = True
     else:
-        filtered = [version for version in versions if data[version]['hasVideo']]
+        filtered = [version for version in versions if data[version]['videoExtensions']]
         if filtered:
-            data[filtered[0]]['isMain'] = True 
+            data[filtered[0]]['isMainVersion'] = True 
     return data
 
 
