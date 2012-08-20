@@ -555,5 +555,5 @@ def sort_string(string):
     string = re.sub('(\d+)', lambda x: '%010d' % int(x.group(0)), string)
     return unicodedata.normalize('NFKD', string)
 
-def sorted_strings(strings, keys=None):
-    return sorted(strings, cmp=lambda a, b: cmp(sort_string(a), sort_string(b)), keys=keys)
+def sorted_strings(strings, key=None):
+    return sorted(strings, cmp=lambda a, b: cmp(sort_string(a), sort_string(b)), key=key)
