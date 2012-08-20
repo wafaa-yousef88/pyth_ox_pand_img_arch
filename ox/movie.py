@@ -220,23 +220,20 @@ def parse_paths(paths):
     versions = sorted(version_files.keys())
     for version in versions:
         data[version] = {'isMainVersion': False, 'files': [], 'videoExtensions': [], 'subtitleLanguages': []}
-        parts = sorted(list(set([
-            file['part'] for file in version_files[version]
-        ])))
+        parts = sorted(list(set([file['part'] for file in version_files[version]])))
         # videoExtensions
-        extensions = sorted(list(set([
-            file['extension'] for file in version_files[version] if file['type'] == 'video'
-        ])))
-        for extension in extensions:
+        for extension in sorted(
+            list(set([file['extension'] for file in version_files[version] if file['type'] == 'video']))
+        ):
             if len([
                 file for file in version_files[version] if file['extension'] == extension
             ]) >= len(parts):
                 data[version]['videoExtensions'].append(extension)
         # subtitleLanguages
-        languages = sorted(list(set([
-            file['language'] for file in version_files[version] if file['extension'] == 'srt'
-        ])))
-        for language in sorted(languages, key=lambda x: LANGUAGES.index(x) if x in LANGUAGES else x):
+        for language in sorted(
+            list(set([file['language'] for file in version_files[version] if file['extension'] == 'srt'])),
+            key=lambda x: LANGUAGES.index(x) if x in LANGUAGES else x
+        ):
             if len([
                 file for file in version_files[version] if file['extension'] == 'srt' and file['language'] == language
             ]) >= len(parts):
@@ -250,8 +247,8 @@ def parse_paths(paths):
             subtitles = [
                 file for file in files_by_part if file['extension'] == 'srt' and file['language'] == data[version]['subtitleLanguages'][0]
             ] if data[version]['subtitleLanguages'] else []
-            for i, file in enumerate(files_by_part):
-                files_by_part[i]['isMainFile'] = (
+            for file in files_by_part:
+                file['isMainFile'] = (
                     len(videos) > 0 and file['path'] == videos[0]['path']
                 ) or (
                     len(subtitles) > 0 and file['path'] == subtitles[0]['path']
