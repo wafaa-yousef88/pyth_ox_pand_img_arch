@@ -232,7 +232,6 @@ def parse_paths(paths):
                 file for file in version_files[version] if file['extension'] == extension
             ]) >= len(parts):
                 data[version]['videoExtensions'].append(extension)
-                break
         # subtitleLanguages
         languages = sorted(list(set([
             file['language'] for file in version_files[version] if file['extension'] == 'srt'
@@ -268,7 +267,10 @@ def parse_paths(paths):
     if filtered:
         data[filtered[0]]['isMainVersion'] = True
     else:
-        filtered = [version for version in versions if data[version]['videoExtensions']]
+        filtered = sorted(
+            [version for version in versions if data[version]['videoExtensions']],
+            key=lambda x: data[x]['videoExtensions'][0]
+        )
         if filtered:
             data[filtered[0]]['isMainVersion'] = True 
     return data
