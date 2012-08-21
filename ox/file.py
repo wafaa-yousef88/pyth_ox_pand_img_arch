@@ -5,13 +5,14 @@ from __future__ import division
 import os
 import hashlib
 import re
-import sys
 import struct
 import subprocess
+import sqlite3
 
 from ox.utils import json
 
 __all__ = ['sha1sum', 'oshash', 'avinfo', 'makedirs']
+
 
 def cmd(program):
     local = os.path.expanduser('~/.ox/bin/%s' % program)
@@ -19,7 +20,70 @@ def cmd(program):
         program = local
     return program
 
-def sha1sum(filename):
+def _get_file_cache():
+    import ox.cache
+    return os.path.join(ox.cache.cache_path(), 'files.sqlite')
+
+def cache(filename, type='oshash'):
+    conn = sqlite3.connect(_get_file_cache(), timeout=10)
+    conn.text_factory = str
+    conn.row_factory = sqlite3.Row
+
+    if not cache.init:
+        c = conn.cursor()
+        c.execute('CREATE TABLE IF NOT EXISTS cache (path varchar(1024) unique, oshash varchar(16), sha1 varchar(42), size int, mtime int, info text)')
+        c.execute('CREATE INDEX IF NOT EXISTS cache_oshash ON cache (oshash)')
+        c.execute('CREATE INDEX IF NOT EXISTS cache_sha1 ON cache (sha1)')
+        conn.commit()
+        cache.init = True
+    c = conn.cursor()
+    c.execute('SELECT oshash, sha1, info, size, mtime FROM cache WHERE path = ?', (filename, ))
+    stat = os.stat(filename)
+    row = None
+    h = None
+    sha1 = None
+    info = ''
+    for row in c:
+        if stat.st_size == row['size'] and int(stat.st_mtime) == int(row['mtime']):
+            value = row[type]
+            if value:
+                if type == 'info':
+                    value = json.loads(value)
+                return value
+            h = row['oshash']
+            sha1 = row['sha1']
+            info = row['info']
+    if type == 'oshash':
+        value = h = oshash(filename, cached=False)
+    elif type == 'sha1':
+        value = sha1 = sha1sum(filename, cached=False)
+    elif type == 'info':
+        value = avinfo(filename, cached=False)
+        info = json.dumps(value)
+    t = (filename, h, sha1, stat.st_size, int(stat.st_mtime), info)
+    with conn:
+        sql = u'INSERT OR REPLACE INTO cache values (?, ?, ?, ?, ?, ?)'
+        c.execute(sql, t)
+    return value
+cache.init = None
+
+def cleanup_cache():
+    conn = sqlite3.connect(_get_file_cache(), timeout=10)
+    conn.text_factory = str
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+    c.execute('SELECT path FROM cache')
+    paths = [r[0] for r in c]
+    for path in paths:
+        if not os.path.exists(path):
+            c.execute('DELETE FROM cache WHERE path = ?', (path, ))
+    conn.commit()
+    c.execute('VACUUM')
+    conn.commit()
+
+def sha1sum(filename, cached=False):
+    if cached:
+        return cache(filename, 'sha1')
     sha1 = hashlib.sha1()
     file=open(filename)
     buffer=file.read(4096)
@@ -33,7 +97,9 @@ def sha1sum(filename):
     os hash - http://trac.opensubtitles.org/projects/opensubtitles/wiki/HashSourceCodes
     plus modification for files < 64k, buffer is filled with file data and padded with 0
 '''
-def oshash(filename):
+def oshash(filename, cached=True):
+    if cached:
+        return cache(filename, 'oshash')
     try:
         longlongformat = 'q'  # long long
         bytesize = struct.calcsize(longlongformat)
@@ -66,7 +132,9 @@ def oshash(filename):
     except(IOError):
         return "IOError"
 
-def avinfo(filename):
+def avinfo(filename, cached=True):
+    if cached:
+        return cache(filename, 'info')
     if os.path.getsize(filename):
         ffmpeg2theora = cmd('ffmpeg2theora')
         p = subprocess.Popen([ffmpeg2theora], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
