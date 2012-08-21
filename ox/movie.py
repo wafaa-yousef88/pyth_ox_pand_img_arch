@@ -61,7 +61,7 @@ def format_path(data, has_director_directory=True):
 
 def parse_item_files(files):
     # parses a list of file objects associated with one item (file objects
-    # as returned by parse_path, but extended with 'originalPath' and 'size')
+    # as returned by parse_path, but extended with 'originalPath' and 'time')
     def get_file_key(file):
         return '\n'.join([
             file['version'], file['part'], file['language'], file['extension']]
@@ -86,19 +86,19 @@ def parse_item_files(files):
         duplicate_files += path_files[1:]
     # determine versions ('version.single|multi-part.videoextension')
     version_files = {}
-    size = {}
+    time = {}
     video_files = [file for file in unique_files if file['type'] == 'video']
     versions = set([file['version'] for file in video_files])
     for version in versions:
         for file in [file for file in video_files if file['version'] == version]:
             version_key = get_version_key(file)
-            version_files[version_key] = (version_files[version_key] or []) + [file]
-            size[version_key] = (size[version_key] or 0) + file['size']
-    # determine preferred video extension (largest size)
+            version_files[version_key] = (version_files[version_key] if version_key in version_files else []) + [file]
+            time[version_key] = sorted([time[version_key], file['time']])[-1] if version_key in time else file['time']
+    # determine preferred video extension (newest)
     extension = {}
     for key in set(['.'.join(version_key.split('.')[:-1] + '.') for version_key in version_files]):
         extensions = set([version_key.split('.')[-1] for version_key in version_files if version_key.startswith(key)])
-        extension[key] = sorted(extensions, key=lambda x: size[key + x])[-1]
+        extension[key] = sorted(extensions, key=lambda x: time[key + x])[-1]
     # associate other (non-video) files
     other_files = [file for file in unique_files if file['type'] != 'video']
     versions = set([file['version'] for file in other_files])
@@ -108,7 +108,7 @@ def parse_item_files(files):
             if key in extension:
                 version_files[key + extension[key]].append(file)
             else:
-                version_files[key] = (version_files[key] or []) + [file]
+                version_files[key] = (version_files[key] if key in version_files else []) + [file]
                 extension[key] = None
     # determine main_files (video + subtitles)
     full = {}
@@ -132,11 +132,11 @@ def parse_item_files(files):
                 language[version_key] = subtitle_language
                 main_files[version_key] += language_files
                 break
-    # determine main version (best subtitle language, then video size)
+    # determine main version (best subtitle language, then video time)
     main_version = None
     full_version_keys = sorted(
         [version_key for version_key in version_files if full[version_key]],
-        key=lambda x: size[x]
+        key=lambda x: -time[x]
     )
     if full_version_keys:
         language_version_keys = sorted(
@@ -157,8 +157,7 @@ def parse_item_files(files):
             ),
             'isFullVersion': full[version_key],
             'isMainVersion': version_key == main_version,
-            'subtitleLanguage': languages[version_key][0] if version_key in languages else None,
-            'videoSize': size[version_key] if version_key in size else None
+            'subtitleLanguage': languages[version_key][0] if version_key in languages else None
         }
     return data
 
