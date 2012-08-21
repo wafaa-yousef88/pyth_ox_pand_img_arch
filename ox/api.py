@@ -4,6 +4,8 @@
 from __future__ import with_statement
 
 import cookielib
+import gzip
+import StringIO
 import urllib2
 
 from .utils import json
@@ -56,12 +58,16 @@ class API(object):
     def _json_request(self, url, form):
         result = {}
         try:
-            request = urllib2.Request(str(url))
             body = str(form)
+            request = urllib2.Request(str(url))
             request.add_header('Content-type', form.get_content_type())
-            request.add_header('Content-length', len(body))
+            request.add_header('Content-Length', str(len(body)))
+            request.add_header('Accept-Encoding', 'gzip, deflate')
             request.add_data(body)
-            result = self._opener.open(request).read().strip()
+            f = self._opener.open(request)
+            result = f.read()
+            if f.headers.get('content-encoding', None) == 'gzip':
+                result = gzip.GzipFile(fileobj=StringIO.StringIO(result)).read()
             result = result.decode('utf-8')
             return json.loads(result)
         except urllib2.HTTPError, e:
