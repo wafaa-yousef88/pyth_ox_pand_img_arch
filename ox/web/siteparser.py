@@ -31,9 +31,12 @@ class SiteParser(dict):
         return "%s%s" % (self.baseUrl, page)
 
     def read_url(self, url, timeout):
-        return read_url(url, timeout=timeout, unicode=True)
+        if not url in self._cache:
+            self._cache[url] = read_url(url, timeout=timeout, unicode=True)
+        return self._cache[url]
 
     def __init__(self, timeout=-1):
+        self._cache = {}
         for key in self.regex:
             url = self.get_url(self.regex[key]['page'])
             data = self.read_url(url, timeout)

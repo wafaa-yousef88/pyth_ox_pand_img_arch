@@ -264,7 +264,9 @@ class Imdb(SiteParser):
     }
 
     def read_url(self, url, timeout):
-        return read_url(url, timeout=timeout, unicode=True)
+        if not url in self._cache:
+            self._cache[url] = read_url(url, timeout=timeout, unicode=True)
+        return self._cache[url]
 
     def __init__(self, id, timeout=-1):
         #use akas.imdb.com to always get original title:
