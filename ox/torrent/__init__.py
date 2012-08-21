@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-# GPL 2007-2009
+# GPL 2007-2012
 
 from threading import Event
 from hashlib import sha1
@@ -8,31 +8,26 @@ import os
 
 from bencode import bencode, bdecode
 
-__all__ = ['createTorrent', 'getInfoHash', 'getTorrentInfoFromFile', 'getTorrentInfo', 'getFiles', 'getTorrentSize']
+__all__ = ['create_torrent', 'get_info_hash', 'get_torrent_info', 'get_files', 'get_torrent_size']
 
-def createTorrent(file, url, params = {}, flag = Event(),
+def create_torrent(file, url, params = {}, flag = Event(),
                    progress = lambda x: None, progress_percent = 1):
     "Creates a torrent for a given file, using url as tracker url"
     from makemetafile import make_meta_file
     return make_meta_file(file, url, params, flag, progress, progress_percent)
 
-def getInfoHash(torrentFile):
+def get_info_hash(torrentFile):
     "Returns Torrent Info Hash from torrent file"
     metainfo_file = open(torrentFile, 'rb')
     metainfo = bdecode(metainfo_file.read())
     info = metainfo['info']
     return sha1(bencode(info)).hexdigest()
 
-def getTorrentInfoFromFile(torrentFile):
-    f = open(torrentFile, 'rb')
-    data = f.read()
-    f.close()
-    tinfo = getTorrentInfo(data)
-    tinfo['timestamp'] = os.stat(torrentFile).st_ctime
-    return tinfo
-
-def getTorrentInfo(data):
+def get_torrent_info(data=None, file=None):
     from bencode import bencode
+    if file:
+        with open(file, 'rb') as f:
+            data = f.read()
 
     "Returns Torrent Info from torrent file"
     tinfo = {}
@@ -56,11 +51,13 @@ def getTorrentInfo(data):
     tinfo['size'] = file_length
     tinfo['hash'] = sha1(bencode(info)).hexdigest()
     tinfo['announce'] = metainfo['announce']
+    if file:
+        tinfo['timestamp'] = os.stat(file).st_ctime
     return tinfo
 
-def getFiles(data):
+def get_files(data):
     files = []
-    info = getTorrentInfo(data)
+    info = get_torrent_info(data=data)
     if 'files' in info:
         for f in info['files']:
             path = [info['name'], ]
@@ -70,7 +67,7 @@ def getFiles(data):
         files.append(info['name'])
     return files
 
-def getTorrentSize(torrentFile):
+def get_torrent_size(file):
     "Returns Size of files in torrent file in bytes"
-    return getTorrentInfoFromFile(torrentFile)['size']
+    return get_torrent_info(file=file)['size']
 
