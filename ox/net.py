@@ -11,6 +11,7 @@ import urllib2
 from chardet.universaldetector import UniversalDetector
 
 
+DEBUG = False
 # Default headers for HTTP requests.
 DEFAULT_HEADERS = {
     'User-Agent': 'Mozilla/5.0 (X11; Linux i686; rv:7.0.1) Gecko/20100101 Firefox/7.0.1',
@@ -51,6 +52,8 @@ def open_url(url, data=None, headers=DEFAULT_HEADERS):
     return urllib2.urlopen(req)
 
 def read_url(url, data=None, headers=DEFAULT_HEADERS, return_headers=False, unicode=False):
+    if DEBUG:
+        print 'ox.net.read_url', url
     f = open_url(url, data, headers)
     result = f.read()
     f.close()

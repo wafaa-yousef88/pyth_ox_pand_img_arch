@@ -82,6 +82,8 @@ def read_url(url, data=None, headers=DEFAULT_HEADERS, timeout=cache_timeout, val
         valid   - function to check if result is ok, its passed result and headers
                   if this function fails, InvalidResult will be raised deal with it in your code 
     '''
+    if net.DEBUG:
+        print 'ox.cache.read_url', url
     #FIXME: send last-modified / etag from cache and only update if needed
     url = _fix_unicode_url(url)
     result = store.get(url, data, headers, timeout)
