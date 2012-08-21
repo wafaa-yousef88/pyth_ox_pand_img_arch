@@ -323,7 +323,7 @@ class Imdb(SiteParser):
             if isinstance(self['cast'][0], basestring):
                 self['cast'] = [self['cast']]
             self['actor'] = [c[0] for c in self['cast']]
-            self['cast'] = map(lambda x: {'actor': x[0], 'character': x[1]}, self['cast'])
+            self['cast'] = [{'actor': x[0], 'character': x[1]} for x in self['cast']]
 
         if 'connections' in self:
             cc={}

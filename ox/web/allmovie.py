@@ -63,19 +63,19 @@ def parse_entry(html, title):
 
 def parse_list(html, title):
     html = find_re(html, '<dt>%s</dt>.*?<dd>(.*?)</dd>' % title.lower())
-    r = map(lambda x: strip_tags(x), re.compile('<li>(.*?)</li>', re.DOTALL).findall(html))
+    r = map(strip_tags, re.compile('<li>(.*?)</li>', re.DOTALL).findall(html))
     if not r and html:
         r = [strip_tags(html)]
     return r
 
 def parse_table(html):
-    return map(
-        lambda x: map(
-            lambda x: strip_tags(x).strip().replace('&nbsp;', ''),
-            x.split('<td width="305">-')
-        ),
-        find_re(html, '<div id="results-table">(.*?)</table>').split('</tr>')[:-1]
-    )
+    return [
+        [
+            strip_tags(r).strip().replace('&nbsp;', '')
+            for r in x.split('<td width="305">-')
+        ]
+        for x in find_re(html, '<div id="results-table">(.*?)</table>').split('</tr>')[:-1]
+    ]
 
 def parse_text(html, title):
     return strip_tags(find_re(html, '%s</td>.*?<td colspan="2"><p>(.*?)</td>' % title)).strip()
