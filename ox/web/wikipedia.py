@@ -13,7 +13,7 @@ def get_id(url):
 
 def get_url(id=None, imdb=None, allmovie=None):
     if imdb:
-        query = '"%s"'% imdbId
+        query = '"%s"'% imdb
         result = find(query)
         if result:
             url = result[0][1]
