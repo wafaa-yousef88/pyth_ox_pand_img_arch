@@ -212,13 +212,14 @@ def parse_paths(paths):
             version_files[''] = [
                 file for file in files_by_version if file['part'] == None
             ]
-            version_files['%s[1]' % (' ' + version if version else '')] = [
+            version_files['%s[multi-part]' % (' ' + version if version else '')] = [
                 file for file in files_by_version if file['part'] != None
             ]
         else:
             version_files[version or ''] = files_by_version
     versions = sorted(version_files.keys())
     for version in versions:
+        # FIXME: make video_extensions and subtitle_languages local variables
         data[version] = {'isMainVersion': False, 'files': [], 'videoExtensions': [], 'subtitleLanguages': []}
         parts = sorted(list(set([file['part'] for file in version_files[version]])))
         # videoExtensions
