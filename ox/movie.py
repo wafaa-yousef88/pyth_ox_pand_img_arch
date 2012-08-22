@@ -113,7 +113,7 @@ def parse_item_files(files):
             else:
                 version_files[key] = (version_files[key] if key in version_files else []) + [file]
                 extension[key] = None
-    # determine main_files (video + subtitles)
+    # determine main_files (video + srt)
     full = {}
     language = {}
     main_files = {}
@@ -135,11 +135,12 @@ def parse_item_files(files):
                 language[version_key] = subtitle_language
                 main_files[version_key] += language_files
                 break
-    # determine main version (best subtitle language, then video time)
+    # determine main version (best srt language, then video time)
     main_version = None
     full_version_keys = sorted(
         [version_key for version_key in version_files if full[version_key]],
-        key=lambda x: -time[x]
+        key=lambda x: time[x],
+        reverse=True
     )
     if full_version_keys:
         language_version_keys = sorted(
