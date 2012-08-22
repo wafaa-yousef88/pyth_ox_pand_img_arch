@@ -109,6 +109,7 @@ def parse_item_files(files):
         for file in [file for file in other_files if file['version'] == version]:
             key = get_version_key(file, extension=False)
             if key in extension:
+                print key, extension
                 version_files[key + extension[key]].append(file)
             else:
                 version_files[key] = (version_files[key] if key in version_files else []) + [file]
