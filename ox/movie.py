@@ -71,7 +71,7 @@ def parse_item_files(files):
         ])
     def get_version_key(file, extension=True):
         return '%s.%s-part.%s' % (
-            file['version'],
+            file['version'] or '',
             'single' if file['part'] == None else 'multi',
             file['extension'] if extension else ''
         )
