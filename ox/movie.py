@@ -152,17 +152,18 @@ def parse_item_files(files):
     for file in duplicate_files:
         version_files[get_version_key(file)].append(file)
     # return data
-    data = {}
+    data = []
     for version_key in version_files:
-        data[version_key] = {
+        data.append({
             'files': sorted(
                 [dict(file, isMainFile=file in main_files[version_key]) for file in version_files[version_key]],
                 key=lambda x: x['path']
             ),
             'isFullVersion': full[version_key],
             'isMainVersion': version_key == main_version,
-            'subtitleLanguage': language[version_key] if version_key in language else None
-        }
+            'subtitleLanguage': language[version_key] if version_key in language else None,
+            'version': version_key
+        })
     return data
 
 
