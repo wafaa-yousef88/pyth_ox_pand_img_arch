@@ -150,7 +150,9 @@ def parse_item_files(files):
         main_version = language_version_keys[0] if language_version_keys else full_version_keys[0]
     # add duplicate files
     for file in duplicate_files:
-        version_files[get_version_key(file)].append(file)
+        key = get_version_key(file, extension=False)
+        version_key = '%s%s' % (key, extension[key] if key in extension else '')
+        version_files[version_key].append(file)
     # return data
     data = []
     for version_key in version_files:
