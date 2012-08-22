@@ -72,14 +72,14 @@ def parse_item_files(files):
             'single' if file['part'] == None else 'multi',
             file['extension'] if extension else ''
         )
-    # filter out duplicate files (keep shortest original path, sorted alphabetically)
+    # filter out duplicate files (keep shortest path, sorted alphabetically)
     # since same version+part+language+extension can still differ in part title,
-    # ''/'en' or 'mpg'/'mpeg', or have an unparsed section in their original path
+    # ''/'en' or 'mpg'/'mpeg', or have an unparsed section in their path
     unique_files = []
     duplicate_files = []
     for key in [get_file_key(file) for file in files]:
         key_files = sorted(
-            sorted([file['originalPath'] for file in files if get_file_key(file) == key]),
+            sorted([file['path'] for file in files if get_file_key(file) == key]),
             key=lambda x: len(x)
         )
         unique_files.append(path_files[0])
@@ -153,7 +153,7 @@ def parse_item_files(files):
         data[version_key] = {
             'files': sorted(
                 [dict(file, isMainFile=file in main_files[version_key]) for file in version_files[version_key]],
-                key=lambda x: x['originalPath']
+                key=lambda x: x['path']
             ),
             'isFullVersion': full[version_key],
             'isMainVersion': version_key == main_version,
@@ -295,8 +295,8 @@ def parse_path(path):
     data['type'] = parse_type(data['extension'])
     if data['type'] == 'subtitle' and not data['language']:
         data['language'] = LANGUAGES[0]
-    # path
-    data['path'] = format_path(data)
+    # normalizedPath
+    data['normalizedPath'] = format_path(data)
     return data
 
 
