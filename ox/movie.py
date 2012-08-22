@@ -300,8 +300,8 @@ def parse_path(path):
     data['extension'] = re.sub('^mpeg$', 'mpg', extension.lower()) if extension else None
     # type
     data['type'] = parse_type(data['extension'])
-    if data['type'] == 'subtitle':
-        data['language'] = language or LANGUAGES[0]
+    # language
+    data['language'] = language or LANGUAGES[0] if data['type'] == 'subtitle' else None
     # normalizedPath
     data['normalizedPath'] = format_path(data)
     return data
