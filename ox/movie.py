@@ -152,7 +152,7 @@ def parse_item_files(files):
     for file in duplicate_files:
         key = get_version_key(file, extension=False)
         version_key = '%s%s' % (key, extension[key] if key in extension else '')
-        version_files[version_key].append(file)
+        version_files[version_key] = (version_files[version_key] if version_key in version_files else []) + [file]
     # return data
     data = []
     for version_key in version_files:
