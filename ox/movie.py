@@ -295,13 +295,13 @@ def parse_path(path):
     while data['partTitle'] and len(parts) and not re.search('^[a-z]{2}$', parts[0]):
         data['partTitle'] += '.%s' % parts.pop(0)
     # language
-    data['language'] = parts.pop(0) if len(parts) and re.search('^[a-z]{2}$', parts[0]) and data['type'] == 'subtitle' else None
+    language = parts.pop(0) if len(parts) and re.search('^[a-z]{2}$', parts[0]) else None
     # extension
     data['extension'] = re.sub('^mpeg$', 'mpg', extension.lower()) if extension else None
     # type
     data['type'] = parse_type(data['extension'])
-    if data['type'] == 'subtitle' and not data['language']:
-        data['language'] = LANGUAGES[0]
+    if data['type'] == 'subtitle':
+        data['language'] = language or LANGUAGES[0]
     # normalizedPath
     data['normalizedPath'] = format_path(data)
     return data
