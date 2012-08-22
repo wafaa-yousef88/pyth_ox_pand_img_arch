@@ -161,7 +161,7 @@ def parse_item_files(files):
             ),
             'isFullVersion': full[version_key],
             'isMainVersion': version_key == main_version,
-            'subtitleLanguage': languages[version_key][0] if version_key in languages else None
+            'subtitleLanguage': language[version_key] if version_key in languages else None
         }
     return data
 
