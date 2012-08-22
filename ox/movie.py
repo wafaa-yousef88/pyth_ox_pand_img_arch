@@ -66,7 +66,7 @@ def parse_item_files(files):
         return '\n'.join([
             file['version'] or '',
             file['part'] or '',
-            file['language'] if file['language'] and file['type'] == 'subtitle' else '',
+            file['language'] or '',
             file['extension'] or ''
         ])
     def get_version_key(file, extension=True):
@@ -295,7 +295,7 @@ def parse_path(path):
     while data['partTitle'] and len(parts) and not re.search('^[a-z]{2}$', parts[0]):
         data['partTitle'] += '.%s' % parts.pop(0)
     # language
-    data['language'] = parts.pop(0) if len(parts) and re.search('^[a-z]{2}$', parts[0]) else None
+    data['language'] = parts.pop(0) if len(parts) and re.search('^[a-z]{2}$', parts[0]) and data['type'] == 'subtitle' else None
     # extension
     data['extension'] = re.sub('^mpeg$', 'mpg', extension.lower()) if extension else None
     # type
