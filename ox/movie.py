@@ -98,7 +98,6 @@ def parse_item_files(files):
             version_files[version_key] = (version_files[version_key] if version_key in version_files else []) + [file]
             time[version_key] = sorted([time[version_key], file['time']])[-1] if version_key in time else file['time']
     # determine preferred video extension (newest)
-    print version_files
     extension = {}
     for key in set(['/'.join(version_key.split('/')[:-1]) + '/' for version_key in version_files]):
         extensions = set([version_key.split('/')[-1] for version_key in version_files if version_key.startswith(key)])
@@ -110,11 +109,10 @@ def parse_item_files(files):
         for file in [file for file in other_files if file['version'] == version]:
             key = get_version_key(file, extension=False)
             if key in extension:
-                print key, extension
                 version_files[key + extension[key]].append(file)
             else:
                 version_files[key] = (version_files[key] if key in version_files else []) + [file]
-                extension[key] = None
+                extension[key] = ''
     # determine main_files (video + srt)
     full = {}
     language = {}
