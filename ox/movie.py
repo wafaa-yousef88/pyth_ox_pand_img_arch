@@ -64,8 +64,11 @@ def parse_item_files(files):
     # as returned by parse_path, but extended with 'originalPath' and 'time')
     def get_file_key(file):
         return '\n'.join([
-            file['version'], file['part'], file['language'], file['extension']]
-        )
+            file['version'] or '',
+            file['part'] or '',
+            file['language'] or '',
+            file['extension'] or ''
+        ])
     def get_version_key(file, extension=True):
         return '%s.%s-part.%s' % (
             file['version'],
