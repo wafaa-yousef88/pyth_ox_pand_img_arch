@@ -85,8 +85,8 @@ def parse_item_files(files):
             sorted([file['path'] for file in files if get_file_key(file) == key]),
             key=lambda x: len(x)
         )
-        unique_files.append(path_files[0])
-        duplicate_files += path_files[1:]
+        unique_files.append(key_files[0])
+        duplicate_files += key_files[1:]
     # determine versions ('version.single|multi-part.videoextension')
     version_files = {}
     time = {}
