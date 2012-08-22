@@ -66,7 +66,7 @@ def parse_item_files(files):
         return '\n'.join([
             file['version'] or '',
             file['part'] or '',
-            file['language'] or '',
+            file['language'] if file['language'] and file['type'] == 'subtitle' else '',
             file['extension'] or ''
         ])
     def get_version_key(file, extension=True):
@@ -113,13 +113,13 @@ def parse_item_files(files):
             else:
                 version_files[key] = (version_files[key] if key in version_files else []) + [file]
                 extension[key] = ''
-    # determine main_files (video + srt)
+    # determine main files (video + srt)
     full = {}
     language = {}
     main_files = {}
     for version_key in version_files:
         parts = sorted(list(set([file['part'] for file in version_files[version_key]])))
-        # determine if all parts have video
+        # determine if all parts have one video file
         video_files = [file for file in version_files[version_key] if file['type'] == 'video']
         full[version_key] = len(video_files) == len(parts)
         main_files[version_key] = video_files if full[version_key] else []
