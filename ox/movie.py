@@ -99,7 +99,7 @@ def parse_item_files(files):
             time[version_key] = sorted([time[version_key], file['time']])[-1] if version_key in time else file['time']
     # determine preferred video extension (newest)
     extension = {}
-    for key in set(['.'.join(version_key.split('.')[:-1] + '.') for version_key in version_files]):
+    for key in set(['.'.join(version_key.split('.')[:-1]) + '.' for version_key in version_files]):
         extensions = set([version_key.split('.')[-1] for version_key in version_files if version_key.startswith(key)])
         extension[key] = sorted(extensions, key=lambda x: time[key + x])[-1]
     # associate other (non-video) files
