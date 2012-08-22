@@ -61,7 +61,7 @@ def format_path(data, has_director_directory=True):
 
 def parse_item_files(files):
     # parses a list of file objects associated with one item (file objects
-    # as returned by parse_path, but extended with 'originalPath' and 'time')
+    # as returned by parse_path, but extended with 'path' and 'time')
     def get_file_key(file):
         return '\n'.join([
             file['version'] or '',
@@ -82,8 +82,8 @@ def parse_item_files(files):
     duplicate_files = []
     for key in [get_file_key(file) for file in files]:
         key_files = sorted(
-            sorted([file['path'] for file in files if get_file_key(file) == key]),
-            key=lambda x: len(x)
+            sorted([file for file in files if get_file_key(file) == key]),
+            key=lambda x: len(x['path'])
         )
         unique_files.append(key_files[0])
         duplicate_files += key_files[1:]
