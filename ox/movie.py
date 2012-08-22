@@ -125,7 +125,7 @@ def parse_item_files(files):
         main_files[version_key] = video_files if full[version_key] else []
         # determine preferred subtitle language
         language[version_key] = None
-        subtitle_files = [file for file in version_files[version] if file['extension'] == 'srt']
+        subtitle_files = [file for file in version_files[version_key] if file['extension'] == 'srt']
         for subtitle_language in sorted(
             list(set([file['language'] for file in subtitle_files])),
             key=lambda x: LANGUAGES.index(x) if x in LANGUAGES else x
