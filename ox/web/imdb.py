@@ -575,6 +575,22 @@ def get_movie_poster(imdbId):
         return get_movie_poster(info['series'])
     return ''
 
+def get_episodes(imdbId, season=None):
+    episodes = {}
+    url = 'http://www.imdb.com/title/tt%s/episodes' % imdbId
+    if season:
+        url += '?season=%d' % season
+        data = ox.cache.read_url(url)
+        for e in re.compile('<div data-const="tt(\d{7})".*?>.*?<div>S(\d+), Ep(\d+)<\/div>\n<\/div>', re.DOTALL).findall(data):
+            episodes['S%02dE%02d' %(int(e[1]), int(e[2]))] = e[0]
+    else:
+        data = ox.cache.read_url(url)
+        match = re.compile('<strong>Season (\d+)</strong>').findall(data)
+        if match:
+            for season in range(1, int(match[0]) + 1):
+               episodes.update(get_episodes(imdbId, season))
+    return episodes
+
 def max_votes():
     url = 'http://www.imdb.com/search/title?num_votes=500000,&sort=num_votes,desc'
     data = ox.cache.read_url(url)
