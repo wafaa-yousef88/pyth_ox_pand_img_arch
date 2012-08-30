@@ -401,6 +401,8 @@ class Imdb(SiteParser):
 
         for key in ('actor', 'writer', 'producer', 'editor'):
             if key in self:
+                if isinstance(self[key][0], list):
+                    self[key] = [i[0] for i in self[key] if i]
                 self[key] = sorted(list(set(self[key])),
                                    lambda a, b: self[key].index(a) - self[key].index(b))
 
