@@ -2,6 +2,8 @@
 # vi:si:et:sw=4:sts=4:ts=4
 # GPL 2008
 
+import math
+
 __all__ = ['get_country', 'get_country_name']
 
 '''
@@ -1310,6 +1312,26 @@ COUNTRIES = {
       "continent": "Africa"
    }
 }
+
+# See http://en.wikipedia.org/wiki/WGS-84
+EARTH_RADIUS = 6378137
+
+def crosses_dateline(west, east):
+    return west['lng'] > east['lng']
+
+def get_area(southwest, northeast):
+    def radians(point):
+        return {
+            'lat': math.radians(point['lat']),
+            'lng': math.radians(point['lng'])
+        }
+    if crosses_dateline(southwest, northeast):
+        northeast['lng'] += 360
+    southwest = radians(southwest)
+    northeast = radians(northeast)
+    return math.pow(EARTH_RADIUS, 2) * abs(
+        math.sin(southwest['lat']) - math.sin(northeast['lat'])
+    ) * abs(southwest['lng'] - northeast['lng']);
 
 def get_country(country_code):
     country_code = country_code.upper()
