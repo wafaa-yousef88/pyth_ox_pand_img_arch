@@ -39,7 +39,6 @@ def format_path(data, has_director_directory=True):
     director = data['seriesDirectorSort' if data['isEpisode'] else 'directorSort'] or ['Unknown Director']
     title = data['seriesTitle' if data['isEpisode'] else 'title'] or 'Untitled'
     year = data['seriesYear' if data['isEpisode'] else 'year']
-    language = 'en' if data['type'] == 'subtitle' and data['language'] == None else data['language']
     parts = map(format_underscores, filter(lambda x: x != None, [
         data['directory'] or director[0][0] if has_director_directory else title[0],
         '; '.join(director) if has_director_directory else None,
@@ -56,7 +55,6 @@ def format_path(data, has_director_directory=True):
     if data['subdirectory']:
         parts.insert(-1, data['subdirectory'])
     return '/'.join(parts)
-
 
 
 def parse_item_files(files):
@@ -374,45 +372,32 @@ def parse_movie_path(path):
         language = ''
     
     #season/episode/episodeTitle
-    match = re.compile('(.+?) \((S(\d+))?(E(\d+))?\)( (.+?))?\.').match(parts[-1])
-    if match:
-        seriesTitle = match.group(1)
-        season = match.group(3)
-        episode = match.group(5)
-        episodeTitle = (match.group(6) or '').strip()
-        if episode != None:
-            episode = int(episode)
-        if season != None:
-            season = int(season)
-        if episode and not season:
-            season = 1
+    season = find_re(parts[-1], '\.Season (\d+)\.')
+    if season:
+        season = int(season)
     else:
-        season = find_re(parts[-1], '\.Season (\d+)\.')
-        if season:
-            season = int(season)
+        season = None
+
+    episode = find_re(parts[-1], '\.Episode[s]* ([\d+]+)\.')
+    if episode:
+        episode = episode.split('+')[0]
+        episode = int(episode)
+    else:
+        episode = None
+
+    if episode and 'Episode %d'%episode in fileparts:
+        episodeTitle = fileparts.index('Episode %d' % episode) + 1
+        episodeTitle = fileparts[episodeTitle]
+        if episodeTitle == extension or episodeTitle.startswith('Part'):
+            episodeTitle = None
+
+    if not season and 'Episode' in fileparts:
+        episodeTitle = fileparts.index('Episode') + 1
+        episodeTitle = fileparts[episodeTitle]
+        if episodeTitle == extension or episodeTitle.startswith('Part'):
+            episodeTitle = None
         else:
-            season = None
-
-        episode = find_re(parts[-1], '\.Episode[s]* ([\d+]+)\.')
-        if episode:
-            episode = episode.split('+')[0]
-            episode = int(episode)
-        else:
-            episode = None
-
-        if episode and 'Episode %d'%episode in fileparts:
-            episodeTitle = fileparts.index('Episode %d' % episode) + 1
-            episodeTitle = fileparts[episodeTitle]
-            if episodeTitle == extension or episodeTitle.startswith('Part'):
-                episodeTitle = None
-
-        if not season and 'Episode' in fileparts:
-            episodeTitle = fileparts.index('Episode') + 1
-            episodeTitle = fileparts[episodeTitle]
-            if episodeTitle == extension or episodeTitle.startswith('Part'):
-                episodeTitle = None
-            else:
-                season = 1
+            season = 1
 
     if season:
         seriesTitle = title
