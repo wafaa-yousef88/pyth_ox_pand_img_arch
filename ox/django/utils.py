@@ -1,7 +1,10 @@
+# -*- coding: utf-8 -*-
+# vi:si:et:sw=4:sts=4:ts=4
+from django.utils.datetime_safe import datetime
+from django.utils import simplejson
 from django.http import HttpResponse,Http404
 from django.core.servers.basehttp import FileWrapper
 from django.conf import settings
-from django.utils.datetime_safe import datetime
 
 import mimetypes
 import os
