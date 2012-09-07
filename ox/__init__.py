@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 # GPL 2011
-__version__ = '2.0.1'
+__version__ = '2.1.1'
 
 import cache
 import js

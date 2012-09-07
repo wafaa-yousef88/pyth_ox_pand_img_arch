@@ -19,7 +19,7 @@ def get_bzr_version():
 
 setup(
     name="ox",
-    version="2.0.%s" % get_bzr_version() ,
+    version="2.1.%s" % get_bzr_version() ,
     description="python-ox - the web in a dict",
     author="0x2620",
     author_email="0x2620@0x2620.org",
