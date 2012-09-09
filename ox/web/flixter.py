@@ -32,7 +32,7 @@ def get_data(id, timeout=-1):
     data = {
         "url": get_url(id),
     }
-    html = read_url(data['url'], timeout=timeout, timeout=True)
+    html = read_url(data['url'], timeout=timeout, unicode=True)
     doc = document_fromstring(html)
 
     props = {

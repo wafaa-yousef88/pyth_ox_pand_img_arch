@@ -1,7 +1,7 @@
 python-ox - the web in a dict
 
 Depends:
- python2.5
+ python >= 2.6
  python-chardet (http://chardet.feedparser.org/)
  python-feedparser (http://www.feedparser.org/)
  python-lxml (http://codespeak.net/lxml/)          [optional]
