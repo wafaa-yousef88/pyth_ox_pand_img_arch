@@ -6,7 +6,7 @@ import socket
 from urllib import quote
 
 from ox.cache import read_url
-from ox import find_re, cache, strip_tags, decode_html, getTorrentInfo, int_value, normalize_newlines
+from ox import find_re, cache, strip_tags, decode_html, get_torrent_info, int_value, normalize_newlines
 from ox.normalize import normalize_imdbid
 import ox
 
@@ -85,7 +85,7 @@ def get_data(mininovaId):
     if torrent['description']:
         torrent['description'] = normalize_newlines(decode_html(strip_tags(torrent['description']))).strip()
     t = read_url(torrent[u'torrent_link'])
-    torrent[u'torrent_info'] = getTorrentInfo(t)
+    torrent[u'torrent_info'] = get_torrent_info(t)
     return torrent
 
 class Mininova(Torrent):

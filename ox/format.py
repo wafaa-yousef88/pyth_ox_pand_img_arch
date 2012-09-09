@@ -18,7 +18,7 @@ def toAZ(num):
     'FOO'
 
     >>> toAZ(1234567890)
-    'CYWOQVK'
+    'CYWOQVJ'
     """
     if num < 1: raise ValueError, "must supply a positive integer"
     digits = string.letters[26:]
@@ -74,7 +74,7 @@ def to26(q):
 def from26(q):
     """
     Converts an base 26 string to an integer
-    >>> from32('A')
+    >>> from26('A')
     0
     """
     base26 = string.letters[26:]

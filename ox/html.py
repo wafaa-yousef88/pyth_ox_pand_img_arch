@@ -142,9 +142,9 @@ def decode_html(html):
     >>> decode_html('me &amp; you and &#36;&#38;%')
     u'me & you and $&%'
     >>> decode_html('&#x80;')
-    u'€'
+    u'\u20ac'
     >>> decode_html('Anniversary of Daoud&apos;s Republic')
-    u'Anniversary of Daoud's Republic'
+    u"Anniversary of Daoud's Republic"
     """
     if type(html) != unicode:
         html = unicode(html)[:]
@@ -194,33 +194,33 @@ def escape_html(value):
 def sanitize_html(html, tags=None, wikilinks=False):
     '''
     >>> sanitize_html('http://foo.com, bar')
-    '<a href="http://foo.com">http://foo.com</a>, bar'
+    u'<a href="http://foo.com">http://foo.com</a>, bar'
     >>> sanitize_html('http://foo.com/foobar?foo, bar')
-    '<a href="http://foo.com/foobar?foo">http://foo.com/foobar?foo</a>, bar'
+    u'<a href="http://foo.com/foobar?foo">http://foo.com/foobar?foo</a>, bar'
     >>> sanitize_html('(see: www.foo.com)')
-    '(see: <a href="http://www.foo.com">www.foo.com</a>)'
+    u'(see: <a href="http://www.foo.com">www.foo.com</a>)'
     >>> sanitize_html('foo@bar.com')
-    '<a href="mailto:foo@bar.com">foo@bar.com</a>'
+    u'<a href="mailto:foo@bar.com">foo@bar.com</a>'
     >>> sanitize_html(sanitize_html('foo@bar.com'))
-    '<a href="mailto:foo@bar.com">foo@bar.com</a>'
+    u'<a href="mailto:foo@bar.com">foo@bar.com</a>'
     >>> sanitize_html('<a href="http://foo.com" onmouseover="alert()">foo</a>')
-    '<a href="http://foo.com">foo</a>'
+    u'<a href="http://foo.com">foo</a>'
     >>> sanitize_html('<a href="javascript:alert()">foo</a>')
-    '&lt;a href="javascript:alert()"&gt;foo'
+    u'&lt;a href="javascript:alert()"&gt;foo'
     >>> sanitize_html('[http://foo.com foo]')
-    '<a href="http://foo.com">foo</a>'
+    u'<a href="http://foo.com">foo</a>'
     >>> sanitize_html('<rtl>foo</rtl>')
-    '<div style="direction: rtl">foo</div>'
+    u'<div style="direction: rtl">foo</div>'
     >>> sanitize_html('<script>alert()</script>')
-    '&lt;script&gt;alert()&lt;/script&gt;'
-    >>> sanitize_html('\'foo\' < \'bar\' && "foo" > "bar"')
-    '\'foo\' &lt; \'bar\' &amp;&amp; "foo" &gt; "bar"'
+    u'&lt;script&gt;alert()&lt;/script&gt;'
+    >>> sanitize_html("'foo' < 'bar' && \"foo\" > \"bar\"")
+    u'\'foo\' &lt; \'bar\' &amp;&amp; "foo" &gt; "bar"'
     >>> sanitize_html('<b>foo')
-    '<b>foo</b>'
+    u'<b>foo</b>'
     >>> sanitize_html('<b>foo</b></b>')
-    '<b>foo</b>'
+    u'<b>foo</b>'
     >>> sanitize_html('Anniversary of Daoud&apos;s Republic')
-    'Anniversary of Daoud&apos;s Republic'
+    u"Anniversary of Daoud's Republic"
     '''
     if not tags:
         tags = [

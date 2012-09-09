@@ -405,9 +405,9 @@ def truncate_string(string, length, padding='...', position='right'):
 def truncate_words(s, num):
     """Truncates a string after a certain number of chacters, but ends with a word
 
-    >>> truncate_string('Truncates a string after a certain number of chacters, but ends with a word', 23)
+    >>> truncate_words('Truncates a string after a certain number of chacters, but ends with a word', 23)
     'Truncates a string...'
-    >>> truncate_string('Truncates a string', 23)
+    >>> truncate_words('Truncates a string', 23)
     'Truncates a string'
 
     """

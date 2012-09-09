@@ -6,7 +6,7 @@ import socket
 from urllib import quote, urlencode
 from urllib2 import URLError
 
-from ox import find_re, cache, strip_tags, decode_html, getTorrentInfo, normalize_newlines
+from ox import find_re, cache, strip_tags, decode_html, get_torrent_info, normalize_newlines
 from ox.normalize import normalize_imdbid
 import ox
 
@@ -94,8 +94,8 @@ def get_data(piratebayId):
     torrent[u'description'] = find_re(data, '<div class="nfo">(.*?)</div>')
     if torrent[u'description']:
         torrent['description'] = normalize_newlines(decode_html(strip_tags(torrent['description']))).strip()
-    t = _read_url(torrent[u'torrent_link'])
-    torrent[u'torrent_info'] = getTorrentInfo(t)
+    t = read_url(torrent[u'torrent_link'])
+    torrent[u'torrent_info'] = get_torrent_info(t)
     return torrent
 
 class Thepiratebay(Torrent):

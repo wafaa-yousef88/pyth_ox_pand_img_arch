@@ -35,7 +35,7 @@ def exists(url, data=None, headers=DEFAULT_HEADERS):
         return True
     return False
 
-def headers(url, data=None, headers=DEFAULT_HEADERS):
+def get_headers(url, data=None, headers=DEFAULT_HEADERS):
     try:
         f = open_url(url, data, headers)
         f.headers['Status'] = "%s" % f.code

@@ -172,20 +172,25 @@ def parse_item_files(files):
 def parse_path(path):
     '''
     # all keys
-    >>> parse_path('F/Frost, Mark; Lynch, David/Twin Peaks (1991)/Twin Peaks (S01E01) Pilot.European Version.Part 1.Welcome to Twin Peaks.en.fr.MPEG')['path']
+    >>> parse_path('F/Frost, Mark; Lynch, David/Twin Peaks (1991)/Twin Peaks (S01E01) Pilot.European Version.Part 1.Welcome to Twin Peaks.en.fr.MPEG')['normalizedPath']
     'F/Frost, Mark; Lynch, David/Twin Peaks (1991)/Twin Peaks (S01E00) Pilot.European Version.Part 1.Welcome to Twin Peaks.en.fr.mpg'
+
     # pop directory title off file name
-    >>> parse_path('U/Unknown Director/www.xxx.com.._/www.xxx.com....Directors\'s Cut.avi')['version']
-    'Director\'s Cut'
+    >>> parse_path("U/Unknown Director/www.xxx.com.._/www.xxx.com....Director's Cut.avi")['version']
+    "Director's Cut"
+
     # handle dots
-    >>> parse_path('U/Unknown Director/Unknown Title (2000)/... Mr. .com....Director\'s Cut.srt')['version']
-    'Director\'s Cut'
+    >>> parse_path("U/Unknown Director/Unknown Title (2000)/... Mr. .com....Director's Cut.srt")['version']
+    "Director's Cut"
+
     # multiple years, season zero, multiple episodes, dots in episode title and part title
-    >>> parse_path('G/Groening, Matt/The Simpsons (1989-2012)/The Simpsons (S00E01-02) D.I.Y..Uncensored Version.Part 1.D.I.Y..de.avi')['path']
+    >>> parse_path('G/Groening, Matt/The Simpsons (1989-2012)/The Simpsons (S00E01-02) D.I.Y..Uncensored Version.Part 1.D.I.Y..de.avi')['normalizedPath']
     'G/Groening, Matt/The Simpsons (1989-2012)/The Simpsons (S01E01+02) D.I.Y..Uncensored Version.Part 1.D.I.Y..de.avi'
+
     # handle underscores
     >>> parse_path('U/Unknown Director/_com_ 1_0 _ NaN.._/_com_ 1_0 _ NaN....avi')['title']
     '.com: 1/0 / NaN...'
+
     # TODO: '.com.avi'
     '''
     def parse_title(string):

@@ -17,14 +17,14 @@ def get_url(id):
 
 def get_data(id, timeout=ox.cache.cache_timeout, get_imdb=False):
     '''
-    >>> get_data('1333')['imdbId']
+    >>> get_data('1333').get('imdbId')
     u'0060304'
 
     >>> get_data('236')['posters'][0]
-    u'http://criterion_production.s3.amazonaws.com/release_images/1586/ThirdManReplace.jpg'
+    u'http://s3.amazonaws.com/criterion-production/release_images/1586/ThirdManReplace.jpg'
 
     >>> get_data('786')['posters'][0]
-    u'http://criterion_production.s3.amazonaws.com/product_images/185/343_box_348x490.jpg'
+    u'http://s3.amazonaws.com/criterion-production/product_images/185/343_box_348x490.jpg'
     '''
     data = {
         "url": get_url(id)
@@ -60,6 +60,7 @@ def get_data(id, timeout=ox.cache.cache_timeout, get_imdb=False):
             data["posters"] = [result.replace("_w100", "")]
         else:
             data["posters"] = []
+    data['posters'] = [re.sub('(\?\d+)$', '', p) for p in data['posters']]
     result = find_re(html, "<img alt=\"Film Still\" height=\"252\" src=\"(.*?)\"")
     if result:
         data["stills"] = [result]
