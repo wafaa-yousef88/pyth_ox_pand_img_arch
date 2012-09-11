@@ -36,7 +36,7 @@ The Title[ ([SXX][EYY[+ZZ|-ZZ]])[ Episode Title]][.Version][.Part XY[.Part Title
 
 def format_path(data, directory_key='director'):
     def format_underscores(string):
-        return = re.sub('^\.|\.$|:|/|\?|<|>', '_', string)
+        return re.sub('^\.|\.$|:|/|\?|<|>', '_', string)
     is_episode = data['episode'] != None or data['season'] != None
     director = data['directorSort'] or ['Unknown Director']
     title = data['seriesTitle' if data['isEpisode'] else 'title'] or 'Untitled'
