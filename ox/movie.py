@@ -268,16 +268,11 @@ def parse_path(path):
             data['episodeTitle'] = match.group(4)[1:]
     while data['episodeTitle'] and len(parts) and re.search('^\w+\.*$', parts[0]) and not re.search('^[a-z]{2}$', parts[0]):
         data['episodeTitle'] += '.%s' % parts.pop(0)
-    # isEpisode, seriesDirector, seriesDirectorSort, seriesTitle, seriesYear
+    # isEpisode, seriesTitle, seriesYear
     data['isEpisode'] = False
-    data['seriesDirector'] = data['seriesDirectorSort'] = []
     data['seriesTitle'] = data['seriesYear'] = None
     if data['season'] != None or data['episode'] != None or data['episodes']:
         data['isEpisode'] = True
-        data['seriesDirector'] = data['director']
-        data['director'] = []
-        data['seriesDirectorSort'] = data['directorSort']
-        data['directorSort'] = []
         data['seriesTitle'] = data['title']
         season = 'S%02d' % data['season'] if data['season'] != None else ''
         episode = ''
