@@ -34,17 +34,17 @@ X/[Group, The; Lastname, Firstname/]The Title[ (YEAR[-[YEAR]])]/
 The Title[ ([SXX][EYY[+ZZ|-ZZ]])[ Episode Title]][.Version][.Part XY[.Part Title][.en][.fr].xyz
 '''
 
-def format_path(data, has_director_directory=True):
+def format_path(data, directory_key='director'):
     def format_underscores(string):
         return re.sub('^\.|\.$|/|:', '_', string)
+    is_episode = data['episode'] != None or data['season'] != None
     director = data['directorSort'] or ['Unknown Director']
-    title = data['seriesTitle' if data['episode'] != None else 'title'] or 'Untitled'
-
+    title = data['seriesTitle' if is_episode else 'title'] or 'Untitled'
+    year = data['seriesYear' if is_episode else 'year'] or None
     language = 'en' if data['type'] == 'subtitle' and data['language'] == None else data['language']
     parts = map(format_underscores, filter(lambda x: x != None, [
-        data['directory'] or director[0][0] if has_director_directory else title[0],
-        u'; '.join(director) if has_director_directory else None,
-        u'%s%s' % (title, u' (%s)' % data['year'] if data['year'] else ''),
+        u'; '.join(director),
+        u'%s%s' % (title, u' (%s)' % year if year else ''),
         u'%s%s%s%s%s%s' % (
             data['title'] or 'Untitled',
             u'.%s' % data['version'] if data['version'] else '',
@@ -169,26 +169,26 @@ def parse_item_files(files):
     return data
 
 
-def parse_path(path):
+def parse_path(path, directory_key='director'):
     '''
     # all keys
-    >>> parse_path('F/Frost, Mark; Lynch, David/Twin Peaks (1991)/Twin Peaks (S01E01) Pilot.European Version.Part 1.Welcome to Twin Peaks.en.fr.MPEG')['normalizedPath']
-    'F/Frost, Mark; Lynch, David/Twin Peaks (1991)/Twin Peaks (S01E00) Pilot.European Version.Part 1.Welcome to Twin Peaks.en.fr.mpg'
+    >>> parse_path('Frost, Mark; Lynch, David/Twin Peaks (1991)/Twin Peaks (S01E01) Pilot.European Version.Part 1.Welcome to Twin Peaks.en.fr.MPEG')['normalizedPath']
+    'Frost, Mark; Lynch, David/Twin Peaks (1991)/Twin Peaks (S01E00) Pilot.European Version.Part 1.Welcome to Twin Peaks.en.fr.mpg'
 
     # pop directory title off file name
-    >>> parse_path("U/Unknown Director/www.xxx.com.._/www.xxx.com....Director's Cut.avi")['version']
+    >>> parse_path("Unknown Director/www.xxx.com.._/www.xxx.com....Director's Cut.avi")['version']
     "Director's Cut"
 
     # handle dots
-    >>> parse_path("U/Unknown Director/Unknown Title (2000)/... Mr. .com....Director's Cut.srt")['version']
+    >>> parse_path("Unknown Director/Unknown Title (2000)/... Mr. .com....Director's Cut.srt")['version']
     "Director's Cut"
 
     # multiple years, season zero, multiple episodes, dots in episode title and part title
-    >>> parse_path('G/Groening, Matt/The Simpsons (1989-2012)/The Simpsons (S00E01-02) D.I.Y..Uncensored Version.Part 1.D.I.Y..de.avi')['normalizedPath']
-    'G/Groening, Matt/The Simpsons (1989-2012)/The Simpsons (S01E01+02) D.I.Y..Uncensored Version.Part 1.D.I.Y..de.avi'
+    >>> parse_path('Groening, Matt/The Simpsons (1989-2012)/The Simpsons (S00E01-02) D.I.Y..Uncensored Version.Part 1.D.I.Y..de.avi')['normalizedPath']
+    'Groening, Matt/The Simpsons (1989-2012)/The Simpsons (S01E01+02) D.I.Y..Uncensored Version.Part 1.D.I.Y..de.avi'
 
     # handle underscores
-    >>> parse_path('U/Unknown Director/_com_ 1_0 _ NaN.._/_com_ 1_0 _ NaN....avi')['title']
+    >>> parse_path('Unknown Director/_com_ 1_0 _ NaN.._/_com_ 1_0 _ NaN....avi')['title']
     '.com: 1/0 / NaN...'
 
     # TODO: '.com.avi'
@@ -216,10 +216,8 @@ def parse_path(path):
     else:
         data['subdirectory'] = None
     length = len(parts)
-    # directory
-    data['directory'], director, title, file = [
-        parts[0] if length > 2 else None,
-        parts[1] if length == 4 else None,
+    director, title, file = [
+        parts[-3] if length > 2 else None,
         parts[-2] if length > 1 else None,
         parts[-1]
     ]
