@@ -201,11 +201,17 @@ def parse_path(path, directory_key='director'):
                 return type
         return None
     def parse_underscores(string):
+        # '^_' or '_$' is '.'
         string = re.sub('^_', '.', string)
         string = re.sub('_$', '.', string)
+        # '_.foo$' or '_ (' is '?'
+        string = re.sub('_(?=(\.\w+$| \())', '?', string)
+        # ' _..._ ' is '<...>'
         string = re.sub('(?<= )_(.+)_(?= )', '<\g<1>>', string)
+        # 'foo_bar' or 'foo _ bar' is '/'
         string = re.sub('(?<=\w)_(?=\w)', '/', string)
         string = re.sub(' _ ', ' / ', string)
+        # 'foo_ ' is ':'
         string = re.sub('(?<=\w)_ ', ': ', string)
         return string
     data = {}
