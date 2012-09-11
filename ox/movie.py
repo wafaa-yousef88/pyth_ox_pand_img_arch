@@ -39,8 +39,8 @@ def format_path(data, directory_key='director'):
         return re.sub('^\.|\.$|/|:', '_', string)
     is_episode = data['episode'] != None or data['season'] != None
     director = data['directorSort'] or ['Unknown Director']
-    title = data['seriesTitle' if is_episode else 'title'] or 'Untitled'
-    year = data['seriesYear' if is_episode else 'year'] or None
+    title = data['seriesTitle' if data['isEpisode'] else 'title'] or 'Untitled'
+    year = data['seriesYear' if data['isEpisode'] else 'year'] or None
     language = 'en' if data['type'] == 'subtitle' and data['language'] == None else data['language']
     parts = map(format_underscores, filter(lambda x: x != None, [
         u'; '.join(director),
