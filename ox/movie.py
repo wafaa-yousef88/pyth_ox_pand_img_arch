@@ -7,6 +7,7 @@ from __future__ import division
 import hashlib 
 import os
 import re
+import unicodedata
 
 from normalize import normalize_name
 from text import get_sort_name, find_re
@@ -36,27 +37,26 @@ The Title[ ([SXX][EYY[+ZZ|-ZZ]])[ Episode Title]][.Version][.Part XY[.Part Title
 def format_path(data, has_director_directory=True):
     def format_underscores(string):
         return re.sub('^\.|\.$|/|:', '_', string)
-    director = data['seriesDirectorSort' if data['isEpisode'] else 'directorSort'] or ['Unknown Director']
-    title = data['seriesTitle' if data['isEpisode'] else 'title'] or 'Untitled'
-    year = data['seriesYear' if data['isEpisode'] else 'year']
+    director = data['directorSort'] or ['Unknown Director']
+    title = data['seriesTitle' if data['episode'] != None else 'title'] or 'Untitled'
+
     language = 'en' if data['type'] == 'subtitle' and data['language'] == None else data['language']
     parts = map(format_underscores, filter(lambda x: x != None, [
         data['directory'] or director[0][0] if has_director_directory else title[0],
-        '; '.join(director) if has_director_directory else None,
-        '%s%s' % (title, ' (%s)' % year if year else ''),
-        '%s%s%s%s%s%s' % (
+        u'; '.join(director) if has_director_directory else None,
+        u'%s%s' % (title, u' (%s)' % data['year'] if data['year'] else ''),
+        u'%s%s%s%s%s%s' % (
             data['title'] or 'Untitled',
-            '.%s' % data['version'] if data['version'] else '',
-            '.Part %s' % data['part'] if data['part'] else '',
-            '.%s' % data['partTitle'] if data['partTitle'] else '',
-            '.%s' % data['language'] if data['language'] else '',
-            '.%s' % data['extension'] if data['extension'] else ''
+            u'.%s' % data['version'] if data['version'] else '',
+            u'.Part %s' % data['part'] if data['part'] else '',
+            u'.%s' % data['partTitle'] if data['partTitle'] else '',
+            u'.%s' % data['language'] if data['language'] else '',
+            u'.%s' % data['extension'] if data['extension'] else ''
         )
     ]))
-    if data['subdirectory']:
+    if data.get('subdirectory'):
         parts.insert(-1, data['subdirectory'])
-    return '/'.join(parts)
-
+    return unicodedata.normalize('NFD', u'/'.join(parts))
 
 
 def parse_item_files(files):
