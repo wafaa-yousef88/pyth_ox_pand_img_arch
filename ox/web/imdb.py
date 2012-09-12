@@ -96,7 +96,7 @@ class Imdb(SiteParser):
         'director': {
             'page': 'combined',
             're': [
-                lambda data: data.split('Series Crew')[0],
+                lambda data: data.split('<b>Series Crew</b>')[0],
                 'Directed by</a>(.*?)</table>',
                 '<a href="/name/.*?>(.*?)</a>'
             ],
