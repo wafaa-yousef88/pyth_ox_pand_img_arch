@@ -302,16 +302,19 @@ class Imdb(SiteParser):
         self['title'] = self.get('englishTitle', self['originalTitle'])
 
         for t in ('title', 'englishTitle', 'originalTitle'):
-            if t in self and self[t].startswith('"') and self[t].endswith('"'):
-                self[t] = self[t][1:-1]
+            if t in self:
+                if self[t].startswith('"') and self[t].endswith('"'):
+                    self[t] = self[t][1:-1]
+                self[t] = re.sub('\(\#[.\d]+\)', '', self[t])
 
         if 'alternativeTitles' in self:
             if len(self['alternativeTitles']) == 2 and \
                isinstance(self['alternativeTitles'][0], basestring):
                self['alternativeTitles'] = [self['alternativeTitles']]
-            self['alternativeTitles'] = [[t[0],
+            self['alternativeTitles'] = [[re.sub('\(\#[.\d]+\)', '', t[0]),
                                            t[1].split(' / ')[0].split('(')[0].strip()]
                                           for t in self['alternativeTitles']]
+            #self[t] = re.sub('\(\#[.\d]+\)', '', self[t])
 
         if 'runtime' in self and self['runtime']:
             if 'min' in self['runtime']: base=60
