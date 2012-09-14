@@ -305,7 +305,7 @@ class Imdb(SiteParser):
             if title.startswith('"') and title.endswith('"'):
                 title = title[1:-1]
             title = re.sub('\(\#[.\d]+\)', '', title)
-            return title
+            return title.strip()
 
         for t in ('title', 'englishTitle', 'originalTitle'):
             if t in self:
