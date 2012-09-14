@@ -301,17 +301,20 @@ class Imdb(SiteParser):
             self['englishTitle'] = ititle[0][0]
         self['title'] = self.get('englishTitle', self['originalTitle'])
 
+        def cleanup_title(title):
+            if title.startswith('"') and title.endswith('"'):
+                title = title[1:-1]
+            title = re.sub('\(\#[.\d]+\)', '', title)
+            return title
+
         for t in ('title', 'englishTitle', 'originalTitle'):
             if t in self:
-                if self[t].startswith('"') and self[t].endswith('"'):
-                    self[t] = self[t][1:-1]
-                self[t] = re.sub('\(\#[.\d]+\)', '', self[t])
-
+                self[t] = cleanup_title(self[t])
         if 'alternativeTitles' in self:
             if len(self['alternativeTitles']) == 2 and \
                isinstance(self['alternativeTitles'][0], basestring):
                self['alternativeTitles'] = [self['alternativeTitles']]
-            self['alternativeTitles'] = [[re.sub('\(\#[.\d]+\)', '', t[0]),
+            self['alternativeTitles'] = [[cleanup_title(t[0]),
                                            t[1].split(' / ')[0].split('(')[0].strip()]
                                           for t in self['alternativeTitles']]
             #self[t] = re.sub('\(\#[.\d]+\)', '', self[t])
