@@ -75,7 +75,7 @@ def load(filename, offset=0):
             return srt
 
     data = data.replace('\r\n', '\n')
-    srts = re.compile('(\d\d:\d\d:\d\d[,.]\d\d\d)\s*?-->\s*?(\d\d:\d\d:\d\d[,.]\d\d\d)\s*?(.*?)\n\n', re.DOTALL)
+    srts = re.compile('(\d\d:\d\d:\d\d[,.]\d\d\d)\s*?-->\s*?(\d\d:\d\d:\d\d[,.]\d\d\d).*?\n(.*?)\n\n', re.DOTALL)
     i = 0
     for s in srts.findall(data):
         _s = {'id': str(i),
