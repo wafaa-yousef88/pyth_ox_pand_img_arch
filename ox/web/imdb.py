@@ -291,6 +291,7 @@ class Imdb(SiteParser):
         for t in self.get('alternativeTitles', []):
             for type in t[1].split('/'):
                 type = type.strip()
+                stop_word = False
                 for key in (
                     'complete title',
                     'recut version',
@@ -298,7 +299,10 @@ class Imdb(SiteParser):
                     'working title',
                 ):
                     if key in type:
-                        continue
+                        stop_word = True
+                        break
+                if stop_word:
+                    continue
                 for regexp in (
                     "^.+ \(imdb display title\) \(English title\)$",
                     "^International \(English title\)$",
