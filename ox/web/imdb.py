@@ -291,6 +291,14 @@ class Imdb(SiteParser):
         for t in self.get('alternativeTitles', []):
             for type in t[1].split('/'):
                 type = type.strip()
+                for key in (
+                    'complete title',
+                    'recut version',
+                    'script title',
+                    'working title',
+                ):
+                    if key in type:
+                        continue
                 for regexp in (
                     "^.+ \(imdb display title\) \(English title\)$",
                     "^International \(English title\)$",
@@ -325,7 +333,7 @@ class Imdb(SiteParser):
                 self[t] = cleanup_title(self[t])
 
         if 'internationalTitle' in self and \
-            self.get('title') == self['internationalTitle']:
+            self.get('title', '').lower() == self['internationalTitle'].lower():
             del self['internationalTitle']
 
         if 'alternativeTitles' in self:
