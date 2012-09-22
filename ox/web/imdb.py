@@ -299,6 +299,8 @@ class Imdb(SiteParser):
                     "^.+ \(.+\) \(English title\)$",
                     "^USA$",
                     "^UK$",
+                    "^USA \(imdb display title\)$",
+                    "^UK \(imdb display title\)$",
                     "^USA \(.+\)$",
                     "^UK \(.+\)$",
                     "^Australia \(.+\)$",
@@ -321,6 +323,11 @@ class Imdb(SiteParser):
         for t in ('title', 'internationalTitle'):
             if t in self:
                 self[t] = cleanup_title(self[t])
+
+        if 'internationalTitle' in self and \
+            self.get('title') == self['internationalTitle']:
+            del self['internationalTitle']
+
         if 'alternativeTitles' in self:
             alt = {}
             for t in self['alternativeTitles']:
