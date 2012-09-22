@@ -296,6 +296,7 @@ class Imdb(SiteParser):
                     "^UK$",
                     "^USA \(.+\)$",
                     "^UK \(.+\)$",
+                    "^Australia \(.+\)$",
                     "^International \(.+ title\)$",
                 ):
                     if re.compile(regexp).findall(type):
