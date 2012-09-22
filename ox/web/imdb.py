@@ -355,6 +355,8 @@ class Imdb(SiteParser):
             for t in sorted(alt, lambda a, b: cmp(sorted(alt[a]), sorted(alt[b]))):
                 if alt[t]:
                     self['alternativeTitles'].append((t, sorted(alt[t])))
+            if not self['alternativeTitles']:
+                del self['alternativeTitles']
 
         if 'runtime' in self and self['runtime']:
             if 'min' in self['runtime']: base=60
