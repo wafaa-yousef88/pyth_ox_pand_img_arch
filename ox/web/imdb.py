@@ -283,6 +283,11 @@ class Imdb(SiteParser):
             time.sleep(1)
             super(Imdb, self).__init__(0)
 
+        if 'alternativeTitles' in self:
+            if len(self['alternativeTitles']) == 2 and \
+               isinstance(self['alternativeTitles'][0], basestring):
+               self['alternativeTitles'] = [self['alternativeTitles']]
+
         for t in self.get('alternativeTitles', []):
             for type in t[1].split('/'):
                 type = type.strip()
@@ -317,9 +322,6 @@ class Imdb(SiteParser):
             if t in self:
                 self[t] = cleanup_title(self[t])
         if 'alternativeTitles' in self:
-            if len(self['alternativeTitles']) == 2 and \
-               isinstance(self['alternativeTitles'][0], basestring):
-               self['alternativeTitles'] = [self['alternativeTitles']]
             alt = {}
             for t in self['alternativeTitles']:
                 title = cleanup_title(t[0])
