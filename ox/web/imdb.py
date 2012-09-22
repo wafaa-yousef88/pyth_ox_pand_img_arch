@@ -284,7 +284,7 @@ class Imdb(SiteParser):
             super(Imdb, self).__init__(0)
 
         for t in self.get('alternativeTitles', []):
-            for type in t[1].lower().split('/'):
+            for type in t[1].split('/'):
                 type = type.strip()
                 for regexp in (
                     "^.+ \(imdb display title\) \(English title\)$",
