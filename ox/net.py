@@ -70,7 +70,8 @@ def read_url(url, data=None, headers=DEFAULT_HEADERS, return_headers=False, unic
     return result
 
 def detect_encoding(data):
-    if 'content="text/html; charset=utf-8"' in data:
+    if 'content="text/html; charset=utf-8"' in data or \
+        'meta charset="utf-8"' in data:
         return 'utf-8'
     elif 'content="text/html; charset=iso-8859-1"' in data:
         return 'iso-8859-1'
