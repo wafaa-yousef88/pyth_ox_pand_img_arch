@@ -232,7 +232,7 @@ class Imdb(SiteParser):
             're': '<span class="tv-extra">(TV series)</span>',
             'type': 'string'
         },
-        'originalTitle': {
+        'title': {
             'page': 'combined',
             're': '<h1>(.*?) <span>',
             'type': 'string'
@@ -283,23 +283,28 @@ class Imdb(SiteParser):
             time.sleep(1)
             super(Imdb, self).__init__(0)
 
-        #only list one country per alternative title
-
-        def is_international_title(t):
-            if 'script title' in t[1].lower(): return False
-            if 'recut version' in t[1].lower(): return False
-            if 'working title' in t[1].lower(): return False
-            if 'complete title' in t[1].lower(): return False
-            if 'usa (imdb display title)' in t[1].lower(): return True
-            if t[1].lower() == 'usa': return True
-            if 'international (english title)' in t[1].lower(): return True
-            #fails if orignial is english... Japan (English title)
-            #if 'english title' in t[1].lower(): return True
-            return False
-        ititle = filter(is_international_title, self.get('alternativeTitles', []))
-        if ititle:
-            self['englishTitle'] = ititle[0][0]
-        self['title'] = self.get('englishTitle', self['originalTitle'])
+        for t in self.get('alternativeTitles', []):
+            for type in t[1].lower().split('/'):
+                type = type.strip()
+                for regexp in (
+                    "^.+ \(imdb display title\) \(English title\)$",
+                    "^International \(English title\)$",
+                    "^.+ \(English title\)$",
+                    "^International \(.+\) \(English title\)$",
+                    "^.+ \(.+\) \(English title\)$",
+                    "^USA$",
+                    "^UK$",
+                    "^USA \(.+\)$",
+                    "^UK \(.+\)$",
+                    "^International \(.+ title\)$",
+                ):
+                    if re.compile(regexp).findall(type):
+                        self['internationalTitle'] = t[0]
+                        break
+                if 'internationalTitle' in self:
+                    break
+            if 'internationalTitle' in self:
+                break
 
         def cleanup_title(title):
             if title.startswith('"') and title.endswith('"'):
@@ -307,17 +312,27 @@ class Imdb(SiteParser):
             title = re.sub('\(\#[.\d]+\)', '', title)
             return title.strip()
 
-        for t in ('title', 'englishTitle', 'originalTitle'):
+        for t in ('title', 'internationalTitle'):
             if t in self:
                 self[t] = cleanup_title(self[t])
         if 'alternativeTitles' in self:
             if len(self['alternativeTitles']) == 2 and \
                isinstance(self['alternativeTitles'][0], basestring):
                self['alternativeTitles'] = [self['alternativeTitles']]
-            self['alternativeTitles'] = [[cleanup_title(t[0]),
-                                           t[1].split(' / ')[0].split('(')[0].strip()]
-                                          for t in self['alternativeTitles']]
-            #self[t] = re.sub('\(\#[.\d]+\)', '', self[t])
+            alt = {}
+            for t in self['alternativeTitles']:
+                title = cleanup_title(t[0])
+                if title not in (self.get('title'), self.get('internationalTitle')):
+                    if title not in alt:
+                        alt[title] = []
+                    for c in t[1].split('/'):
+                        c = c.replace('International', '').split('(')[0].strip()
+                        if c:
+                            alt[title].append(c)
+            self['alternativeTitles'] = []
+            for t in sorted(alt, lambda a, b: cmp(sorted(alt[a]), sorted(alt[b]))):
+                if alt[t]:
+                    self['alternativeTitles'].append((t, sorted(alt[t])))
 
         if 'runtime' in self and self['runtime']:
             if 'min' in self['runtime']: base=60

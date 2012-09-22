@@ -208,7 +208,6 @@ def get_sort_name(name):
 
     >>> get_sort_name('Scorsese, Martin')
     'Scorsese, Martin'
-
     """
     if not ' ' in name or ', ' in name:
         return name
