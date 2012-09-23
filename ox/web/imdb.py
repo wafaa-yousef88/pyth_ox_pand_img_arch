@@ -420,7 +420,7 @@ class Imdb(SiteParser):
             if 'director' in self:
                 self['episodeDirector'] = self['director']
 
-            series = Imdb(self['series'])
+            series = Imdb(self['series'], timeout=timeout)
             if not 'creator' in series and 'director' in series:
                 series['creator'] = series['director']
                 if len(series['creator']) > 10:
