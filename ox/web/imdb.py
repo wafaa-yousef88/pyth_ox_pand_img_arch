@@ -293,10 +293,13 @@ class Imdb(SiteParser):
                 type = type.strip()
                 stop_word = False
                 for key in (
+                    'alternative title',
                     'complete title',
                     'recut version',
                     'script title',
                     'working title',
+                    'reissue title',
+                    'IMAX version'
                 ):
                     if key in type:
                         stop_word = True
@@ -402,6 +405,8 @@ class Imdb(SiteParser):
                 del self['_director']
         if 'isSeries' in self:
             del self['isSeries']
+        if 'episodeTitle' in self:
+            self['episodeTitle'] = re.sub('Episode \#\d+\.\d+', '', self['episodeTitle'])
 
         if 'series' in self:
             if 'episodeTitle' in self:
@@ -410,6 +415,8 @@ class Imdb(SiteParser):
             if 'episodeTitle' in self and 'season' in self and 'episode' in self:
                 self['title'] = "%s (S%02dE%02d) %s" % (
                         self['seriesTitle'], self['season'], self['episode'], self['episodeTitle'])
+            if 'title' in self:
+                self['title'] = self['title'].strip()
             if 'director' in self:
                 self['episodeDirector'] = self['director']
 
@@ -433,8 +440,6 @@ class Imdb(SiteParser):
             if 'creator' in self:
                 self['seriesDirector'] = self['creator']
 
-            if 'originalTitle' in self:
-                del self['originalTitle']
         else:
             for key in ('seriesTitle', 'episodeTitle', 'season', 'episode'):
                 if key in self:
