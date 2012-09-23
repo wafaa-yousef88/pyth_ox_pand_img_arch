@@ -14,7 +14,7 @@ from chardet.universaldetector import UniversalDetector
 DEBUG = False
 # Default headers for HTTP requests.
 DEFAULT_HEADERS = {
-    'User-Agent': 'Mozilla/5.0 (X11; Linux i686; rv:7.0.1) Gecko/20100101 Firefox/7.0.1',
+    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:15.0) Gecko/20100101 Firefox/15.0.1',
     'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
     'Accept-Language': 'en-us,en;q=0.5',
