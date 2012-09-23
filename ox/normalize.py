@@ -104,7 +104,7 @@ def normalize_imdbid(imdbId):
 
 # Common suffixes in surnames.
 _sname_suffixes = (
-    'al', 'ben', 'da', 'de', 'del', 'den', 'der', 'di', 'du',
+    'al', 'ben', 'da', 'de', 'del', 'den', 'der', 'des', 'di', 'du',
     'e', 'el', 'la', 'le', 'the', 'vom', 'von', 'van', 'y'
 )
 
