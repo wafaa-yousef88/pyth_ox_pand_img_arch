@@ -415,11 +415,11 @@ class Imdb(SiteParser):
         if 'series' in self:
             if 'episodeTitle' in self:
                 self['seriesTitle'] = self['title']
-                self['title'] = "%s (S01) %s" % (self['seriesTitle'], self['episodeTitle'])
-            if 'episodeTitle' in self and 'season' in self and 'episode' in self:
-                self['title'] = "%s (S%02dE%02d) %s" % (
+                if 'season' in self and 'episode' in self:
+                    self['title'] = "%s (S%02dE%02d) %s" % (
                         self['seriesTitle'], self['season'], self['episode'], self['episodeTitle'])
-            if 'title' in self:
+                else:
+                    self['title'] = "%s (S01) %s" % (self['seriesTitle'], self['episodeTitle'])
                 self['title'] = self['title'].strip()
             if 'director' in self:
                 self['episodeDirector'] = self['director']
