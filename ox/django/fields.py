@@ -40,6 +40,8 @@ class DictField(models.TextField):
 
     def to_python(self, value):
         """Convert our string value to python after we load it from the DB"""
+        if value == None:
+            return value
         if isinstance(value, dict):
             return value
         try:
@@ -51,6 +53,8 @@ class DictField(models.TextField):
 
     def get_db_prep_save(self, value, connection):
         """Convert our JSON object to a string before we save"""
+        if value == None:
+            return value
         assert isinstance(value, dict)
         value = json.dumps(value, default=to_json)
         return super(DictField, self).get_db_prep_save(value, connection=connection)
