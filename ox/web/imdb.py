@@ -373,7 +373,11 @@ class Imdb(SiteParser):
             if isinstance(self['cast'][0], basestring):
                 self['cast'] = [self['cast']]
             self['actor'] = [c[0] for c in self['cast']]
-            self['cast'] = [{'actor': x[0], 'character': x[1]} for x in self['cast']]
+            def cleanup_character(c):
+                c = c.replace('(uncredited)', '').strip()
+                return c
+            self['cast'] = [{'actor': x[0], 'character': cleanup_character(x[1])}
+                            for x in self['cast']]
 
         if 'connections' in self:
             cc={}
