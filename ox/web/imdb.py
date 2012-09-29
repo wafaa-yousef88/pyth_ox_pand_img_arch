@@ -72,8 +72,8 @@ class Imdb(SiteParser):
             'type': 'list'
         },
         'connections': {
-            'page': 'movieconnections',
-            're': '<h5>(.*?)</h5>(.*?)\n\n',
+            'page': 'trivia?tab=mc',
+            're': '<h4 class="li_group">(.*?)</h4>(.*?)(<\/div>\n  <a|<script)',
             'type': 'list'
         },
         'country': {
@@ -383,7 +383,7 @@ class Imdb(SiteParser):
             cc={}
             if len(self['connections']) == 2 and isinstance(self['connections'][0], basestring):
                 self['connections'] = [self['connections']]
-            for rel, data in self['connections']:
+            for rel, data, _ in self['connections']:
                 #cc[unicode(rel)] = re.compile('<a href="/title/tt(\d{7})/">(.*?)</a>').findall(data)
                 def get_conn(c):
                     title = c[1]
