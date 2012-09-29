@@ -86,8 +86,6 @@ UA_REGEXPS = {
         '(Netscape)\d?\/(\d+)',
         '(NokiaBrowser)\/(\d+)',
         '(OmniWeb)\/(\d+)',
-        '(Opera) (\d+)',
-        '(Opera)\/(\d+)',
         '(Opera)\/.+Version\/(\d+)',
         'Version\/(\d+).+(Safari)',
         '(WebKit)\/(\d+)',
