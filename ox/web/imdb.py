@@ -381,7 +381,7 @@ class Imdb(SiteParser):
 
         if 'connections' in self:
             cc={}
-            if len(self['connections']) == 2 and isinstance(self['connections'][0], basestring):
+            if len(self['connections']) == 3 and isinstance(self['connections'][0], basestring):
                 self['connections'] = [self['connections']]
             for rel, data, _ in self['connections']:
                 #cc[unicode(rel)] = re.compile('<a href="/title/tt(\d{7})/">(.*?)</a>').findall(data)
@@ -389,11 +389,15 @@ class Imdb(SiteParser):
                     title = c[1]
                     if title.startswith('"') and title.endswith('"'):
                         title = title[1:-1]
-                    return {
+                    r = {
                         'id': c[0],
-                        'title': title
+                        'title': title,
                     }
-                cc[unicode(rel)] = map(get_conn, re.compile('<a href="/title/tt(\d{7})/">(.*?)</a>').findall(data))
+                    description = c[2].split('<br />')
+                    if len(description) == 2:
+                        r['description'] = description[-1].strip()
+                    return r
+                cc[unicode(rel)] = map(get_conn, re.compile('<a href="/title/tt(\d{7})/">(.*?)</a>(.*?)<\/div', re.DOTALL).findall(data))
 
 
             self['connections'] = cc
