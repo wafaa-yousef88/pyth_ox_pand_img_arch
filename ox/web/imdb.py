@@ -332,6 +332,8 @@ class Imdb(SiteParser):
         def cleanup_title(title):
             if title.startswith('"') and title.endswith('"'):
                 title = title[1:-1]
+            if title.startswith("'") and title.endswith("'"):
+                title = title[1:-1]
             title = re.sub('\(\#[.\d]+\)', '', title)
             return title.strip()
 
@@ -386,12 +388,9 @@ class Imdb(SiteParser):
             for rel, data, _ in self['connections']:
                 #cc[unicode(rel)] = re.compile('<a href="/title/tt(\d{7})/">(.*?)</a>').findall(data)
                 def get_conn(c):
-                    title = c[1]
-                    if title.startswith('"') and title.endswith('"'):
-                        title = title[1:-1]
                     r = {
                         'id': c[0],
-                        'title': title,
+                        'title': cleanup_title(c[1]),
                     }
                     description = c[2].split('<br />')
                     if len(description) == 2:
