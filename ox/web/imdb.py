@@ -393,7 +393,7 @@ class Imdb(SiteParser):
                         'title': cleanup_title(c[1]),
                     }
                     description = c[2].split('<br />')
-                    if len(description) == 2:
+                    if len(description) == 2 and description[-1].strip() != '-':
                         r['description'] = description[-1].strip()
                     return r
                 cc[unicode(rel)] = map(get_conn, re.compile('<a href="/title/tt(\d{7})/">(.*?)</a>(.*?)<\/div', re.DOTALL).findall(data))
