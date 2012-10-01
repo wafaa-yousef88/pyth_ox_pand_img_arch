@@ -288,6 +288,7 @@ class Imdb(SiteParser):
                isinstance(self['alternativeTitles'][0], basestring):
                self['alternativeTitles'] = [self['alternativeTitles']]
 
+        types = {}
         for t in self.get('alternativeTitles', []):
             for type in t[1].split('/'):
                 type = type.strip()
@@ -304,27 +305,27 @@ class Imdb(SiteParser):
                     if key in type:
                         stop_word = True
                         break
-                if stop_word:
-                    continue
-                for regexp in (
-                    "^.+ \(imdb display title\) \(English title\)$",
-                    "^International \(English title\)$",
-                    "^.+ \(English title\)$",
-                    "^International \(.+\) \(English title\)$",
-                    "^.+ \(.+\) \(English title\)$",
-                    "^USA$",
-                    "^UK$",
-                    "^USA \(imdb display title\)$",
-                    "^UK \(imdb display title\)$",
-                    "^USA \(.+\)$",
-                    "^UK \(.+\)$",
-                    "^Australia \(.+\)$",
-                    "^International \(.+ title\)$",
-                ):
-                    if re.compile(regexp).findall(type):
-                        self['internationalTitle'] = t[0]
-                        break
-                if 'internationalTitle' in self:
+                if not stop_word:
+                    types[type] = t[0]
+
+        for regexp in (
+            "^.+ \(imdb display title\) \(English title\)$",
+            "^International \(English title\)$",
+            "^.+ \(English title\)$",
+            "^International \(.+\) \(English title\)$",
+            "^.+ \(.+\) \(English title\)$",
+            "^USA$",
+            "^UK$",
+            "^USA \(imdb display title\)$",
+            "^UK \(imdb display title\)$",
+            "^USA \(.+\)$",
+            "^UK \(.+\)$",
+            "^Australia \(.+\)$",
+            "^International \(.+ title\)$",
+        ):
+            for type in types:
+                if re.compile(regexp).findall(type):
+                    self['internationalTitle'] = types[type]
                     break
             if 'internationalTitle' in self:
                 break
