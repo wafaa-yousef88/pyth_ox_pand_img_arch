@@ -457,6 +457,12 @@ class Imdb(SiteParser):
                 self['episodeDirector'] = self['director']
             self['director'] = self['creator']
 
+        #make lists unique but keep order
+        for key in ('director',):
+            if key in self:
+                self[key] = [x for i,x in enumerate(self[key])
+                             if x not in self[key][i+1:]]
+
         for key in ('actor', 'writer', 'producer', 'editor'):
             if key in self:
                 if isinstance(self[key][0], list):
