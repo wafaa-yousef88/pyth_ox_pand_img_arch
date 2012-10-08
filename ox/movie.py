@@ -43,7 +43,7 @@ def format_path(data, directory_key='director'):
     year = data['seriesYear' if data['isEpisode'] else 'year'] or None
     language = 'en' if data['type'] == 'subtitle' and data['language'] == None else data['language']
     parts = map(format_underscores, filter(lambda x: x != None, [
-        u'; '.join(director),
+        u'; '.join(director[:10]),
         u'%s%s' % (title, u' (%s)' % year if year else ''),
         u'%s%s%s%s%s%s' % (
             data['title'] or 'Untitled',
