@@ -364,6 +364,10 @@ class Imdb(SiteParser):
             if not self['alternativeTitles']:
                 del self['alternativeTitles']
 
+        if 'internationalTitle' in self:
+            self['originalTitle'] = self['title']
+            self['title'] = self.pop('internationalTitle')
+
         if 'runtime' in self and self['runtime']:
             if 'min' in self['runtime']: base=60
             else: base=1
