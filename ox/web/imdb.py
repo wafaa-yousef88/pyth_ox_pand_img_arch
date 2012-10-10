@@ -307,23 +307,28 @@ class Imdb(SiteParser):
                         break
                 if not stop_word and not type in types:
                     types[type] = t[0]
-        for regexp in (
+        regexps = [
             "^.+ \(imdb display title\) \(English title\)$",
             "^International \(English title\)$",
-            "^.+ \(English title\)$",
             "^International \(.+\) \(English title\)$",
             "^.+ \(.+\) \(English title\)$",
             "^USA$",
             "^UK$",
             "^USA \(imdb display title\)$",
             "^UK \(imdb display title\)$",
-            "^USA \(.+\)$",
-            "^UK \(.+\)$",
-            "^Australia \(.+\)$",
-            "^International \(.+ title\)$",
-        ):
+        ]
+        if not filter(lambda c: c in ('USA', 'UK', 'Australia'), self.get('country', [])):
+            regexps.insert(2, "^.+ \(English title\)$")
+            regexps += [
+                "^USA \(.+\)$",
+                "^UK \(.+\)$",
+                "^Australia \(.+\)$",
+                "^International \(.+ title\)$",
+            ]
+        for regexp in regexps:
             for type in types:
                 if re.compile(regexp).findall(type):
+                    #print types[type], type
                     self['internationalTitle'] = types[type]
                     break
             if 'internationalTitle' in self:
