@@ -305,9 +305,8 @@ class Imdb(SiteParser):
                     if key in type:
                         stop_word = True
                         break
-                if not stop_word:
+                if not stop_word and not type in types:
                     types[type] = t[0]
-
         for regexp in (
             "^.+ \(imdb display title\) \(English title\)$",
             "^International \(English title\)$",
