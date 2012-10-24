@@ -3,6 +3,7 @@
 import os
 import mimetypes
 from datetime import datetime, timedelta
+from urllib import quote
 
 from django.http import HttpResponse, Http404
 from django.conf import settings
@@ -43,7 +44,8 @@ def HttpFileResponse(path, content_type=None, filename=None):
     if filename:
         if isinstance(filename, unicode):
             filename = filename.encode('utf-8')
-        response['Content-Disposition'] = 'attachment; filename="%s"' % filename
+        response['Content-Disposition'] = 'attachment; filename*=UTF=8''%s' % quote(filename)
+
     response['Expires'] = datetime.strftime(datetime.utcnow() + timedelta(days=1), "%a, %d-%b-%Y %H:%M:%S GMT")
     return response
 
