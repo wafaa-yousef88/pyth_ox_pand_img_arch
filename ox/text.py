@@ -42,7 +42,8 @@ SUFFIXES = ['ii', 'iii', 'jr', 'jr.', 'ph.d.', 'phd', 'sr', 'sr.']
 UA_ALIASES = {
     'browser': {
         'Chrome': '(CrMo)',
-        'Firefox': '(Fennec|Firebird|Iceweasel|Minefield|Namoroka|Phoenix|SeaMonkey|Shiretoko)'
+        'Firefox': '(Fennec|Firebird|Iceweasel|Minefield|Namoroka|Phoenix|SeaMonkey|Shiretoko)',
+        'Nokia Browser': '(OviBrowser)'
     },
     'robot': {},
     'system': {
@@ -54,18 +55,24 @@ UA_ALIASES = {
 UA_NAMES = {
     'browser': {
         'chromeframe': 'Chrome Frame',
+        'FBForIPhone': 'WebKit',
         'Gecko': 'Mozilla',
         'Mozilla': 'Netscape',
-        'MSIE': 'Internet Explorer'
+        'MSIE': 'Internet Explorer',
+        'NokiaBrowser': 'Nokia Browser'
     },
     'robot': {},
     'system': {
         'CPU OS': 'iOS',
         'iPhone': 'iOS',
         'iPhone OS': 'iOS',
+        'J2ME/MIDP': 'Java',
         'Mac_PowerPC': 'Mac OS',
         'Mac_PPC': 'Mac OS',
         'Macintosh': 'Mac OS',
+        'PLAYSTATION': 'PlayStation',
+        'S': 'Nokia',
+        'Series': 'Nokia',
         'Win': 'Windows',
         'X11': 'Linux'
     }
@@ -77,6 +84,7 @@ UA_REGEXPS = {
         '(chromeframe)\/(\d+)',
         '(Chrome)\/(\d+)',
         '(Epiphany)\/(\d+)',
+        '(FBForIPhone)',
         '(Firefox)\/(\d+)',
         '(Galeon)\/(\d+)',
         '(iCab) (\d+)',
@@ -87,9 +95,10 @@ UA_REGEXPS = {
         '(NokiaBrowser)\/(\d+)',
         '(OmniWeb)\/(\d+)',
         '(Opera)\/.+Version\/(\d+)',
+        '(OviBrowser)\/(\d+)',
         'Version\/(\d+).+(Safari)',
         '(WebKit)\/(\d+)',
-        '(MSIE) (\d+)', # last, since Opera used to mask as MSIE
+        '(MSIE) (\d\d?(?!\d))', # last, since Opera used to mask as MSIE
         '(Gecko)',
         '(Mozilla)\/(3|4)'
     ],
@@ -97,10 +106,12 @@ UA_REGEXPS = {
         '(BingPreview)\/(\d+)',
         '(Google Web Preview).+Chrome\/(\d+)',
         '(Googlebot)\/(\d+)',
-        '(WebCrawler)\/(\d+)'
+        '(WebCrawler)\/(\d+)',
+        '(Yahoo! Slurp)\/(\d+)'
     ],
     'system': [
         '(Android) (\d+)',
+        '(Android)',
         '(BeOS)',
         '(BlackBerry) (\d+)',
         '(BlackBerry)',
@@ -109,6 +120,7 @@ UA_REGEXPS = {
         '(CPU OS) (\d+)',
         '(iPhone OS) (\d+)',
         '(iPhone)', # Opera
+        '(J2ME\/MIDP)',
         '(Linux).+(CentOS|CrOS|Debian|Fedora|Gentoo|Mandriva|MeeGo|Mint|Red Hat|SUSE|Ubuntu|webOS)',
         '(CentOS|CrOS|Debian|Fedora|Gentoo|Mandriva|MeeGo|Mint|Red Hat|SUSE|Ubuntu|webOS).+(Linux)',
         '(Linux)',
@@ -117,6 +129,9 @@ UA_REGEXPS = {
         '(Mac_PowerPC)',
         '(Mac_PPC)',
         '(Macintosh)',
+        '(PLAYSTATION) (\d+)',
+        '(S)(60);',
+        '(Series) ?(40|60)',
         '(Symbian OS)',
         '(SymbianOS)\/(\d+)',
         '(SymbOS)',
@@ -124,6 +139,7 @@ UA_REGEXPS = {
         '(Unix) (AIX|HP-UX|IRIX|SunOS)',
         '(Unix)',
         '(Windows) (NT \d\.\d)',
+        '(Windows) (Phone OS)',
         '(Windows) (3\.1|95|98|2000|2003|CE|ME|Mobile|NT|XP)', # Opera
         '(Win) (9x 4\.90)', # Firefox
         '(Win)(16)', # Firefox
@@ -146,7 +162,8 @@ UA_VERSIONS = {
         '10.6': '10.6 (Snow Leopard)',
         '10.7': '10.7 (Lion)',
         '10.8': '10.8 (Mountain Lion)',
-        'CrOS': 'Chrome OS',
+        '40': 'Series 40',
+        '60': 'Series 60',
         'NT 3.1': 'NT 3.1 (3.1)',
         'NT 3.5': 'NT 3.5 (NT)',
         'NT 4.0': 'NT 4.0 (NT)',
