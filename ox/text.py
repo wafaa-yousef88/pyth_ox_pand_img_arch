@@ -57,6 +57,7 @@ UA_NAMES = {
         'chromeframe': 'Chrome Frame',
         'FBForIPhone': 'WebKit',
         'Gecko': 'Mozilla',
+        'konqueror': 'Konqueror',
         'Mozilla': 'Netscape',
         'MSIE': 'Internet Explorer',
         'NokiaBrowser': 'Nokia Browser'
@@ -82,14 +83,15 @@ UA_REGEXPS = {
         '(Camino)\/(\d+)',
         '(Chimera)\/(\d+)',
         '(chromeframe)\/(\d+)',
-        '(Chromium)\/(\d+)',
+        '(Epiphany)\/(\d+)', # before Chrome, Chromium and Safari
+        '(Chromium)\/(\d+)', # before Chrome
         '(Chrome)\/(\d+)',
-        '(Epiphany)\/(\d+)',
         '(FBForIPhone)',
         '(Firefox)\/(\d+)',
         '(Galeon)\/(\d+)',
         '(iCab) (\d+)',
         '(iCab)\/(\d+)',
+        '(konqueror)\/(\d+)',
         '(Konqueror)\/(\d+)',
         '(Lynx)\/(\d+)',
         '(Netscape)\d?\/(\d+)',
