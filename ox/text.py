@@ -82,6 +82,7 @@ UA_REGEXPS = {
         '(Camino)\/(\d+)',
         '(Chimera)\/(\d+)',
         '(chromeframe)\/(\d+)',
+        '(Chromium)\/(\d+)',
         '(Chrome)\/(\d+)',
         '(Epiphany)\/(\d+)',
         '(FBForIPhone)',
