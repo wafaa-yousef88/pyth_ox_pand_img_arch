@@ -13,6 +13,8 @@ def video_url(youtubeId, format='mp4', timeout=cache_timeout):
         youtubeId - if of video
         format - video format, options: webm, 1080p, 720p, mp4, high
     """
+    def get_url(stream):
+        return '%s&signature=%s' % (stream['url'], stream['sig'])
     fmt = None
     if format == '1080p':
         fmt=37
@@ -24,11 +26,11 @@ def video_url(youtubeId, format='mp4', timeout=cache_timeout):
         fmt=35
     elif format == 'webm':
         streams = videos(youtubeId, 'webm')
-        return streams[max(streams.keys())]['url']
+        return get_url(streams[max(streams.keys())])
 
     streams = videos(youtubeId)
     if str(fmt) in streams:
-        return streams[str(fmt)]['url']
+        return get_url(streams[str(fmt)])
 
 def find(query, max_results=10, offset=1, orderBy='relevance'):
     query = quote(query)
