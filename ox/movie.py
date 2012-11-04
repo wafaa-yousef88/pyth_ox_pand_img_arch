@@ -22,8 +22,8 @@ EXTENSIONS = {
         'idx', 'srt', 'sub'
     ],
     'video': [
-        'avi', 'divx', 'dv', 'flv', 'm4v', 'mkv', 'mov', 'mp4',
-        'mpeg', 'mpg', 'mts', 'ogm', 'ogv', 'rm', 'webm', 'wmv'
+        'avi', 'divx', 'dv', 'flv', 'm2t' 'm4v', 'mkv', 'mov', 'mp4',
+        'mpeg', 'mpg', 'mts', 'ogm', 'ogv', 'rm', 'vob', 'webm', 'wmv'
     ],
 }
 LANGUAGES = ['en', 'fr', 'de', 'es', 'it']
