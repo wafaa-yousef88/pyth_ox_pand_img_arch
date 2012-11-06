@@ -425,8 +425,10 @@ class Imdb(SiteParser):
             self['episodeTitle'] = re.sub('Episode \#\d+\.\d+', '', self['episodeTitle'])
 
         if 'series' in self:
+            series = Imdb(self['series'], timeout=timeout)
+            self['seriesTitle'] = series['title']
             if 'episodeTitle' in self:
-                self['seriesTitle'] = self['title']
+                self['seriesTitle'] = series['title']
                 if 'season' in self and 'episode' in self:
                     self['title'] = "%s (S%02dE%02d) %s" % (
                         self['seriesTitle'], self['season'], self['episode'], self['episodeTitle'])
@@ -436,7 +438,6 @@ class Imdb(SiteParser):
             if 'director' in self:
                 self['episodeDirector'] = self['director']
 
-            series = Imdb(self['series'], timeout=timeout)
             if not 'creator' in series and 'director' in series:
                 series['creator'] = series['director']
                 if len(series['creator']) > 10:
