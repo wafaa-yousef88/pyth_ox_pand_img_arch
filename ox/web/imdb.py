@@ -300,7 +300,8 @@ class Imdb(SiteParser):
                     'script title',
                     'working title',
                     'reissue title',
-                    'IMAX version'
+                    'IMAX version',
+                    'alternative spelling'
                 ):
                     if key in type:
                         stop_word = True
