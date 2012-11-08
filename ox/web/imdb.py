@@ -301,7 +301,9 @@ class Imdb(SiteParser):
                     'working title',
                     'reissue title',
                     'IMAX version',
-                    'alternative spelling'
+                    'alternative spelling',
+                    'informal short title',
+                    'alternative transliteration'
                 ):
                     if key in type:
                         stop_word = True
@@ -310,21 +312,23 @@ class Imdb(SiteParser):
                     types[type] = t[0]
         regexps = [
             "^.+ \(imdb display title\) \(English title\)$",
-            "^International \(English title\)$",
-            "^International \(.+\) \(English title\)$",
-            "^.+ \(.+\) \(English title\)$",
-            "^USA$",
-            "^UK$",
             "^USA \(imdb display title\)$",
             "^UK \(imdb display title\)$",
+            "^International \(English title\)$",
+            "^International \(.+\) \(English title\)$",
+            "^USA$",
+            "^UK$",
         ]
-        if not filter(lambda c: c in ('USA', 'UK', 'Australia'), self.get('country', [])):
-            regexps.insert(2, "^.+ \(English title\)$")
+        if not filter(lambda c: c in ('USA', 'UK', 'Australia', 'New Zealand'), self.get('country', [])):
+            regexps.insert(5, "^[^(]+ \(English title\)$")
+            regexps.insert(6, "^.+ \(.+\) \(English title\)$")
             regexps += [
                 "^USA \(.+\)$",
                 "^UK \(.+\)$",
                 "^Australia \(.+\)$",
+                "(literal English title)",
                 "^International \(.+ title\)$",
+                "^International \(.+\) \(.+ title\)$",
             ]
         for regexp in regexps:
             for type in types:
