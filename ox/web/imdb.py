@@ -229,7 +229,7 @@ class Imdb(SiteParser):
         },
         'isSeries': {
             'page': 'combined',
-            're': '<span class="tv-extra">(TV series)</span>',
+            're': '<span class="tv-extra">\(*TV series',
             'type': 'string'
         },
         'title': {
