@@ -41,7 +41,7 @@ SUFFIXES = ['ii', 'iii', 'jr', 'jr.', 'ph.d.', 'phd', 'sr', 'sr.']
 
 UA_ALIASES = {
     'browser': {
-        'Chrome': '(CrMo)',
+        'Chrome': '(CriOS|CrMo)',
         'Firefox': '(Fennec|Firebird|Iceweasel|Minefield|Namoroka|Phoenix|SeaMonkey|Shiretoko)',
         'Nokia Browser': '(OviBrowser)'
     },
