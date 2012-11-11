@@ -303,7 +303,8 @@ class Imdb(SiteParser):
                     'IMAX version',
                     'alternative spelling',
                     'informal short title',
-                    'alternative transliteration'
+                    'alternative transliteration',
+                    'restored version'
                 ):
                     if key in type:
                         stop_word = True
