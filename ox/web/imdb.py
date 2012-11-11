@@ -316,13 +316,13 @@ class Imdb(SiteParser):
             "^UK \(imdb display title\)$",
             "^International \(English title\)$",
             "^International \(.+\) \(English title\)$",
-            "^USA$",
-            "^UK$",
         ]
         if not filter(lambda c: c in ('USA', 'UK', 'Australia', 'New Zealand'), self.get('country', [])):
-            regexps.insert(5, "^[^(]+ \(English title\)$")
-            regexps.insert(6, "^.+ \(.+\) \(English title\)$")
             regexps += [
+                "^[^(]+ \(English title\)$",
+                "^.+ \(.+\) \(English title\)$",
+                "^USA$",
+                "^UK$",
                 "^USA \(.+\)$",
                 "^UK \(.+\)$",
                 "^Australia \(.+\)$",
