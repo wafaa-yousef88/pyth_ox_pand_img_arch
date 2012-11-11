@@ -324,8 +324,8 @@ class Imdb(SiteParser):
         regexps = [
             "^.+ \(imdb display title\) \(English title\)$",
             "^USA \(imdb display title\)$",
-            "^UK \(imdb display title\)$",
             "^International \(English title\)$",
+            "^UK \(imdb display title\)$",
             "^International \(.+\) \(English title\)$",
         ]
         if 'Hong Kong' in self.get('country', []):
