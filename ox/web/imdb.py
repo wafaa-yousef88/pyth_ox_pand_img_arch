@@ -289,23 +289,33 @@ class Imdb(SiteParser):
                self['alternativeTitles'] = [self['alternativeTitles']]
 
         types = {}
+        stop_words = [ 
+            'alternative spelling',
+            'alternative title',
+            'alternative transliteration',
+            'complete title',
+            'IMAX version',
+            'informal short title',
+            'longer version',
+            'new title',
+            'recut version',
+            'reissue title',
+            'restored version',
+            'script title',
+            'TV title',
+            'working title',
+        ]
+        #ignore english japanese titles
+        #for movies that are not only from japan
+        if ['Japan'] != self.get('country', []):
+            stop_words += [
+                'Japan (English title)'
+            ]
         for t in self.get('alternativeTitles', []):
             for type in t[1].split('/'):
                 type = type.strip()
                 stop_word = False
-                for key in (
-                    'alternative title',
-                    'complete title',
-                    'recut version',
-                    'script title',
-                    'working title',
-                    'reissue title',
-                    'IMAX version',
-                    'alternative spelling',
-                    'informal short title',
-                    'alternative transliteration',
-                    'restored version'
-                ):
+                for key in stop_words:
                     if key in type:
                         stop_word = True
                         break
@@ -318,7 +328,12 @@ class Imdb(SiteParser):
             "^International \(English title\)$",
             "^International \(.+\) \(English title\)$",
         ]
-        if not filter(lambda c: c in ('USA', 'UK', 'Australia', 'New Zealand'), self.get('country', [])):
+        if 'Hong Kong' in self.get('country', []):
+            regexps += [
+                "Hong Kong \(English title\)"
+            ]
+        english_countries = ('USA', 'UK', 'Australia', 'New Zealand')
+        if not filter(lambda c: c in english_countries, self.get('country', [])):
             regexps += [
                 "^[^(]+ \(English title\)$",
                 "^.+ \(.+\) \(English title\)$",
