@@ -296,6 +296,7 @@ class Imdb(SiteParser):
             'complete title',
             'IMAX version',
             'informal short title',
+            'Japan (imdb display title)',
             'longer version',
             'new title',
             'recut version',
