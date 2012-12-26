@@ -5,6 +5,7 @@ from __future__ import division
 import os
 import hashlib
 import re
+import shutil
 import struct
 import subprocess
 import sqlite3
@@ -249,7 +250,8 @@ def makedirs(path):
 def copy_file(source, target, verbose=False):
     if verbose:
         print 'copying', source, 'to', target
-    write_file(target, read_file(source))
+    write_path(target)
+    shutil.copyfile(source, target)
 
 def read_file(file, verbose=False):
     if verbose:
