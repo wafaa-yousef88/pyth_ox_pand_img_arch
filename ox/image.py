@@ -8,6 +8,11 @@ import Image
 import ImageDraw
 import ImageFont
 
+ZONE_INDEX = []
+for pixel_index in range(64):
+    x, y = pixel_index % 8, int(pixel_index / 8)
+    ZONE_INDEX.append(int(x / 2) + int(y / 4) * 4)
+
 def drawText(image, position, text, font_file, font_size, color):
     draw = ImageDraw.Draw(image)
     font = ImageFont.truetype(font_file, font_size, encoding='unic')
@@ -35,6 +40,50 @@ def getHSL(rgb):
         else:
             hsl[1] = (maximum - minimum) / (2 - 2 * hsl[2])
     return tuple(hsl)
+
+def getImageHash(image, mode):
+    image = image.resize((8, 8), Image.ANTIALIAS)
+    image_hash = 0
+    if mode == 'color':
+        # divide the image into 8 zones:
+        # 0 0 1 1 2 2 3 3
+        # 0 0 1 1 2 2 3 3
+        # 0 0 1 1 2 2 3 3
+        # 0 0 1 1 2 2 3 3
+        # 4 4 5 5 6 6 7 7
+        # 4 4 5 5 6 6 7 7
+        # 4 4 5 5 6 6 7 7
+        # 4 4 5 5 6 6 7 7
+        image_data = image.getdata()
+        zone_values = []
+        for zone_index in range(8):
+            zone_values.append([])
+        for pixel_index, pixel_value in enumerate(image_data):
+            zone_values[ZONE_INDEX[pixel_index]].append(pixel_value)
+        for zone_index, pixel_values in enumerate(zone_values):
+            # get the mean for each color channel
+            mean = map(lambda x: int(round(sum(x) / 8)), zip(*pixel_values))
+            # store the mean color of each zone as an 8-bit value:
+            # RRRGGGBB
+            color_index = sum((
+                int(mean[0] / 32) << 5,
+                int(mean[1] / 32) << 2,
+                int(mean[2] / 64)
+            ))
+            image_hash += color_index * pow(2, zone_index * 8)
+    elif mode == 'shape':
+        # pixels brighter than the mean register as 1,
+        # pixels equal to or darker than the mean as 0
+        image_data = image.convert('L').getdata()
+        image_mean = sum(image_data) / 64
+        for pixel_index, pixel_value in enumerate(image_data):
+            if pixel_value > image_mean:
+                image_hash += pow(2, pixel_index)
+    image_hash = hex(image_hash)[2:].upper()
+    if image_hash.endswith('L'):
+        image_hash = image_hash[:-1]
+    image_hash = '0' * (16 - len(h)) + h
+    return image_hash
 
 def getImageHeat(image_file):
     image = Image.open(image_file).convert('RGB').resize((16, 16), Image.ANTIALIAS)
