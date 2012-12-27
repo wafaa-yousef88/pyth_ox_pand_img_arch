@@ -41,8 +41,8 @@ def getHSL(rgb):
             hsl[1] = (maximum - minimum) / (2 - 2 * hsl[2])
     return tuple(hsl)
 
-def getImageHash(image, mode):
-    image = image.resize((8, 8), Image.ANTIALIAS)
+def getImageHash(image_file, mode):
+    image = Image.open(image_file).convert('RGB').resize((8, 8), Image.ANTIALIAS)
     image_hash = 0
     if mode == 'color':
         # divide the image into 8 zones:
