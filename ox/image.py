@@ -82,7 +82,7 @@ def getImageHash(image_file, mode):
     image_hash = hex(image_hash)[2:].upper()
     if image_hash.endswith('L'):
         image_hash = image_hash[:-1]
-    image_hash = '0' * (16 - len(h)) + h
+    image_hash = '0' * (16 - len(image_hash)) + image_hash
     return image_hash
 
 def getImageHeat(image_file):
