@@ -27,3 +27,4 @@ from normalize import *
 from oembed import *
 from text import *
 from torrent import *
+from fixunicode import *
