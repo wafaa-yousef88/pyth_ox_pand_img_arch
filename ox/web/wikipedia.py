@@ -99,7 +99,7 @@ def get_movie_data(wikipedia_url):
 
 def get_image_url(name):
     url = 'http://en.wikipedia.org/wiki/Image:' + name.replace(' ', '%20')
-    data = read_url(url, unicode=True)
+    data = read_url(url)
     url = find_re(data, 'href="(http://upload.wikimedia.org/.*?)"')
     if not url:
         url = find_re(data, 'href="(//upload.wikimedia.org/.*?)"')
