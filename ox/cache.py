@@ -264,8 +264,10 @@ class FileCache(Cache):
         prefix, i, f = self.files(domain, url_hash)
         if os.path.exists(i):
             with open(i) as _i:
-                info = json.load(_i)
-
+                try:
+                    info = json.load(_i)
+                except:
+                    return r
             now = time.mktime(time.localtime())
             expired = now-timeout
 
