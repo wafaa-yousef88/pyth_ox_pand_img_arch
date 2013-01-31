@@ -514,7 +514,7 @@ class ImdbCombined(Imdb):
     def __init__(self, id, timeout=-1):
         _regex = {}
         for key in self.regex:
-            if self.regex[key]['page'] == 'combined':
+            if self.regex[key]['page'] in ('combined', 'releaseinfo'):
                 _regex[key] = self.regex[key]
         self.regex = _regex
         super(ImdbCombined, self).__init__(id, timeout)
