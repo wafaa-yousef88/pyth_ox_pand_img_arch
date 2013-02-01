@@ -569,6 +569,7 @@ def sort_string(string):
     string = string.replace(u'Æ', 'AE').replace(u'Ø', 'O').replace(u'Þ', 'Th')
 
     #pad numbered titles
+    string = re.sub('(\d),(\d{3})', '\\1\\2', string)
     string = re.sub('(\d+)', lambda x: '%010d' % int(x.group(0)), string)
     return unicodedata.normalize('NFKD', string)
 
