@@ -37,11 +37,9 @@ The Title[ ([SXX][EYY[+ZZ|-ZZ]])[ Episode Title]][.Version][.Part XY[.Part Title
 def format_path(data, directory_key='director'):
     def format_underscores(string):
         return re.sub('^\.|\.$|:|/|\?|<|>', '_', string)
-    is_episode = data['episode'] != None or data['season'] != None
     director = data['directorSort'] or ['Unknown Director']
     title = data['seriesTitle' if data['isEpisode'] else 'title'] or 'Untitled'
     year = data['seriesYear' if data['isEpisode'] else 'year'] or None
-    language = 'en' if data['type'] == 'subtitle' and data['language'] == None else data['language']
     parts = map(format_underscores, filter(lambda x: x != None, [
         u'; '.join(director[:10]),
         u'%s%s' % (title, u' (%s)' % year if year else ''),
@@ -305,8 +303,6 @@ def parse_path(path, directory_key='director'):
     data['extension'] = re.sub('^mpeg$', 'mpg', extension.lower()) if extension else None
     # type
     data['type'] = parse_type(data['extension'])
-    # language
-    data['language'] = language or LANGUAGES[0] if data['type'] == 'subtitle' else None
     # normalizedPath
     data['normalizedPath'] = format_path(data)
     return data
