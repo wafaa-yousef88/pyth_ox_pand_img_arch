@@ -55,6 +55,8 @@ class DictField(models.TextField):
         """Convert our JSON object to a string before we save"""
         if value == None:
             return value
+        if isinstance(value, basestring):
+            value = eval(value)
         assert isinstance(value, dict)
         value = json.dumps(value, default=to_json)
         return super(DictField, self).get_db_prep_save(value, connection=connection)
@@ -79,6 +81,10 @@ class TupleField(models.TextField):
 
     def get_db_prep_save(self, value, connection):
         """Convert our JSON object to a string before we save"""
+        if isinstance(value, basestring):
+            value = eval(value)
+            if isinstance(value, list):
+                value = tuple(value)
         assert isinstance(value, tuple)
         value = json.dumps(value, default=to_json)
         return super(TupleField, self).get_db_prep_save(value, connection=connection)
