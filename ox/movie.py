@@ -298,7 +298,7 @@ def parse_path(path, directory_key='director'):
     while data['partTitle'] and len(parts) and not re.search('^[a-z]{2}$', parts[0]):
         data['partTitle'] += '.%s' % parts.pop(0)
     # language
-    language = parts.pop(0) if len(parts) and re.search('^[a-z]{2}$', parts[0]) else None
+    data['language'] = parts.pop(0) if len(parts) and re.search('^[a-z]{2}$', parts[0]) else None
     # extension
     data['extension'] = re.sub('^mpeg$', 'mpg', extension.lower()) if extension else None
     # type
