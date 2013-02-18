@@ -183,6 +183,14 @@ class Imdb(SiteParser):
             ],
             'type': 'list'
         },
+        'productioncompany': {
+            'page': 'combined',
+            're': [
+                'Production Companies</b><ul>(.*?)</ul>',
+                '<a href="/company/.*?/">(.*?)</a>'
+            ],
+            'type': 'list'
+        },
         'rating': {
             'page': 'combined',
             're': '<div class="starbar-meta">.*?<b>([\d,.]+?)/10</b>',
