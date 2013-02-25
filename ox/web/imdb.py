@@ -216,13 +216,19 @@ class Imdb(SiteParser):
         },
         'color': {
             'page': 'combined',
-            're': '<h5>Color:</h5><div class="info-content"><a.*?>(.*?)</a>',
-            'type': 'string'
+            're': [
+                '<h5>Color:</h5><div class="info-content">(.*?)</div>',
+                '<a.*?>(.*?)</a>'
+            ],
+            'type': 'list'
         },
         'sound': {
             'page': 'combined',
-            're': '<h5>Sound Mix:</h5><div class="info-content"><a.*?>(.*?)</a>',
-            'type': 'string'
+            're': [
+                '<h5>Sound Mix:</h5><div class="info-content">(.*?)</div>',
+                '<a.*?>(.*?)</a>'
+            ],
+            'type': 'list'
         },
         'season': {
             'page': 'combined',
