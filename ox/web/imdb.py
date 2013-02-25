@@ -183,7 +183,7 @@ class Imdb(SiteParser):
             ],
             'type': 'list'
         },
-        'productioncompany': {
+        'productionCompany': {
             'page': 'combined',
             're': [
                 'Production Companies</b><ul>(.*?)</ul>',
