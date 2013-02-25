@@ -214,6 +214,16 @@ class Imdb(SiteParser):
             're': '<h5>Runtime:</h5><div class="info-content">.*?([0-9]+ sec|[0-9]+ min).*?</div>',
             'type': 'string'
         },
+        'color': {
+            'page': 'combined',
+            're': '<h5>Color:</h5><div class="info-content"><a.*?>(.*?)</a>',
+            'type': 'string'
+        },
+        'sound': {
+            'page': 'combined',
+            're': '<h5>Sound Mix:</h5><div class="info-content"><a.*?>(.*?)</a>',
+            'type': 'string'
+        },
         'season': {
             'page': 'combined',
             're': [
