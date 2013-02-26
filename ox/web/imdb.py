@@ -119,6 +119,15 @@ class Imdb(SiteParser):
             ],
             'type': 'list'
         },
+        'composer': {
+            'page': 'combined',
+            're': [
+                lambda data: data.split('Series Crew')[0],
+                'Original Music by</a>(.*?)</table>',
+                '<a href="/name/.*?>(.*?)</a>'
+            ],
+            'type': 'list'
+        },
         'episodeTitle': {
             'page': 'combined',
             're': '<div id="tn15title">.*?<em>(.*?)</em>',
