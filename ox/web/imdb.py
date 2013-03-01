@@ -262,7 +262,7 @@ class Imdb(SiteParser):
         },
         'isSeries': {
             'page': 'combined',
-            're': '<span class="tv-extra">\(*TV series',
+            're': '<span class="tv-extra">(TV series) ',
             'type': 'string'
         },
         'title': {
@@ -476,6 +476,7 @@ class Imdb(SiteParser):
                 del self['_director']
         if 'isSeries' in self:
             del self['isSeries']
+            self['isSeries'] = True
         if 'episodeTitle' in self:
             self['episodeTitle'] = re.sub('Episode \#\d+\.\d+', '', self['episodeTitle'])
 
