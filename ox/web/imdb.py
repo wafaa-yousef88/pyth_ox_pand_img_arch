@@ -262,7 +262,7 @@ class Imdb(SiteParser):
         },
         'isSeries': {
             'page': 'combined',
-            're': '<span class="tv-extra">(TV series) ',
+            're': '<span class="tv-extra">(TV series|TV mini-series) ',
             'type': 'string'
         },
         'title': {
