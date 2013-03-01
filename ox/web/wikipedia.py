@@ -53,13 +53,23 @@ def get_movie_data(wikipedia_url):
     for row in _box:
         d = row.split('=')
         if len(d) == 2:
-            key = d[0].strip()
-            if key[0] == '|':
-                key = key[1:]
+            _key = d[0].strip()
+            if _key:
+                key = _key
+                if key[0] == '|':
+                    key = key[1:]
             value = d[1].strip()
+            value = value.replace('<!-- see WP:ALT -->', '')
             if '<br>' in value:
                 value = value.split('<br>')
-            filmbox[key.strip()] = value
+            key = key.strip()
+            if value:
+                if key in filmbox:
+                    filmbox[key] += value
+                    if isinstance(filmbox[key], list):
+                        filmbox[key] = [k for k in filmbox[key] if k]
+                else:
+                    filmbox[key] = value
     if not filmbox_data:
         return filmbox
     if 'amg_id' in filmbox and not filmbox['amg_id'].isdigit():
