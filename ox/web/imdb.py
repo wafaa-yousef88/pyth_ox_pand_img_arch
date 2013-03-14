@@ -528,7 +528,7 @@ class Imdb(SiteParser):
                 self[key] = [x for i,x in enumerate(self[key])
                              if x not in self[key][i+1:]]
 
-        for key in ('actor', 'writer', 'producer', 'editor'):
+        for key in ('actor', 'writer', 'producer', 'editor', 'composer'):
             if key in self:
                 if isinstance(self[key][0], list):
                     self[key] = [i[0] for i in self[key] if i]
