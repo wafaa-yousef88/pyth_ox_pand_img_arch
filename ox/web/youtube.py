@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 from urllib import quote, unquote_plus
+import urllib2
+import cookielib
 import re
 from xml.dom.minidom import parseString
 
@@ -62,7 +64,9 @@ def info(id):
     for cat in xml.getElementsByTagName('media:category'):
         info['categories'].append(cat.firstChild.data)
 
-    info['keywords'] = xml.getElementsByTagName('media:keywords')[0].firstChild.data.split(', ')
+    k = xml.getElementsByTagName('media:keywords')[0].firstChild
+    if k:
+        info['keywords'] = k.data.split(', ')
     url = "http://www.youtube.com/watch?v=%s" % id
     data = read_url(url)
     match = re.compile('<h4>License:</h4>(.*?)</p>', re.DOTALL).findall(data)
@@ -115,3 +119,43 @@ def videos(id, format=''):
         if not stream_type or stream['type'].startswith(stream_type):
             streams[stream['itag']] = stream
     return streams
+
+def download_webm(id, filename):
+    stream_type = 'video/webm'
+    url = "http://www.youtube.com/watch?v=%s" % id
+    cj = cookielib.CookieJar()
+    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
+    opener.addheaders = [
+        ('User-Agent',
+         'Mozilla/5.0 (X11; Linux i686; rv:2.0) Gecko/20100101 Firefox/4.0'),
+        ('Accept-Language', 'en-us, en;q=0.50')
+    ]
+    u = opener.open(url)
+    data = u.read()
+    u.close()
+    match = re.compile('"url_encoded_fmt_stream_map": "(.*?)"').findall(data)
+    streams = {}
+    for x in match[0].split(','):
+        stream = {}
+        for s in x.split('\\u0026'):
+            key, value = s.split('=')
+            value = unquote_plus(value)
+            stream[key] = value
+        if stream['type'].startswith(stream_type):
+            streams[stream['itag']] = stream
+    if streams:
+        s = max(streams.keys())
+        url = '%s&signature=%s' % (streams[s]['url'], streams[s]['sig'])
+    else:
+        return None
+
+    #download video and save to file.
+    u = opener.open(url)
+    f = open(filename, 'w')
+    data = True
+    while data:
+        data = u.read(4096)
+        f.write(data)
+    f.close()
+    u.close()
+    return filename
