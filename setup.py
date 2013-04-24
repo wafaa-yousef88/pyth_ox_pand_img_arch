@@ -8,13 +8,22 @@ except:
 
 def get_bzr_version():
     import os
+    import re
     info = os.path.join(os.path.dirname(__file__), '.bzr/branch/last-revision')
+    changelog = os.path.join(os.path.dirname(__file__), 'debian/changelog')
     if os.path.exists(info):
         f = open(info)
         rev = int(f.read().split()[0])
         f.close()
         if rev:
             return u'%s' % rev
+    elif os.path.exists(changelog):
+        f = open(changelog)
+        head = f.read().strip().split('\n')[0]
+        f.close()
+        rev = re.compile('\d+\.\d+\.(\d+)').findall(head)
+        if rev:
+            return u"%s" % rev[0]
     return u'unknown'
 
 setup(
