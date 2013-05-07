@@ -65,7 +65,6 @@ def get_movie_data(wikipedia_url):
             key = key.strip()
             if value:
                 if key in filmbox:
-                    print key, value, filmbox
                     if isinstance(value, list) and isinstance(filmbox[key], basestring):
                         filmbox[key] = [filmbox[key]] + value
                     else:
