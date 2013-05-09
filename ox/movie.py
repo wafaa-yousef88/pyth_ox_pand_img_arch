@@ -22,6 +22,7 @@ EXTENSIONS = {
         'idx', 'srt', 'sub'
     ],
     'video': [
+        '3gp',
         'avi', 'divx', 'dv', 'flv', 'm2t', 'm4v', 'mkv', 'mov', 'mp4',
         'mpeg', 'mpg', 'mts', 'ogm', 'ogv', 'rm', 'vob', 'webm', 'wmv'
     ],
