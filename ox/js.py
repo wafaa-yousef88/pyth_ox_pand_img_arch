@@ -109,9 +109,11 @@ def tokenize(source):
                 token['type'] == 'operator' and not token['value'] in ['++', '--', ')', ']', '}']
             )
         return is_regexp
+    column = 1
     cursor = 0
     length = len(source)
     tokens = []
+    line = 1
     while cursor < length:
         char = source[cursor]
         start = cursor
@@ -161,8 +163,21 @@ def tokenize(source):
             type = 'whitespace'
             while cursor < length and source[cursor] in WHITESPACE:
                 cursor += 1
+        value = source[start:cursor]
         tokens.append({
+            'column': column,
+            'line': line,
             'type': type,
-            'value': source[start:cursor]
+            'value': value
         })
+        if type == 'comment':
+            lines = value.split('\n');
+            column = len(lines[-1])
+            line += len(lines) - 1
+        elif type == 'linebreak':
+            column = 1
+            column = 1
+            line += len(value)
+        else:
+            column += len(value)
     return tokens
