@@ -135,7 +135,10 @@ class Imdb(SiteParser):
         },
         'filmingLocations': {
             'page': 'locations',
-            're': '<a href="/search/title\?locations=.*?">(.*?)</a>',
+            're': [
+                '<a href="/search/title\?locations=.*?".*?>(.*?)</a>',
+                lambda data: data.strip(),
+            ],
             'type': 'list'
         },
         'genre': {
