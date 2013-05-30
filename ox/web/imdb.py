@@ -159,7 +159,7 @@ class Imdb(SiteParser):
         },
         'keyword': {
             'page': 'keywords',
-            're': '<a href="/keyword/.*?/">(.*?)</a>',
+            're': '<a href="/keyword/.*?">(.*?)</a>',
             'type': 'list'
         },
         'language': {
