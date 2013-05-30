@@ -341,6 +341,8 @@ class Imdb(SiteParser):
             'script title',
             'TV title',
             'working title',
+            'pre-release title',
+            'promotional abbreviation',
         ]
         #ignore english japanese titles
         #for movies that are not only from japan
