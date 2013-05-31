@@ -35,14 +35,14 @@ def get_data(id, timeout=ox.cache.cache_timeout, get_imdb=False):
         html = ox.cache.read_url(data["url"], timeout=timeout)
     data["number"] = find_re(html, "<li>Spine #(\d+)")
 
-    data["title"] = find_re(html, "<meta property=['\"]og:title['\"] content=['\"](.*?)['\"]")
+    data["title"] = find_re(html, "<h1 class=\"movietitle\">(.*?)</h1>")
     data["title"] = data["title"].split(u' \u2014 The Television Version')[0]
     data["director"] = strip_tags(find_re(html, "<h2 class=\"director\">(.*?)</h2>"))
     results = find_re(html, '<div class="left_column">(.*?)</div>')
     results = re.compile("<li>(.*?)</li>").findall(results)
     data["country"] = results[0]
     data["year"] = results[1]
-    data["synopsis"] = strip_tags(find_re(html, "<p><strong>SYNOPSIS:</strong> (.*?)</p>"))
+    data["synopsis"] = strip_tags(find_re(html, "<div class=\"content_block last\">.*?<p>(.*?)</p>"))
 
     result = find_re(html, "<div class=\"purchase\">(.*?)</div>")
     if 'Blu-Ray' in result or 'Essential Art House DVD' in result:
@@ -72,8 +72,7 @@ def get_data(id, timeout=ox.cache.cache_timeout, get_imdb=False):
     if timeout == ox.cache.cache_timeout:
         timeout = -1
     if get_imdb:
-        data['imdbId'] = imdb.get_movie_id(data['title'],
-            data['director'], data['year'], timeout=timeout)
+        data['imdbId'] = imdb.get_movie_id(data['title'], data['director'], data['year'], timeout=timeout)
     return data
 
 def get_ids(page=None):
