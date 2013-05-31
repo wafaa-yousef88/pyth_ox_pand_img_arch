@@ -157,8 +157,8 @@ def parse_item_files(files):
     for version_key in version_files:
         for extension in EXTENSIONS['subtitle']:
             subtitle_files = [file for file in version_files[version_key] if file['extension'] == extension]
-            subtitle_languages = set([file['language'] for file in subtitle_files])
-            if len(subtitle_languages) == 1 and LANGUAGES[0] in subtitle_languages:
+            subtitle_languages = list(set([file['language'] for file in subtitle_files]))
+            if len(subtitle_languages) == 1 and subtitle_languages[0] == LANGUAGES[0]:
                 for subtitle_file in subtitle_files:
                     subtitle_file['normalizedPath'] = format_path(dict(subtitle_file, **{'language': None}))
     # return data
