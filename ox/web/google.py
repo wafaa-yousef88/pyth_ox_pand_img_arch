@@ -31,9 +31,7 @@ def find(query, max_results=DEFAULT_MAX_RESULTS, timeout=DEFAULT_TIMEOUT):
     data = read_url(url, timeout=timeout)
     results = []
     data = re.sub('<span class="f">(.*?)</span>', '\\1', data)
-    for a in re.compile(
-        '<a href="(\S+?)" class=l .*?>(.*?)</a>.*?<span class="st">(.*?)<\/span>'
-    ).findall(data):
+    for a in re.compile('<a href="(htt\S+?)".*?>(.*?)</a>.*?<span class="st">(.*?)<\/span>').findall(data):
         results.append((strip_tags(decode_html(a[1])), a[0], strip_tags(decode_html(a[2]))))
         if len(results) >= max_results:
             break
