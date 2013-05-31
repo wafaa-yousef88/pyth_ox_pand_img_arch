@@ -156,9 +156,11 @@ def parse_item_files(files):
     # remove unneeded '.en'
     for version_key in version_files:
         for extension in EXTENSIONS['subtitle']:
-            files = [file for file in version_files[version_key] if file['extension'] == extension]
-            if len(files) == 1 and files[0]['language'] == LANGUAGES[0]:
-                files[0]['normalizedPath'] = format_path(dict(files[0], **{'language': None}))
+            subtitle_files = [file for file in version_files[version_key] if file['extension'] == extension]
+            subtitle_languages = set([file['language'] for file in subtitle_files])
+            if len(languages) == 1 and languages[0] == LANGUAGES[0]:
+                for subtitle_file in subtitle_files:
+                    subtitle_file['normalizedPath'] = format_path(dict(subtitle_file, **{'language': None}))
     # return data
     data = []
     for version_key in version_files:
