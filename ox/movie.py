@@ -165,8 +165,16 @@ def parse_item_files(files):
             'subtitleLanguage': language[version_key] if version_key in language else None,
             'version': version_key
         })
+    data = normalize_paths(data)
     return data
 
+def normalize_paths(versions):
+    for version in versions:
+        for extension in EXTENSIONS['subtitle']:
+            files = [file for file in version['files'] if file['extension'] == extension]
+            if len(files) == 1 and files[0]['language'] == LANGUAGES[0]:
+                files[0]['normalizedPath'] = format_path(dict(files[0], **{'language': None}))
+    return versions
 
 def parse_path(path, directory_key='director'):
     '''
