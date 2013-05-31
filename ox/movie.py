@@ -57,10 +57,11 @@ def format_path(data, directory_key='director'):
         parts.insert(-1, data['subdirectory'])
     return unicodedata.normalize('NFD', u'/'.join(parts))
 
-
 def parse_item_files(files):
     # parses a list of file objects associated with one item (file objects
     # as returned by parse_path, but extended with 'path' and 'time')
+    # and returns a list of version objects (in case of english-only subtitles,
+    # version[i]['files'][j]['normalizedPath'] will be modified)
     def get_file_key(file):
         return '\n'.join([
             file['version'] or '',
@@ -152,6 +153,12 @@ def parse_item_files(files):
         key = get_version_key(file, extension=False)
         version_key = '%s%s' % (key, extension[key] if key in extension else '')
         version_files[version_key] = (version_files[version_key] if version_key in version_files else []) + [file]
+    # remove unneeded '.en'
+    for version_key in version_files:
+        for extension in EXTENSIONS['subtitle']:
+            files = [file for file in version_files[version_key] if file['extension'] == extension]
+            if len(files) == 1 and files[0]['language'] == LANGUAGES[0]:
+                files[0]['normalizedPath'] = format_path(dict(files[0], **{'language': None}))
     # return data
     data = []
     for version_key in version_files:
