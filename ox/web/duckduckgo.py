@@ -15,7 +15,7 @@ def find(query, timeout=ox.cache.cache_timeout):
     url = 'http://duckduckgo.com/html/?' + params
     data = read_url(url, timeout=timeout, unicode=True)
     results = []
-    regex = '<a .*?class="l le" href="(.+?)">(.*?)</a>.*?<div class="cra">(.*?)</div>'
+    regex = '<a .*?class="large" href="(.+?)">(.*?)</a>.*?<div class="snippet">(.*?)</div>'
     for r in re.compile(regex, re.DOTALL).findall(data):
         results.append((strip_tags(decode_html(r[1])), r[0], strip_tags(decode_html(r[2]))))
     return results
