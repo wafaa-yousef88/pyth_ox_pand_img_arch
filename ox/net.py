@@ -3,6 +3,7 @@
 # GPL 2008
 import os
 import gzip
+import re
 import StringIO
 import struct
 import urllib
@@ -70,11 +71,12 @@ def read_url(url, data=None, headers=DEFAULT_HEADERS, return_headers=False, unic
     return result
 
 def detect_encoding(data):
-    if 'content="text/html; charset=utf-8"' in data.lower() or \
-        'meta charset="utf-8"' in data.lower():
-        return 'utf-8'
-    elif 'content="text/html; charset=iso-8859-1"' in data:
-        return 'iso-8859-1'
+    data_lower = data.lower()
+    charset = re.compile('content="text/html; charset=(.*?)"').findall(data)
+    if not charset:
+        charset = re.compile('meta charset="(.*?)"').findall(data)
+    if charset:
+        return charset[0].lower()
     detector = UniversalDetector()
     for line in data.split('\n'):
         detector.feed(line)
