@@ -132,6 +132,11 @@ def getRGB(hsl):
                 rgb[i] = v1
     return tuple(map(lambda x: int(x * 255), rgb))
 
+def getTextSize(image, text, font_file, font_size):
+    draw = ImageDraw.Draw(image)
+    font = ImageFont.truetype(font_file, font_size, encoding='unic')
+    return draw.textsize(text, font=font)
+
 def wrapText(text, max_width, max_lines, font_file, font_size):
     # wraps text to max_width and max_lines
     def get_width(string):
