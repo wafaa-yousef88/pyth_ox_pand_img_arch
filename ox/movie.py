@@ -490,7 +490,7 @@ def get_oxid(title, director=[], year='',
         return hashlib.sha1(string.encode('utf-8')).hexdigest().upper()
     director = ', '.join(director)
     episode_director = ', '.join(episode_director)
-    if not episode and not episode_title:
+    if not season and not episode and not episode_title:
         oxid = get_hash(director)[:8] + get_hash('\n'.join([title, str(year)]))[:8]
     else:
         oxid = get_hash('\n'.join([director, title, str(year), str(season)]))[:8] + \
