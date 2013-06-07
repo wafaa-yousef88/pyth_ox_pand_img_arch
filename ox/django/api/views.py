@@ -22,8 +22,11 @@ def api(request):
         for f in sorted(methods):
             api.append({'name': f,
                         'doc': actions.doc(f).replace('\n', '<br>\n')})
-        context = RequestContext(request, {'api': api,
-                                           'sitename': settings.SITENAME})
+        context = RequestContext(request, {
+            'api': api,
+            'settings': settings,
+            'sitename': settings.SITENAME
+        })
         return render_to_response('api.html', context)
     action = request.POST['action']
     version = getattr(request, 'version', None)
