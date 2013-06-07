@@ -111,7 +111,8 @@ class ApiActions(dict):
         else:
             f = self[name]
         if name != 'api' and hasattr(f, 'func_closure') and f.func_closure:
-            f = f.func_closure[len(f.func_closure)-1].cell_contents 
+            fc = filter(lambda c: hasattr(c.cell_contents, '__call__'), f.func_closure)
+            f = fc[len(fc)-1].cell_contents 
         info = f.func_code.co_filename[len(settings.PROJECT_ROOT)+1:]
         info = u'%s:%s' % (info, f.func_code.co_firstlineno)
         return info, trim(inspect.getsource(f))
