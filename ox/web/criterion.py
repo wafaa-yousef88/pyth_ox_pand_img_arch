@@ -72,11 +72,11 @@ def get_data(id, timeout=ox.cache.cache_timeout, get_imdb=False):
     if timeout == ox.cache.cache_timeout:
         timeout = -1
     if get_imdb:
-        data['imdbId'] = imdb.get_movie_id(data['title'], data['director'], data['year'], timeout=timeout)
+        # removed year, as "title (year)" may fail to match
+        data['imdbId'] = imdb.get_movie_id(data['title'], data['director'], timeout=timeout)
     return data
 
 def get_ids(page=None):
-
     ids = []
     if page:
         url = "http://www.criterion.com/library/expanded_view?m=dvd&p=%s&pp=50&s=spine" % page
