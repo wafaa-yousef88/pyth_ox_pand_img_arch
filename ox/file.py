@@ -273,9 +273,15 @@ def write_file(file, data, verbose=False):
     f.close()
     return len(data)
 
-def write_json(file, data, indent=0, sort_keys=False, verbose=False):
-    data = json.dumps(data, indent=indent, sort_keys=sort_keys)
-    write_file(file, data, verbose=verbose)
+def write_image(file, image, verbose=False):
+    if verbose:
+        print 'writing', file
+    write_path(file)
+    image.save(file)
+
+def write_json(file, data, ensure_ascii=True, indent=0, sort_keys=False, verbose=False):
+    data = json.dumps(data, ensure_ascii=ensure_ascii, indent=indent, sort_keys=sort_keys)
+    write_file(file, data if ensure_ascii else data.encode('utf-8'), verbose=verbose)
 
 def write_link(source, target, verbose=False):
     if verbose:
