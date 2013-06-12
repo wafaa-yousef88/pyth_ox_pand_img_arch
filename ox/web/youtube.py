@@ -120,6 +120,16 @@ def videos(id, format=''):
             streams[stream['itag']] = stream
     return streams
 
+def playlist(url):
+    data = read_url(url)
+    items = []
+    for i in list(set(re.compile('<a href="(/watch\?v=.*?)" title="(.*?)" ').findall(data))):
+        items.append({
+            'title': i[1],
+            'url': 'http://youtube.com' + i[0].split('&amp;')[0]
+        })
+    return items
+
 def download_webm(id, filename):
     stream_type = 'video/webm'
     url = "http://www.youtube.com/watch?v=%s" % id
