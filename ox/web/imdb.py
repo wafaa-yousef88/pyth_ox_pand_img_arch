@@ -13,7 +13,7 @@ from ox.normalize import normalize_title, normalize_imdbid
 import ox.cache
 
 from siteparser import SiteParser
-import google
+import duckduckgo
 
 
 def read_url(url, data=None, headers=ox.cache.DEFAULT_HEADERS, timeout=ox.cache.cache_timeout, valid=None, unicode=False):
@@ -692,9 +692,13 @@ def get_movie_id(title, director='', year='', timeout=-1):
 
     #print (title, director), ": '',"
     #print google_query
-    results = google.find(google_query, timeout=timeout)
+    #results = google.find(google_query, timeout=timeout)
+    results = duckduckgo.find(google_query, timeout=timeout)
     if results:
-        return find_re(results[0][1], 'title/tt(\d{7})')
+        for r in results[:2]:
+            imdbId = find_re(r[1], 'title/tt(\d{7})')
+            if imdbId:
+                return imdbId
     #or nothing
     return ''
 
