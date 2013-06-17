@@ -126,7 +126,7 @@ def playlist(url):
     for i in list(set(re.compile('<a href="(/watch\?v=.*?)" title="(.*?)" ').findall(data))):
         items.append({
             'title': i[1],
-            'url': 'http://youtube.com' + i[0].split('&amp;')[0]
+            'url': 'http://www.youtube.com' + i[0].split('&amp;')[0]
         })
     return items
 
