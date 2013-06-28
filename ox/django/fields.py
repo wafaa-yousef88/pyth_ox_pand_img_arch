@@ -4,11 +4,17 @@ import time
 import datetime
 
 from django.db import models
+from django.utils import datetime_safe
+
 from ox.utils import json
 
 
 def to_json(python_object):
     if isinstance(python_object, datetime.datetime):
+        value = datetime_safe.datetime.fromordinal(python_object.toordinal())
+        return {'__class__': 'datetime.datetime',
+                '__value__': value.strftime('%Y-%m-%dT%H:%M:%SZ')}
+    if isinstance(python_object, datetime_safe.datetime):
         return {'__class__': 'datetime.datetime',
                 '__value__': python_object.strftime('%Y-%m-%dT%H:%M:%SZ')}
     if isinstance(python_object, time.struct_time):
@@ -26,8 +32,9 @@ def from_json(json_object):
     if '__class__' in json_object:
         if json_object['__class__'] == 'bytes':
             return bytes(json_object['__value__'])
-        if json_object['__class__'] == 'datetime.datetime':
-            return datetime.datetime.strptime(json_object['__value__'], '%Y-%m-%dT%H:%M:%SZ')
+        if json_object['__class__'] == 'datetime_safe.datetime' \
+            or json_object['__class__'] == 'datetime.datetime':
+            return datetime_safe.datetime.strptime(json_object['__value__'], '%Y-%m-%dT%H:%M:%SZ')
         if json_object['__class__'] == 'time.asctime':
             return time.strptime(json_object['__value__'])
     return json_object
