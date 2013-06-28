@@ -15,6 +15,7 @@ import ox.cache
 from siteparser import SiteParser
 import duckduckgo
 
+from ..utils import datetime
 
 def read_url(url, data=None, headers=ox.cache.DEFAULT_HEADERS, timeout=ox.cache.cache_timeout, valid=None, unicode=False):
     headers = headers.copy()
@@ -210,8 +211,11 @@ class Imdb(SiteParser):
         },
         'releasedate': {
             'page': 'releaseinfo',
-            're': '<a href="/date/(\d{2})-(\d{2})/">.*?</a> <a href="/year/(\d{4})/">',
-            'type': 'date'
+            're': [
+                '<td class="release_date">(.*?)</td>',
+                ox.strip_tags,
+            ],
+            'type': 'list'
         },
         'reviews': {
             'page': 'externalreviews',
@@ -549,8 +553,18 @@ class Imdb(SiteParser):
             self['profit'] = self['gross'] - self['budget']
 
         if 'releasedate' in self:
-            if isinstance(self['releasedate'], list):
-                self['releasedate'] = min(self['releasedate'])
+            def parse_date(d):
+                try:
+                    d = datetime.strptime(d, '%d %B %Y')
+                except:
+                    try:
+                        d = datetime.strptime(d, '%B %Y')
+                    except:
+                        return 'x'
+                return '%d-%02d-%02d' % (d.year, d.month, d.day)
+            self['releasedate'] = min([
+                parse_date(d) for d in self['releasedate']
+            ])
         if 'summary' in self:
             self['summary'] = self['summary'].split('</p')[0].strip()
 
