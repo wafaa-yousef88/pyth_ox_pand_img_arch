@@ -565,6 +565,8 @@ class Imdb(SiteParser):
             self['releasedate'] = min([
                 parse_date(d) for d in self['releasedate']
             ])
+            if self['releasedate'] == 'x':
+                del self['releasedate']
         if 'summary' in self:
             self['summary'] = self['summary'].split('</p')[0].strip()
 
