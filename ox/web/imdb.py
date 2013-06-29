@@ -358,7 +358,7 @@ class Imdb(SiteParser):
                 'Japan (English title)'
             ]
         for t in self.get('alternativeTitles', []):
-            for type in t[1].split('/'):
+            for type in t[0].split('/'):
                 type = type.strip()
                 stop_word = False
                 for key in stop_words:
@@ -366,7 +366,7 @@ class Imdb(SiteParser):
                         stop_word = True
                         break
                 if not stop_word and not type in types:
-                    types[type] = t[0]
+                    types[type] = t[1]
         regexps = [
             "^.+ \(imdb display title\) \(English title\)$",
             "^USA \(imdb display title\)$",
@@ -420,11 +420,11 @@ class Imdb(SiteParser):
         if 'alternativeTitles' in self:
             alt = {}
             for t in self['alternativeTitles']:
-                title = cleanup_title(t[0])
+                title = cleanup_title(t[1])
                 if title not in (self.get('title'), self.get('internationalTitle')):
                     if title not in alt:
                         alt[title] = []
-                    for c in t[1].split('/'):
+                    for c in t[0].split('/'):
                         c = c.replace('International', '').split('(')[0].strip()
                         if c:
                             alt[title].append(c)
