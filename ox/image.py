@@ -215,7 +215,7 @@ def wrapText(text, max_width, max_lines, font_file, font_size):
                     break
             else:
                 # word does not fit in one line
-                lines[line] += ' '
+                #lines[line] += ' '
                 chars = list(word)
                 for char in chars:
                     line = len(lines) - 1
@@ -236,4 +236,6 @@ def wrapText(text, max_width, max_lines, font_file, font_size):
                         while get_width(test) > max_width:
                             test = test[:-2] + ellipsis
                         lines[line] = test
+                lines[line] += ' '
+
     return lines
