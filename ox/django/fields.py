@@ -11,9 +11,13 @@ from ox.utils import json
 
 def to_json(python_object):
     if isinstance(python_object, datetime.datetime):
-        value = datetime_safe.datetime.fromordinal(python_object.toordinal())
+        if python_object.year < 1900:
+            tt = python_ojbect.timetuple()
+            value = '%d-%02d-%02dT%02d:%02d%02dZ' % tuple(list(tt)[:6])
+        else:
+            value = python_ojbect.strftime('%Y-%m-%dT%H:%M:%SZ')
         return {'__class__': 'datetime.datetime',
-                '__value__': value.strftime('%Y-%m-%dT%H:%M:%SZ')}
+                '__value__': value}
     if isinstance(python_object, datetime_safe.datetime):
         return {'__class__': 'datetime.datetime',
                 '__value__': python_object.strftime('%Y-%m-%dT%H:%M:%SZ')}

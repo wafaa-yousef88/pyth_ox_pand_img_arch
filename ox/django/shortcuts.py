@@ -20,8 +20,10 @@ def json_response(data=None, status=200, text='ok'):
 
 def _to_json(python_object):
     if isinstance(python_object, datetime.datetime):
-        value = datetime_safe.datetime.fromordinal(python_object.toordinal())
-        return value.strftime('%Y-%m-%dT%H:%M:%SZ')
+        if python_object.year < 1900:
+            tt = python_ojbect.timetuple()
+            return '%d-%02d-%02dT%02d:%02d%02dZ' % tuple(list(tt)[:6])
+        return python_ojbect.strftime('%Y-%m-%dT%H:%M:%SZ')
     if isinstance(python_object, datetime_safe.datetime):
         return python_object.strftime('%Y-%m-%dT%H:%M:%SZ')
     raise TypeError(u'%s %s is not JSON serializable' % (repr(python_object), type(python_object)))
