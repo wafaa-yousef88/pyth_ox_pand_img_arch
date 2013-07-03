@@ -139,6 +139,14 @@ def getTextSize(image, text, font_file, font_size):
 
 def wrapText(text, max_width, max_lines, font_file, font_size):
     # wraps text to max_width and max_lines
+    def get_min_width():
+        # returns the width of the longest non-hyphenated word
+        min_width = 0
+        for word in words:
+            width = get_width(word)
+            if width <= max_width and width > min_width:
+                min_width = width
+        return min_width
     def get_width(string):
         return draw.textsize(string, font=font)[0]
     image = Image.new('RGB', (1, 1))
@@ -150,15 +158,7 @@ def wrapText(text, max_width, max_lines, font_file, font_size):
         # text fits in one line
         lines = [text]
     else:
-        if max_lines:
-            # test if the same number of lines
-            # can be achieved with shorter lines
-            best_lines = len(wrapText(text, max_width, 0, font_file, font_size))
-            test_lines = best_lines
-            while test_lines == best_lines:
-                max_width -= 1
-                test_lines = len(wrapText(text, max_width, 0, font_file, font_size))
-            max_width += 1
+        lines = ['']
         words = []
         spaces = []
         test_words = text.split(' ')
@@ -181,7 +181,16 @@ def wrapText(text, max_width, max_lines, font_file, font_size):
                         spaces.append(word[position - 1])
                     else:
                         spaces.append(' ')
-        lines = ['']
+        if max_lines:
+            # test if the same number of lines can be achieved with shorter
+            # lines, without hyphenating words that are not yet hyphenated
+            best_lines = len(wrapText(text, max_width, 0, font_file, font_size))
+            test_lines = best_lines
+            min_width = get_min_width()
+            while test_lines == best_lines and max_width >= min_width:
+                max_width -= 1
+                test_lines = len(wrapText(text, max_width, 0, font_file, font_size))
+            max_width += 1
         for i, word in enumerate(words):
             line = len(lines) - 1
             word_width = get_width(word)
@@ -215,7 +224,6 @@ def wrapText(text, max_width, max_lines, font_file, font_size):
                     break
             else:
                 # word does not fit in one line
-                #lines[line] += ' '
                 chars = list(word)
                 for char in chars:
                     line = len(lines) - 1
@@ -237,5 +245,4 @@ def wrapText(text, max_width, max_lines, font_file, font_size):
                             test = test[:-2] + ellipsis
                         lines[line] = test
                 lines[line] += ' '
-
     return lines
