@@ -11,13 +11,13 @@ from ox.cache import read_url
 
 def find(query, timeout=60):
     url = 'https://twitter.com/search/' + quote(query)
-    data = ox.cache.read_url(url, timeout=timeout)
+    data = ox.cache.read_url(url, timeout=timeout).decode('utf-8')
     doc = lxml.html.document_fromstring(data)
     tweets = []
     for e in doc.xpath("//div[contains(@class, 'original-tweet')]"):
         t = lxml.html.tostring(e)
         text = e.xpath(".//p[contains(@class, 'js-tweet-text')]")[0]
-        html = lxml.html.tostring(text).strip()
+        html = lxml.html.tostring(text, encoding='unicode').strip()
         text = ox.decode_html(ox.strip_tags(html)).strip()
         user = re.compile('data-name="(.*?)"').findall(t)[0]
         user = ox.decode_html(ox.strip_tags(user)).strip()
