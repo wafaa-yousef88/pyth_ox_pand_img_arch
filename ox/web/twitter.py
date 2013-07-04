@@ -9,15 +9,16 @@ import ox
 from ox.cache import read_url
 
 
-def find(query):
+def find(query, timeout=60):
     url = 'https://twitter.com/search/' + quote(query)
-    data = ox.cache.read_url(url, timeout=60)
+    data = ox.cache.read_url(url, timeout=timeout)
     doc = lxml.html.document_fromstring(data)
     tweets = []
     for e in doc.xpath("//div[contains(@class, 'original-tweet')]"):
         t = lxml.html.tostring(e)
         text = e.xpath(".//p[contains(@class, 'js-tweet-text')]")[0]
-        text = ox.decode_html(ox.strip_tags(lxml.html.tostring(text))).strip()
+        html = lxml.html.tostring(text).strip()
+        text = ox.decode_html(ox.strip_tags(html)).strip()
         user = re.compile('data-name="(.*?)"').findall(t)[0]
         user = ox.decode_html(ox.strip_tags(user)).strip()
         tweets.append({
@@ -27,5 +28,6 @@ def find(query):
             'time': datetime.fromtimestamp(int(re.compile('data-time="(\d+)"').findall(t)[0])),
             'user': user,
             'text': text,
+            'html': html,
         })
     return tweets
