@@ -16,6 +16,7 @@ from siteparser import SiteParser
 import duckduckgo
 
 from ..utils import datetime
+from ..geo import normalize_country_name
 
 def read_url(url, data=None, headers=ox.cache.DEFAULT_HEADERS, timeout=ox.cache.cache_timeout, valid=None, unicode=False):
     headers = headers.copy()
@@ -328,6 +329,10 @@ class Imdb(SiteParser):
                isinstance(self['alternativeTitles'][0], basestring):
                self['alternativeTitles'] = [self['alternativeTitles']]
 
+        #normalize country names
+        if 'country' in self:
+            self['country'] = [normalize_country_name(c) or c for c in self['country']]
+
         types = {}
         stop_words = [ 
             'alternative spelling',
@@ -378,7 +383,10 @@ class Imdb(SiteParser):
             regexps += [
                 "Hong Kong \(English title\)"
             ]
-        english_countries = ('USA', 'UK', 'Australia', 'New Zealand')
+        english_countries = (
+            'USA', 'UK', 'United States', 'United Kingdom',
+            'Australia', 'New Zealand'
+        )
         if not filter(lambda c: c in english_countries, self.get('country', [])):
             regexps += [
                 "^[^(]+ \(English title\)$",
