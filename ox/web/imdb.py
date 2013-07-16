@@ -376,8 +376,10 @@ class Imdb(SiteParser):
             "^.+ \(imdb display title\) \(English title\)$",
             "^USA \(imdb display title\)$",
             "^International \(English title\)$",
+            "^International \(English title\)$",
             "^UK \(imdb display title\)$",
             "^International \(.+\) \(English title\)$",
+            "^World-wide \(English title\)$",
         ]
         if 'Hong Kong' in self.get('country', []):
             regexps += [
@@ -396,7 +398,8 @@ class Imdb(SiteParser):
                 "^USA \(.+\)$",
                 "^UK \(.+\)$",
                 "^Australia \(.+\)$",
-                "(literal English title)",
+                "World-wide \(English title\)",
+                "\(literal English title\)",
                 "^International \(.+ title\)$",
                 "^International \(.+\) \(.+ title\)$",
             ]
