@@ -34,10 +34,10 @@ def render_to_json_response(dictionary, content_type="text/json", status=200):
         content_type = "text/javascript"
         indent = 2
     if getattr(settings, 'JSON_DEBUG', False):
-        print json.dumps(dictionary, indent=2, default=_to_json)
+        print json.dumps(dictionary, indent=2, default=_to_json, ensure_ascii=False).encode('utf-8')
 
-    return HttpResponse(json.dumps(dictionary, indent=indent, default=_to_json),
-                        content_type=content_type, status=status)
+    return HttpResponse(json.dumps(dictionary, indent=indent, default=_to_json,
+        ensure_ascii=False).encode('utf-8'), content_type=content_type, status=status)
 
 def get_object_or_404_json(klass, *args, **kwargs):
     from django.shortcuts import _get_queryset
