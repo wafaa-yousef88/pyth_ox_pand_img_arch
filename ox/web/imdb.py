@@ -436,9 +436,10 @@ class Imdb(SiteParser):
                     if title not in alt:
                         alt[title] = []
                     for c in t[0].split('/'):
-                        c = c.replace('International', '').split('(')[0].strip()
-                        if c:
-                            alt[title].append(c)
+                        if not '(working title)' in c:
+                            c = c.replace('International', '').replace('World-wide', '').split('(')[0].strip()
+                            if c:
+                                alt[title].append(c)
             self['alternativeTitles'] = []
             for t in sorted(alt, lambda a, b: cmp(sorted(alt[a]), sorted(alt[b]))):
                 if alt[t]:
