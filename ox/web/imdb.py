@@ -443,7 +443,8 @@ class Imdb(SiteParser):
             self['alternativeTitles'] = []
             for t in sorted(alt, lambda a, b: cmp(sorted(alt[a]), sorted(alt[b]))):
                 if alt[t]:
-                    self['alternativeTitles'].append((t, sorted(alt[t])))
+                    countries = sorted([normalize_country_name(c) or c for c in alt[t]])
+                    self['alternativeTitles'].append((t, countries))
             if not self['alternativeTitles']:
                 del self['alternativeTitles']
 
