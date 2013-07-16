@@ -357,6 +357,7 @@ class Imdb(SiteParser):
             '(subtitle)',
             'TV title',
             'working title',
+            'World-wide (Spanish title)',
         ]
         #ignore english japanese titles
         #for movies that are not only from japan
