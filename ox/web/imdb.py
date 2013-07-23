@@ -333,6 +333,9 @@ class Imdb(SiteParser):
         if 'country' in self:
             self['country'] = [normalize_country_name(c) or c for c in self['country']]
 
+        if 'sound' in self:
+            self['sound'] = list(set(self['sound']))
+
         types = {}
         stop_words = [ 
             'alternative spelling',
