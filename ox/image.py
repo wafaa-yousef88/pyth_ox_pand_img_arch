@@ -55,9 +55,7 @@ def getImageHash(image_file, mode):
         # 4 4 5 5 6 6 7 7
         # 4 4 5 5 6 6 7 7
         image_data = image.getdata()
-        zone_values = []
-        for zone_index in range(8):
-            zone_values.append([])
+        zone_values = 8 * [[]]
         for pixel_index, pixel_value in enumerate(image_data):
             zone_values[ZONE_INDEX[pixel_index]].append(pixel_value)
         for zone_index, pixel_values in enumerate(zone_values):
