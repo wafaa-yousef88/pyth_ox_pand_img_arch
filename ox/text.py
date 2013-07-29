@@ -65,6 +65,7 @@ UA_NAMES = {
     },
     'robot': {},
     'system': {
+        'BB': 'BlackBerry',
         'CPU OS': 'iOS',
         'iPhone': 'iOS',
         'iPhone OS': 'iOS',
@@ -119,6 +120,7 @@ UA_REGEXPS = {
     'system': [
         '(Android) (\d+)',
         '(Android)',
+        '(BB)(\d+)',
         '(BeOS)',
         '(BlackBerry) (\d+)',
         '(BlackBerry)',
