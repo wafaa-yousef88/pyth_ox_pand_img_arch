@@ -57,6 +57,7 @@ UA_NAMES = {
         'chromeframe': 'Chrome Frame',
         'FBForIPhone': 'WebKit',
         'Gecko': 'Mozilla',
+        'IEMobile': 'Internet Explorer',
         'konqueror': 'Konqueror',
         'Mozilla': 'Netscape',
         'MSIE': 'Internet Explorer',
@@ -71,10 +72,12 @@ UA_NAMES = {
         'Mac_PowerPC': 'Mac OS',
         'Mac_PPC': 'Mac OS',
         'Macintosh': 'Mac OS',
+        'Playstation': 'PlayStation',
         'PLAYSTATION': 'PlayStation',
         'S': 'Nokia',
         'Series': 'Nokia',
         'Win': 'Windows',
+        'Windows Phone OS': 'Windows Phone'
         'X11': 'Linux'
     }
 }
@@ -89,6 +92,7 @@ UA_REGEXPS = {
         '(FBForIPhone)',
         '(Firefox)\/(\d+)',
         '(Galeon)\/(\d+)',
+        '(IEMobile)\/(\d+)',
         '(iCab) (\d+)',
         '(iCab)\/(\d+)',
         '(konqueror)\/(\d+)',
@@ -132,7 +136,10 @@ UA_REGEXPS = {
         '(Mac_PowerPC)',
         '(Mac_PPC)',
         '(Macintosh)',
+        'Nintendo (Wii).+NX\/(\d+)',
         '(PLAYSTATION) (\d+)',
+        '(Playstation) Vita (\d+)',
+        '(RIM Tablet OS) (\d+)',
         '(S)(60);',
         '(Series) ?(40|60)',
         '(Symbian OS)',
@@ -142,7 +149,8 @@ UA_REGEXPS = {
         '(Unix) (AIX|HP-UX|IRIX|SunOS)',
         '(Unix)',
         '(Windows) (NT \d\.\d)',
-        '(Windows) (Phone OS)',
+        '(Windows Phone) (\d+)',
+        '(Windows Phone OS) (\d+)',
         '(Windows) (3\.1|95|98|2000|2003|CE|ME|Mobile|NT|XP)', # Opera
         '(Win) (9x 4\.90)', # Firefox
         '(Win)(16)', # Firefox
@@ -165,6 +173,7 @@ UA_VERSIONS = {
         '10.6': '10.6 (Snow Leopard)',
         '10.7': '10.7 (Lion)',
         '10.8': '10.8 (Mountain Lion)',
+        '10.9': '10.9 (Mavericks),'
         '40': 'Series 40',
         '60': 'Series 60',
         'NT 3.1': 'NT 3.1 (3.1)',
