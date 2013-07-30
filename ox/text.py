@@ -78,7 +78,7 @@ UA_NAMES = {
         'S': 'Nokia',
         'Series': 'Nokia',
         'Win': 'Windows',
-        'Windows Phone OS': 'Windows Phone'
+        'Windows Phone OS': 'Windows Phone',
         'X11': 'Linux'
     }
 }
@@ -175,7 +175,7 @@ UA_VERSIONS = {
         '10.6': '10.6 (Snow Leopard)',
         '10.7': '10.7 (Lion)',
         '10.8': '10.8 (Mountain Lion)',
-        '10.9': '10.9 (Mavericks),'
+        '10.9': '10.9 (Mavericks)',
         '40': 'Series 40',
         '60': 'Series 60',
         'NT 3.1': 'NT 3.1 (3.1)',
