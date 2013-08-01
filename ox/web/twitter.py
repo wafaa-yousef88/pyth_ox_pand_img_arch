@@ -8,9 +8,11 @@ import lxml.html
 import ox
 from ox.cache import read_url
 
-
-def find(query, timeout=60):
-    url = 'https://twitter.com/search/' + quote(query)
+def find(query=None, user=None, timeout=60):
+    if user:
+        url = 'https://twitter.com/' + quote(user)
+    else:
+        url = 'https://twitter.com/search/' + quote(query)
     data = ox.cache.read_url(url, timeout=timeout).decode('utf-8')
     doc = lxml.html.document_fromstring(data)
     tweets = []
