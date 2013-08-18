@@ -1929,3 +1929,19 @@ def normalize_country_name(country_name):
             name = country['name']
             break
     return name and name.decode('utf-8')
+
+def split_geoname(geoname):
+    if isinstance(geoname, unicode):
+        geoname = geoname.encode('utf-8')
+    countries = [
+        'Bonaire, Sint Eustatius and Saba',
+        'Saint Helena, Ascension and Tristan da Cunha'
+    ]
+    for country in countries:
+        if geoname.endswith(country):
+            geoname = geoname.replace(country, country.replace(', ', '; '))
+    split = geoname.split(', ')
+    for country in countries:
+        if geoname.endswith(country.replace(', ', '; ')):
+            split[-1] = country
+    return split
