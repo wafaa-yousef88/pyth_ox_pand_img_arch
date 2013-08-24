@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-import urllib2
 import urllib
 import re
-import os
 import time
 import unicodedata
 
 import ox
 from ox import find_re, strip_tags
-from ox.normalize import normalize_title, normalize_imdbid
 import ox.cache
 
 from siteparser import SiteParser
@@ -376,8 +373,28 @@ class Imdb(SiteParser):
                     if key in type:
                         stop_word = True
                         break
-                if not stop_word and not type in types:
-                    types[type] = t[1]
+                if not stop_word:
+                    if not type in types:
+                        types[type] = []
+                    types[type].append(t[1])
+        titles = {}
+        for type in types:
+            for title in types[type]:
+                if not title in titles:
+                    titles[title] = []
+                titles[title].append(type)
+        def select_title(type):
+            title = types[type][0]
+            count = 0
+            if len(types[type]) > 1:
+                for t in types[type]:
+                    if len(titles[t]) > count:
+                        count = len(titles[t])
+                        title = t
+            return title
+
+        types = {type: select_title(type) for type in types}
+
         regexps = [
             "^.+ \(imdb display title\) \(English title\)$",
             "^USA \(imdb display title\)$",
