@@ -225,15 +225,15 @@ def sanitize_html(html, tags=None, wikilinks=False):
     if not tags:
         tags = [
             # inline formatting
-            'b', 'code', 'i', 's', 'sub', 'sup', 'u',
+            'b', 'bdi', 'code', 'em', 'i', 'q', 's', 'span', 'strong', 'sub', 'sup', 'u',
             # block formatting
-            'blockquote', 'h1', 'h2', 'h3', 'p', 'pre',
+            'blockquote', 'cite', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'pre',
             # lists
             'li', 'ol', 'ul',
             # tables
             'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr',
             # other
-            'a', 'br', 'img',
+            'a', 'br', 'img', 'figure', 'figcaption',
             # special
             'rtl', '[]'
         ]
