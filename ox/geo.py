@@ -1910,9 +1910,19 @@ def get_area(southwest, northeast):
         math.sin(southwest['lat']) - math.sin(northeast['lat'])
     ) * abs(southwest['lng'] - northeast['lng']);
 
-def get_country(country_code):
-    country_code = country_code.upper()
-    return COUNTRIES[country_code] if country_code in COUNTRIES else {}
+def get_country(code_or_name):
+    if isinstance(code_or_name, unicode):
+        code_or_name = code_or_name.encode('utf-8')
+    if len(code_or_name) == 2:
+        code_or_name = code_or_name.upper()
+        return COUNTRIES[code_or_name] if code_or_name in COUNTRIES else {}
+    else:
+        for code, country in COUNTRIES.iteritems():
+            if code_or_name == country['name'] or (
+                'aliases' in country and code_or_name in country['aliases']
+            ):
+                return country
+    return {}
 
 def get_country_name(country_code):
     country_code = country_code.upper()
