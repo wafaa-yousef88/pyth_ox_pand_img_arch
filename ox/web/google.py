@@ -27,13 +27,18 @@ def find(query, max_results=DEFAULT_MAX_RESULTS, timeout=DEFAULT_TIMEOUT):
     >>> find("The Matrix site:imdb.com", 1)[0][1]
     u'http://www.imdb.com/title/tt0133093/'
     """
-    url = 'http://google.com/search?q=%s' % quote_plus(query)
-    data = read_url(url, timeout=timeout)
     results = []
-    data = re.sub('<span class="f">(.*?)</span>', '\\1', data)
-    for a in re.compile('<a href="(htt\S+?)".*?>(.*?)</a>.*?<span class="st">(.*?)<\/span>').findall(data):
-        results.append((strip_tags(decode_html(a[1])), a[0], strip_tags(decode_html(a[2]))))
-        if len(results) >= max_results:
-            break
+    offset = 0
+    while len(results) < max_results:
+        url = 'http://google.com/search?q=%s' % quote_plus(query)
+        if offset:
+            url += '&start=%d' % offset
+        data = read_url(url, timeout=timeout)
+        data = re.sub('<span class="f">(.*?)</span>', '\\1', data)
+        for a in re.compile('<a href="(htt\S+?)".*?>(.*?)</a>.*?<span class="st">(.*?)<\/span>').findall(data):
+            results.append((strip_tags(decode_html(a[1])), a[0], strip_tags(decode_html(a[2]))))
+            if len(results) >= max_results:
+                break
+        offset += 10
     return results
 
