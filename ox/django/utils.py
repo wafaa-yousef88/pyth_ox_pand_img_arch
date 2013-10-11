@@ -38,7 +38,11 @@ def x_sendfile(fname,download_name=None):
 
     return response
 
-if getattr(settings,'SENDFILE',False) == 'x_sendfile':
+try:
+    __sendfile = getattr(settings,'SENDFILE',False) == 'x_sendfile'
+except:
+    __sendfile = False
+if __sendfile == 'x_sendfile':
     sendfile = x_sendfile
 else:
     sendfile = basic_sendfile
