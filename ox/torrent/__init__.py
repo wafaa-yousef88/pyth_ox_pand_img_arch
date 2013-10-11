@@ -26,6 +26,8 @@ def get_info_hash(torrentFile):
 def get_torrent_info(data=None, file=None):
     from bencode import bencode
     if file:
+        if isinstance(file, unicode):
+            file = file.encode('utf-8')
         with open(file, 'rb') as f:
             data = f.read()
 
