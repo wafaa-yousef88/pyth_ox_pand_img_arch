@@ -38,7 +38,6 @@ class SQLCompiler(SQLCompiler):
                 result = _result
             else:
                 result = map(lambda e: e + ' NULLS LAST', result)
-            print result
         return result, group_by
 
 class Query(Query):
