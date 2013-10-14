@@ -14,6 +14,22 @@ from ox.utils import json
 
 __all__ = ['sha1sum', 'oshash', 'avinfo', 'makedirs']
 
+EXTENSIONS = {
+    'audio': [
+        'aac', 'flac', 'm4a', 'mp3', 'oga', 'ogg', 'wav', 'wma'
+    ],
+    'image': [
+        'bmp', 'gif', 'jpeg', 'jpg', 'png', 'svg', 'webp'
+    ],
+    'subtitle': [
+        'idx', 'srt', 'sub'
+    ],
+    'video': [
+        '3gp',
+        'avi', 'divx', 'dv', 'flv', 'm2t', 'm4v', 'mkv', 'mov', 'mp4',
+        'mpeg', 'mpg', 'mts', 'ogm', 'ogv', 'rm', 'vob', 'webm', 'wmv'
+    ],
+}
 
 def cmd(program):
     local = os.path.expanduser('~/.ox/bin/%s' % program)

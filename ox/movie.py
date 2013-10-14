@@ -11,22 +11,10 @@ import unicodedata
 
 from normalize import normalize_name
 from text import get_sort_name, find_re
+from file import EXTENSIONS
 
 __all__ = ['parse_movie_path', 'create_movie_path', 'get_oxid']
 
-EXTENSIONS = {
-    'audio': [
-        'aac', 'flac', 'm4a', 'mp3', 'oga', 'ogg', 'wav', 'wma'
-    ],
-    'subtitle': [
-        'idx', 'srt', 'sub'
-    ],
-    'video': [
-        '3gp',
-        'avi', 'divx', 'dv', 'flv', 'm2t', 'm4v', 'mkv', 'mov', 'mp4',
-        'mpeg', 'mpg', 'mts', 'ogm', 'ogv', 'rm', 'vob', 'webm', 'wmv'
-    ],
-}
 LANGUAGES = ['en', 'fr', 'de', 'es', 'it']
 
 '''
