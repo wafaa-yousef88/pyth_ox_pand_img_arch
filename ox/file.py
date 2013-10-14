@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 # GPL 2008
-from __future__ import division
+from __future__ import division, with_statement
 import os
 import hashlib
 import re
@@ -86,12 +86,9 @@ def sha1sum(filename, cached=False):
     if cached:
         return cache(filename, 'sha1')
     sha1 = hashlib.sha1()
-    file=open(filename)
-    buffer=file.read(4096)
-    while buffer:
-        sha1.update(buffer)
-        buffer=file.read(4096)
-    file.close()
+    with open(filename) as f:
+        for chunk in iter(lambda: f.read(128*sha1.block_size), ''):
+            sha1.update(chunk)
     return sha1.hexdigest()
 
 '''
@@ -235,7 +232,7 @@ def ffprobe(filename):
         if not 'display_aspect_ratio' in v and 'width' in v:
             v['display_aspect_ratio'] = '%d:%d' % (v['width'], v['height'])
             v['pixel_aspect_ratio'] = '1:1'
-    info['oshash'] = ox.oshash(filename)
+    info['oshash'] = oshash(filename)
     info['path'] = os.path.basename(filename)
     return info
 
