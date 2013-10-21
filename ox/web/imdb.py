@@ -277,7 +277,10 @@ class Imdb(SiteParser):
         },
         'trivia': {
             'page': 'trivia',
-            're': '<div class="sodatext">(.*?)<br',
+            're': [
+                '<div class="sodatext">(.*?)<(br|/div)',
+                lambda data: data[0]
+            ],
             'type': 'list',
         },
         'votes': {
