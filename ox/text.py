@@ -61,7 +61,8 @@ UA_NAMES = {
         'konqueror': 'Konqueror',
         'Mozilla': 'Netscape',
         'MSIE': 'Internet Explorer',
-        'NokiaBrowser': 'Nokia Browser'
+        'NokiaBrowser': 'Nokia Browser',
+        'Trident': 'Internet Explorer'
     },
     'robot': {},
     'system': {
@@ -106,6 +107,7 @@ UA_REGEXPS = {
         'Version\/(\d+).+(Safari)',
         '(WebKit)\/(\d+)',
         '(MSIE) (\d\d?(?!\d))', # last, since Opera used to mask as MSIE
+        '(Trident)\/.*?rv:(\d+)',
         '(Gecko)',
         '(Mozilla)\/(3|4)'
     ],
