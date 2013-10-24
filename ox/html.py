@@ -234,22 +234,47 @@ def sanitize_html(html, tags=None, wikilinks=False):
             'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr',
             # other
             'a', 'br', 'img', 'figure', 'figcaption',
+            # iframe
+            'iframe',
             # special
             'rtl', '[]'
         ]
     parse = {
-        'a': {
-            '<a [^<>]*?href="((https?:\/\/|\/|mailto:).+?)".*?>': '<a href="{1}">',
-            '<\/a>': '</a>'
-        },
-        'img': {
-            '<img [^<>]*?src="((https?:\/\/|\/).+?)".*?>': '<img src="{1}">'
-        },
-        'rtl': {
-            '<rtl>': '<div style="direction: rtl">',
-            '<\/rtl>': '</div>'
-        },
-        '*': lambda tag: {'<(/?' + tag + ') ?/?>':'<{1}>'}
+        'a': [
+            [
+                '<a [^<>]*?href="((https?:\/\/|\/|mailto:).+?)".*?>',
+                '<a href="{1}">'
+            ],
+            ['<\/a>', '</a>']
+        ],
+        'img': [
+            [
+                '<img [^<>]*?src="((https?:\/\/|\/)[^"]+?)".*?>',
+                '<img src="{1}">'
+            ]
+        ],
+        'iframe': [
+            [
+                '<iframe [^<>]*?width="(\d+)" height="(\d+)"[^<>]*?src="((\/|https?:\/\/)[^"]+?)".*?>',
+                '<iframe width="{1}" height="{2}" src="{3}">'
+            ],
+            [
+                '<iframe [^<>]*?src="((\/|https?:\/\/)[^"]+?)".*?>',
+                '<iframe src="{1}">'
+            ],
+            [
+                '<\/iframe>',
+                '</iframe>'
+            ]
+        ],
+        'rtl': [
+            [
+                '<rtl>',
+                '<div style="direction: rtl">'
+            ],
+            ['<\/rtl>', '</div>']
+        ],
+        '*': lambda tag: [['<(/?' + tag + ') ?/?>', '<{1}>']]
     }
     matches = []
 
@@ -262,7 +287,7 @@ def sanitize_html(html, tags=None, wikilinks=False):
                 '<a href="\\1">\\3</a>', html);
         tags = filter(lambda tag: tag != '[]', tags)
 
-    def replace_match(match, value, replace):
+    def replace_match(match, value, regexp):
         i = 1
         for m in match.groups():
             value = value.replace('{%d}'%i, m)
@@ -272,10 +297,10 @@ def sanitize_html(html, tags=None, wikilinks=False):
 
     for tag in tags:
         p = parse.get(tag, parse['*'](tag))
-        for replace in p:
+        for regexp, value in p:
             html = re.sub(
-                re.compile(replace, re.IGNORECASE),
-                lambda match: replace_match(match, p[replace][:], replace),
+                re.compile(regexp, re.IGNORECASE),
+                lambda match: replace_match(match, value[:], regexp),
                 html
             )
     html = escape(html)
@@ -283,9 +308,15 @@ def sanitize_html(html, tags=None, wikilinks=False):
         html = html.replace('\t%d\t'%(i+1), matches[i])
     html = html.replace('\n\n', '<br/><br/>')
     html = add_links(html)
-    return  sanitize_fragment(html)
+    return sanitize_fragment(html)
 
 def sanitize_fragment(html):
+    '''
+    #html5lib reorders arguments, so not usable
     import html5lib
     return html5lib.parseFragment(html).toxml().decode('utf-8')
+    '''
+    import lxml.html
+    body = lxml.html.document_fromstring(html).find('body')
+    return lxml.html.tostring(body, encoding='utf-8')[6:-7].decode('utf-8')
 
