@@ -318,5 +318,7 @@ def sanitize_fragment(html):
     '''
     import lxml.html
     body = lxml.html.document_fromstring(html).find('body')
-    return lxml.html.tostring(body, encoding='utf-8')[6:-7].decode('utf-8')
-
+    html = lxml.html.tostring(body, encoding='utf-8')[6:-7].decode('utf-8')
+    if html.startswith('<p>') and html.endswith('</p>'):
+        html = html[3:-4]
+    return html
