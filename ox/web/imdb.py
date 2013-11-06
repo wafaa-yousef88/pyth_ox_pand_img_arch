@@ -396,7 +396,12 @@ class Imdb(SiteParser):
                         title = t
             return title
 
-        types = {type: select_title(type) for type in types}
+        #FIXME: does work in python2.6, possible to import from __future__?
+        #types = {type: select_title(type) for type in types}
+        _types = {}
+        for type in types:
+            _types[type] = select_title(type)
+        types = _types
 
         regexps = [
             "^.+ \(imdb display title\) \(English title\)$",
