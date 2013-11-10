@@ -191,7 +191,7 @@ def escape_html(value):
     '''
     return escape(decode_html(value))
 
-def sanitize_html(html, tags=None, wikilinks=False):
+def sanitize_html(html, tags=None, global_attributes=[]):
     '''
     >>> sanitize_html('http://foo.com, bar')
     u'<a href="http://foo.com">http://foo.com</a>, bar'
@@ -209,7 +209,7 @@ def sanitize_html(html, tags=None, wikilinks=False):
     u'&lt;a href="javascript:alert()"&gt;foo'
     >>> sanitize_html('[http://foo.com foo]')
     u'<a href="http://foo.com">foo</a>'
-    >>> sanitize_html('<rtl>foo</rtl>')
+    >>> sanitize_html('<div style="direction: rtl">foo</div>')
     u'<div style="direction: rtl">foo</div>'
     >>> sanitize_html('<script>alert()</script>')
     u'&lt;script&gt;alert()&lt;/script&gt;'
@@ -223,92 +223,171 @@ def sanitize_html(html, tags=None, wikilinks=False):
     u"Anniversary of Daoud's Republic"
     '''
     if not tags:
+        valid_url = '^((https?:\/\/|\/|mailto:).*?)'
         tags = [
             # inline formatting
-            'b', 'bdi', 'code', 'em', 'i', 'q', 's', 'span', 'strong', 'sub', 'sup', 'u',
+            {'name': 'b'},
+            {'name': 'bdi'},
+            {'name': 'code'},
+            {'name': 'em'},
+            {'name': 'i'},
+            {'name': 'q'},
+            {'name': 's'},
+            {'name': 'span'},
+            {'name': 'strong'},
+            {'name': 'sub'},
+            {'name': 'sup'},
+            {'name': 'u'},
             # block formatting
-            'blockquote', 'cite', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'pre',
+            {'name': 'blockquote'},
+            {'name': 'cite'},
+            {
+                'name': 'div',
+                'optional': ['style'],
+                'validation': {
+                    'style': '^direction: rtl$'
+                }
+            },
+            {'name': 'h1'},
+            {'name': 'h2'},
+            {'name': 'h3'},
+            {'name': 'h4'},
+            {'name': 'h5'},
+            {'name': 'h6'},
+            {'name': 'p'},
+            {'name': 'pre'},
             # lists
-            'li', 'ol', 'ul',
+            {'name': 'li'},
+            {'name': 'ol'},
+            {'name': 'ul'},
             # tables
-            'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr',
+            {'name': 'table'},
+            {'name': 'tbody'},
+            {'name': 'td'},
+            {'name': 'tfoot'},
+            {'name': 'th'},
+            {'name': 'thead'},
+            {'name': 'tr'},
             # other
-            'a', 'br', 'img', 'figure', 'figcaption',
-            # iframe
-            'iframe',
-            # special
-            'rtl', '[]'
+             {'name': '[]'},
+            {
+                'name': 'a',
+                'required': ['href'],
+                'validation': {
+                    'href': valid_url
+                }
+            },
+            {'name': 'br'},
+            {
+                'name': 'iframe',
+                'optional': ['width', 'height'],
+                'required': ['src'],
+                'validation': {
+                    'width': '^\d+$',
+                    'height': '^\d+$',
+                    'src': valid_url
+                }
+            },
+            {
+                'name': 'img',
+                'optional': ['width', 'height'],
+                'required': ['src'],
+                'validation': {
+                    'width': '^\d+$',
+                    'height': '^\d+$',
+                    'src': valid_url
+                },
+            },
+            {'name': 'figure'},
+            {'name': 'figcaption'}
         ]
-    parse = {
-        'a': [
-            [
-                '<a [^<>]*?href="((https?:\/\/|\/|mailto:).+?)".*?>',
-                '<a href="{1}">'
-            ],
-            ['<\/a>', '</a>']
-        ],
-        'img': [
-            [
-                '<img [^<>]*?src="((https?:\/\/|\/)[^"]+?)".*?>',
-                '<img src="{1}">'
-            ]
-        ],
-        'iframe': [
-            [
-                '<iframe [^<>]*?width="(\d+)" height="(\d+)"[^<>]*?src="((\/|https?:\/\/)[^"]+?)".*?>',
-                '<iframe width="{1}" height="{2}" src="{3}">'
-            ],
-            [
-                '<iframe [^<>]*?src="((\/|https?:\/\/)[^"]+?)".*?>',
-                '<iframe src="{1}">'
-            ],
-            [
-                '<\/iframe>',
-                '</iframe>'
-            ]
-        ],
-        'rtl': [
-            [
-                '<rtl>',
-                '<div style="direction: rtl">'
-            ],
-            ['<\/rtl>', '</div>']
-        ],
-        '*': lambda tag: [['<(/?' + tag + ') ?/?>', '<{1}>']]
-    }
-    matches = []
 
-    #makes parse_html output the same value if run twice
-    html = decode_html(html)
+    tag_re = re.compile('<(/)?([^\ /]+)(.*?)(/)?>')
+    attr_re = re.compile('([^=\ ]+)="([^"]+)"')
 
-    if '[]' in tags:
-        html = re.sub(
-                re.compile('\[((https?:\/\/|\/).+?) (.+?)\]', re.IGNORECASE),
-                '<a href="\\1">\\3</a>', html);
-        tags = filter(lambda tag: tag != '[]', tags)
-
-    def replace_match(match, value, regexp):
-        i = 1
-        for m in match.groups():
-            value = value.replace('{%d}'%i, m)
-            i += 1
-        matches.append(value)
-        return '\t%d\t' % len(matches)
+    escaped = {}
+    level = 0
+    non_closing_tags = ['img', 'br']
+    required_attributes = {}
+    validation = {}
+    valid_attributes = {}
+    valid_tags = set([tag['name'] for tag in tags if tag['name'] != '[]'])
 
     for tag in tags:
-        p = parse.get(tag, parse['*'](tag))
-        for regexp, value in p:
-            html = re.sub(
-                re.compile(regexp, re.IGNORECASE),
-                lambda match: replace_match(match, value[:], regexp),
-                html
-            )
-    html = escape(html)
-    for i in range(0, len(matches)):
-        html = html.replace('\t%d\t'%(i+1), matches[i])
+        valid_attributes[tag['name']] = tag.get('required', []) \
+                + tag.get('optional', []) \
+                + global_attributes
+        required_attributes[tag['name']] = tag.get('required', [])
+        validation[tag['name']] = tag.get('validation', {})
+
+    if '[]' in validation:
+        html = re.sub(
+            re.compile('\[((https?:\/\/|\/).+?) (.+?)\]', re.IGNORECASE),
+            '<a href="\\1">\\3</a>', html);
+
+    parts = split_tags(html)
+    for i, part in enumerate(parts):
+        is_tag = i % 2
+        if is_tag:
+            t = tag_re.findall(part)
+            if not t:
+                parts[i] = escape_html(decode_html(part))
+                continue
+            closing, name, attributes, end = t[0]
+            closing = closing != ''
+            a = attr_re.findall(attributes)
+            attrs = dict(a)
+
+            if not closing and not name in non_closing_tags:
+                level += 1
+
+            if not attrs and attributes  or name not in valid_tags:
+                valid = False
+            else:
+                valid = True
+                for key in set(attrs) - set(valid_attributes[name]):
+                    del attrs[key]
+                for key in required_attributes[tag['name']]:
+                    if not key in attrs:
+                        valid = False
+
+            if valid:
+                for attr in attrs:
+                    if attr in validation[name]:
+                        if not re.compile(validation[name][attr]).findall(attrs[attr]):
+                            valid = False
+                            break
+
+            if valid and closing:
+                valid = not escaped.get(level)
+            else:
+                escaped[level] = not valid
+            if closing:
+                level -= 1
+            if valid:
+                parts[i] = '<%s%s%s>' % (
+                    ('/' if closing else ''),
+                    name,
+                    (' ' + ' '.join(['%s="%s"' % (key, attrs[key]) for key, value in a if key in attrs])
+                        if not closing and attrs else '')
+                )
+            else:
+                parts[i] = escape_html(decode_html(part))
+        else:
+            parts[i] = escape_html(decode_html(part))
+    html = ''.join(parts)
     html = html.replace('\n\n', '<br/><br/>')
     html = add_links(html)
     return sanitize_fragment(html)
+
+def split_tags(string):
+    tags = []
+    def collect(match):
+        tags.append(match.group(0))
+        return '\0'
+    strings = re.sub('<[^<>]+>', collect, string).split('\0')
+    tags.append('')
+    return [item for sublist in zip(strings, tags) for item in sublist][:-1]
 
 def sanitize_fragment(html):
     '''
