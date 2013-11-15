@@ -275,7 +275,11 @@ def read_file(file, verbose=False):
     return data
 
 def read_json(file, verbose=False):
-    return json.loads(read_file(file, verbose=verbose))
+    if verbose:
+        print 'reading', file
+    with open(file) as fd:
+        data = json.load(fd)
+    return data
 
 def write_file(file, data, verbose=False):
     if verbose:
