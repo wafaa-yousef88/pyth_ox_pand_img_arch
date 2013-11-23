@@ -56,7 +56,8 @@ class API(object):
                 else:
                     kw = None
             return self._request(action, kw)
-        method.__doc__ = self._properties[action]['doc']
+        if 'doc' in self._properties[action]:
+            method.__doc__ = self._properties[action]['doc']
         method.func_name = str(action)
         self._add_method(method, action)
 
