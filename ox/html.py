@@ -395,6 +395,8 @@ def sanitize_fragment(html):
     import html5lib
     return html5lib.parseFragment(html).toxml().decode('utf-8')
     '''
+    if not html:
+        return u''
     import lxml.html
     body = lxml.html.document_fromstring(html).find('body')
     html = lxml.html.tostring(body, encoding='utf-8')[6:-7].decode('utf-8')
