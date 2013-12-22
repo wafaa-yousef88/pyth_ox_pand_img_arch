@@ -58,21 +58,21 @@ def get_movie_data(wikipedia_url):
                 key = _key
                 if key[0] == '|':
                     key = key[1:]
-            value = d[1].strip()
-            value = value.replace('<!-- see WP:ALT -->', '')
-            if '<br>' in value:
-                value = value.split('<br>')
-            key = key.strip()
-            if value:
-                if key in filmbox:
-                    if isinstance(value, list) and isinstance(filmbox[key], basestring):
-                        filmbox[key] = [filmbox[key]] + value
+                key = key.strip()
+                value = d[1].strip()
+                value = value.replace('<!-- see WP:ALT -->', '')
+                if '<br>' in value:
+                    value = value.split('<br>')
+                if value:
+                    if key in filmbox:
+                        if isinstance(value, list) and isinstance(filmbox[key], basestring):
+                            filmbox[key] = [filmbox[key]] + value
+                        else:
+                            filmbox[key] += value
+                        if isinstance(filmbox[key], list):
+                            filmbox[key] = [k for k in filmbox[key] if k]
                     else:
-                        filmbox[key] += value
-                    if isinstance(filmbox[key], list):
-                        filmbox[key] = [k for k in filmbox[key] if k]
-                else:
-                    filmbox[key] = value
+                        filmbox[key] = value
     if not filmbox_data:
         return filmbox
     if 'amg_id' in filmbox and not filmbox['amg_id'].isdigit():
