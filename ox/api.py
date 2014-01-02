@@ -7,6 +7,7 @@ import cookielib
 import gzip
 import StringIO
 import urllib2
+from types import MethodType
 
 from . import __version__
 from .utils import json
@@ -15,9 +16,7 @@ from .form import MultiPartForm
 __all__ = ['getAPI', 'API']
 
 def getAPI(url, cj=None):
-    class A(API):
-        pass
-    return A(url, cj)
+    return API(url, cj)
 
 class API(object):
     __version__ = __version__
@@ -46,7 +45,7 @@ class API(object):
     def _add_method(self, method, name):
         if name is None:
             name = method.func_name
-        setattr(self.__class__, name, method)
+        setattr(self, name, MethodType(method, self, type(self)))
 
     def _add_action(self, action):
         def method(self, *args, **kw):
