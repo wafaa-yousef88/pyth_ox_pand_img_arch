@@ -19,7 +19,7 @@ EXTENSIONS = {
         'aac', 'flac', 'm4a', 'mp3', 'oga', 'ogg', 'wav', 'wma'
     ],
     'image': [
-        'bmp', 'gif', 'jpeg', 'jpg', 'png', 'svg', 'webp'
+        'bmp', 'gif', 'jpeg', 'jpg', 'png', 'svg', 'webp', 'cr2', 'nef'
     ],
     'subtitle': [
         'idx', 'srt', 'sub'
@@ -150,14 +150,9 @@ def avinfo(filename, cached=True):
     if cached:
         return cache(filename, 'info')
     if os.path.getsize(filename):
-        ffmpeg2theora = cmd('ffmpeg2theora')
-        p = subprocess.Popen([ffmpeg2theora], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        info, error = p.communicate()
-        version = info.split('\n')[0].split(' - ')[0].split(' ')[-1]
-        if version < '0.27':
-            raise EnvironmentError('version of ffmpeg2theora needs to be 0.27 or later, found %s' % version)
-        p = subprocess.Popen([ffmpeg2theora, '--info', filename],
-                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        #ffmpeg2theora = cmd('ffmpeg2theora')
+        identify = cmd('adef_identify')
+        p = subprocess.Popen([identify, filename], stdout=subprocess.PIPE, stderr=subprocess.PIPE)                             
         info, error = p.communicate()
         try:
             info = json.loads(info)
@@ -165,9 +160,9 @@ def avinfo(filename, cached=True):
             #remove metadata, can be broken
             reg = re.compile('"metadata": {.*?},', re.DOTALL)
             info = re.sub(reg, '', info)
-            info = json.loads(info)
-        if 'video' in info:
-            for v in info['video']:
+            info = json.loads(info, strict=False)            
+        if 'image' in info:
+            for v in info['image']:
                 if not 'display_aspect_ratio' in v and 'width' in v:
                     v['display_aspect_ratio'] = '%d:%d' % (v['width'], v['height'])
                     v['pixel_aspect_ratio'] = '1:1'
